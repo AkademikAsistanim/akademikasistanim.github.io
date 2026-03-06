@@ -695,11 +695,11 @@
                 // Başarılı olursa onAuthStateChanged tetiklenir ve loadUserData çalışır.
             } catch(e) {
                 showLoading(false);
-                let msg = "Hata: " + e.message; // Debugging için tam hatayı gösterelim
+                let msg = "Hata: " + e.message; 
                 if(e.code === 'auth/invalid-credential') msg = "E-posta veya şifre hatalı.";
                 if(e.code === 'auth/email-already-in-use') msg = "Bu e-posta zaten kullanımda.";
                 if(e.code === 'auth/weak-password') msg = "Şifre çok zayıf. En az 6 karakter girin.";
-                if(e.code === 'auth/operation-not-allowed') msg = "Firebase'de Email girişi aktif değil! (Authentication menüsünden açın)";
+                if(e.code === 'auth/operation-not-allowed') msg = "Hata: E-posta ile giriş Firebase'de kapalı! Lütfen Firebase Authentication menüsünden Email seçeneğini etkinleştirin.";
                 
                 errorEl.innerText = msg;
                 errorEl.classList.remove('hidden');
@@ -724,6 +724,7 @@
                 let msg = "Hata: " + e.message;
                 if(e.code === 'auth/popup-closed-by-user') msg = "Giriş işlemi iptal edildi.";
                 if(e.code === 'auth/operation-not-allowed') msg = "Firebase'de Google girişi aktif değil!";
+                if(e.code === 'auth/unauthorized-domain') msg = "Hata: Bu web sitesi Firebase'de izinli değil. Lütfen Firebase Console > Authentication > Settings > Authorized domains bölümüne gidin ve şu anki web adresinizi listeye ekleyin.";
                 
                 errorEl.innerText = msg;
                 errorEl.classList.remove('hidden');
