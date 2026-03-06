@@ -9,22 +9,25 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@700&display=swap');
 
-        /* Tema Parlaklık Filtresi için Değişken */
-        :root {
-            --theme-brightness: 1; 
-        }
-
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             margin: 0; padding: 0; overflow-x: hidden; min-height: 100vh;
             transition: background 0.5s ease, color 0.5s ease;
         }
 
-        /* Uygulama genelinde parlaklık filtresi */
         .theme-container {
-            filter: brightness(var(--theme-brightness));
             min-height: 100vh;
-            transition: filter 0.3s ease;
+        }
+
+        /* --- PARLAKLIK KATMANI (Tam Ekran Hatalarını Önler) --- */
+        #brightness-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 9999990; /* En üstün bir altı */
+            background-color: black;
+            opacity: 0;
+            transition: opacity 0.3s ease, background-color 0.3s ease;
         }
 
         /* --- 1. SİNEMATİK ARKA PLAN (Doğa Teması) --- */
@@ -176,7 +179,7 @@
         .glow-animate { animation: textGlow 2s infinite alternate; }
         @keyframes textGlow { from { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; opacity: 0.8;} to { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor; opacity: 1;} }
 
-        /* --- POMODORO TAM EKRAN MODU --- */
+        /* --- POMODORO TAM EKRAN MODU DÜZELTMESİ --- */
         .pomo-fs-mode {
             position: fixed !important;
             top: 0 !important;
@@ -190,6 +193,8 @@
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
+            transform: none !important; /* Tarayıcı hatasını engeller */
+            filter: none !important; /* Tarayıcı hatasını engeller */
         }
         .pomo-fs-mode .mod-header,
         .pomo-fs-mode .pomo-history,
@@ -270,6 +275,7 @@
     </style>
 </head>
 <body class="theme-light">
+<div id="brightness-overlay"></div>
 <div class="theme-container">
     
     <!-- YÜKLEME EKRANI -->
@@ -523,7 +529,18 @@
 
         window.changeThemeBrightness = function(value) {
             state.themeBrightness = value;
-            document.documentElement.style.setProperty('--theme-brightness', value);
+            const overlay = document.getElementById('brightness-overlay');
+            if (overlay) {
+                if (value < 1) {
+                    overlay.style.backgroundColor = 'black';
+                    overlay.style.opacity = 1 - value;
+                } else if (value > 1) {
+                    overlay.style.backgroundColor = 'white';
+                    overlay.style.opacity = (value - 1) * 0.5;
+                } else {
+                    overlay.style.opacity = 0;
+                }
+            }
             window.saveDataToCloud();
         }
 
@@ -651,6 +668,19 @@
                 state.activeModules.push(mod); 
                 window.renderAvailableModules(); 
                 window.renderDashboard(); 
+                window.saveDataToCloud();
+            }
+        }
+
+        window.removeActiveModule = function(modId) {
+            if(confirm("Bu modülü çalışma alanından kaldırmak istediğinize emin misiniz? (Daha sonra ayarlardan tekrar ekleyebilirsiniz)")) {
+                state.activeModules = state.activeModules.filter(m => m.id !== modId);
+                const baseMod = state.modules.find(m => m.id === modId);
+                if(baseMod) baseMod.selected = false;
+
+                window.renderDashboard();
+                window.renderAvailableModules(); 
+                window.closePanel();
                 window.saveDataToCloud();
             }
         }
@@ -865,7 +895,7 @@
             
             let html = '<div class="flex justify-between items-center mb-4 border-b border-black/10 pb-3">';
             html += '<h3 class="text-base font-black opacity-80 uppercase tracking-widest flex items-center gap-2">⏳ ' + state.calendar.title + '</h3>';
-            html += '<button onclick="openUnifiedPanel(\'header_calendar\')" class="text-xs bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg hover:bg-indigo-200 font-bold transition shadow-sm">⚙️ Ayarlar</button>';
+            html += '<button onclick="openUnifiedPanel(\'header_calendar\')" class="text-xl bg-indigo-100 text-indigo-700 w-10 h-10 flex items-center justify-center rounded-lg hover:bg-indigo-200 transition shadow-sm" title="Ayarlar">⚙️</button>';
             html += '</div><div class="space-y-3">';
             
             if(data.length === 0) { 
@@ -989,21 +1019,51 @@
             return html;
         }
 
+        window.inlineUpdateInterview = function(modId, index, field, value) {
+            const mod = state.activeModules.find(m => m.id === modId);
+            if(mod && mod.data[index]) {
+                mod.data[index][field] = value;
+                window.saveDataToCloud();
+            }
+        }
+        
+        window.inlineAddInterview = function(modId) {
+            const mod = state.activeModules.find(m => m.id === modId);
+            if(mod) {
+                mod.data.push({code:'YENİ', name:'', interviewed:false, consent:false, transcribed:false});
+                window.renderDashboard();
+                window.saveDataToCloud();
+            }
+        }
+        
+        window.inlineDeleteInterview = function(modId, index) {
+            if(confirm('Bu kaydı silmek istediğinize emin misiniz?')) {
+                const mod = state.activeModules.find(m => m.id === modId);
+                if(mod && mod.data[index]) {
+                    mod.data.splice(index, 1);
+                    window.renderDashboard();
+                    window.saveDataToCloud();
+                }
+            }
+        }
+
         window.renderInterviews = function(mod) {
             let html = '<div class="overflow-x-auto mt-4"><table class="w-full text-left text-sm whitespace-nowrap">';
-            html += '<thead class="bg-black/5 uppercase text-[10px] font-black tracking-widest border-b border-black/10"><tr><th class="px-4 py-3">' + mod.columns.code + '</th><th class="px-4 py-3">' + mod.columns.name + '</th><th class="px-4 py-3 text-center">' + mod.columns.bool1 + '</th><th class="px-4 py-3 text-center">' + mod.columns.bool2 + '</th><th class="px-4 py-3 text-center">' + mod.columns.bool3 + '</th><th class="px-4 py-3"></th></tr></thead>';
+            html += '<thead class="bg-black/5 uppercase text-[10px] font-black tracking-widest border-b border-black/10"><tr><th class="px-4 py-3">' + mod.columns.code + '</th><th class="px-4 py-3 w-full">' + mod.columns.name + '</th><th class="px-4 py-3 text-center">' + mod.columns.bool1 + '</th><th class="px-4 py-3 text-center">' + mod.columns.bool2 + '</th><th class="px-4 py-3 text-center">' + mod.columns.bool3 + '</th><th class="px-4 py-3 text-center">İşlem</th></tr></thead>';
             html += '<tbody class="divide-y divide-black/5">';
             
             mod.data.forEach((d, i) => {
                 html += '<tr class="hover:bg-black/5 transition group">';
-                html += '<td class="px-4 py-3 font-black text-indigo-600 text-xs">' + d.code + '</td>';
-                html += '<td class="px-4 py-3 font-bold">' + d.name + '</td>';
-                html += '<td class="px-4 py-3 text-center">' + (d.interviewed ? '✅' : '❌') + '</td>';
-                html += '<td class="px-4 py-3 text-center">' + (d.consent ? '✅' : '❌') + '</td>';
-                html += '<td class="px-4 py-3 text-center">' + (d.transcribed ? '✅' : '⏳') + '</td>';
-                html += '<td class="px-4 py-3 text-right opacity-0 group-hover:opacity-100 transition"><button onclick="openUnifiedPanel(\'' + mod.id + '\')" class="text-indigo-600 font-bold text-[10px]">DÜZENLE</button></td>';
+                html += '<td class="px-4 py-3"><input type="text" class="bg-transparent font-black text-indigo-600 text-xs w-16 border-b border-transparent hover:border-black/20 focus:border-indigo-500 outline-none transition-colors" value="' + d.code + '" onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'code\', this.value)"></td>';
+                html += '<td class="px-4 py-3"><input type="text" class="bg-transparent font-bold w-full min-w-[150px] border-b border-transparent hover:border-black/20 focus:border-indigo-500 outline-none transition-colors" value="' + d.name + '" placeholder="İsim Girin" onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'name\', this.value)"></td>';
+                html += '<td class="px-4 py-3 text-center"><input type="checkbox" class="w-4 h-4 accent-indigo-600 cursor-pointer" ' + (d.interviewed ? 'checked' : '') + ' onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'interviewed\', this.checked)"></td>';
+                html += '<td class="px-4 py-3 text-center"><input type="checkbox" class="w-4 h-4 accent-indigo-600 cursor-pointer" ' + (d.consent ? 'checked' : '') + ' onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'consent\', this.checked)"></td>';
+                html += '<td class="px-4 py-3 text-center"><input type="checkbox" class="w-4 h-4 accent-indigo-600 cursor-pointer" ' + (d.transcribed ? 'checked' : '') + ' onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'transcribed\', this.checked)"></td>';
+                html += '<td class="px-4 py-3 text-center opacity-0 group-hover:opacity-100 transition"><button onclick="window.inlineDeleteInterview(\'' + mod.id + '\', ' + i + ')" class="text-red-500 font-bold text-[10px] bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition shadow-sm">SİL</button></td>';
                 html += '</tr>';
             });
+            
+            html += '<tr><td colspan="6" class="px-4 py-4 text-center border-t border-black/10"><button onclick="window.inlineAddInterview(\'' + mod.id + '\')" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-6 py-2.5 rounded-xl hover:bg-indigo-100 transition shadow-sm inline-flex items-center gap-2">+ Yeni Görüşme Ekle</button></td></tr>';
             html += '</tbody></table></div>';
             return html;
         }
@@ -1077,7 +1137,7 @@
                 const titleHtml = '<h2 class="text-xl md:text-2xl font-black uppercase tracking-tight opacity-80 flex items-center gap-2">' + mod.icon + ' ' + mod.title + '</h2>';
 
                 let controlsHtml = '<div class="flex items-center gap-2">';
-                controlsHtml += '<button onclick="openUnifiedPanel(\'' + mod.id + '\')" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-200 transition z-20 relative shadow-sm flex items-center gap-1">⚙️ <span class="hidden sm:inline">Ayarlar</span></button>';
+                controlsHtml += '<button onclick="openUnifiedPanel(\'' + mod.id + '\')" class="text-xl bg-indigo-100 text-indigo-700 w-10 h-10 flex items-center justify-center rounded-lg hover:bg-indigo-200 transition z-20 relative shadow-sm" title="Ayarlar">⚙️</button>';
                 controlsHtml += '</div>';
 
                 const div = document.createElement('div');
@@ -1187,17 +1247,31 @@
                 html += '</div></div>';
             }
 
-            if (['calendar', 'stats', 'tasks', 'contacts', 'interviews'].includes(mod.type)) {
+            // Süreç Takibi (interviews) artık doğrudan düzenlendiği için bu panelde "İçerik Verileri" kısmını göstermiyoruz. 
+            // Daha temiz bir görünüm sağlıyor.
+            if (['calendar', 'stats', 'tasks', 'contacts'].includes(mod.type)) {
                 html += '<div id="panel-data-container"></div>';
+            } else if (mod.type === 'interviews') {
+                html += '<div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-sm font-bold text-indigo-700 opacity-80 text-center">💡 Mülakat/Süreç verilerini doğrudan ana ekrandaki tablo üzerinden düzenleyebilirsiniz.</div>';
             }
 
             container.innerHTML = html;
 
-            if (['calendar', 'stats', 'tasks', 'contacts', 'interviews'].includes(mod.type)) {
+            if (['calendar', 'stats', 'tasks', 'contacts'].includes(mod.type)) {
                 window.renderPanelDataRows(mod.type);
             }
 
+            // Footer (Kaydet ve Sil Butonları)
             document.getElementById('panel-footer-btn').style.display = 'block';
+            let isHeaderCal = state.editingModuleId === 'header_calendar';
+            let footerHtml = '';
+            
+            if (!isHeaderCal) {
+                footerHtml += '<button onclick="window.removeActiveModule(\'' + mod.id + '\')" class="bg-red-100 text-red-600 w-16 rounded-xl font-bold text-2xl shadow hover:bg-red-200 transition flex items-center justify-center" title="Bu Modülü Çalışma Alanından Kaldır">🗑️</button>';
+            }
+            footerHtml += '<button onclick="savePanel()" class="btn-primary shadow-lg !py-4 text-lg flex-1">Tüm Değişiklikleri Kaydet</button>';
+            
+            document.getElementById('panel-footer-btn').innerHTML = '<div class="flex gap-3">' + footerHtml + '</div>';
 
             document.getElementById('panel-backdrop').classList.replace('hidden', 'block');
             setTimeout(() => { document.getElementById('panel-backdrop').classList.replace('opacity-0', 'opacity-100'); }, 10);
@@ -1272,20 +1346,6 @@
                     html += '<input type="text" class="custom-input !py-1 !text-xs" value="' + (row.note||'') + '" placeholder="Not" onchange="updateTemp(' + i + ', \'note\', this.value)">';
                     html += '</div></div></div>';
                 }
-                else if(type === 'interviews') {
-                    html += '<div class="panel-row">';
-                    html += '<button onclick="removePanelRow(' + i + ', \'' + type + '\')" class="absolute top-2 right-2 text-red-500 font-bold text-xs hover:text-red-700">SİL</button>';
-                    html += '<div class="space-y-2 mt-2">';
-                    html += '<div class="flex gap-2">';
-                    html += '<input type="text" class="custom-input !py-1 w-20 font-black text-indigo-600 text-xs" value="' + row.code + '" placeholder="KOD" onchange="updateTemp(' + i + ', \'code\', this.value)">';
-                    html += '<input type="text" class="custom-input !py-1 flex-1 font-bold" value="' + row.name + '" placeholder="İsim" onchange="updateTemp(' + i + ', \'name\', this.value)">';
-                    html += '</div>';
-                    html += '<div class="flex gap-4 text-xs font-bold mt-2">';
-                    html += '<label><input type="checkbox" ' + (row.interviewed?'checked':'') + ' onchange="updateTemp(' + i + ', \'interviewed\', this.checked)"> Görüşme</label>';
-                    html += '<label><input type="checkbox" ' + (row.consent?'checked':'') + ' onchange="updateTemp(' + i + ', \'consent\', this.checked)"> Onam</label>';
-                    html += '<label><input type="checkbox" ' + (row.transcribed?'checked':'') + ' onchange="updateTemp(' + i + ', \'transcribed\', this.checked)"> Metin</label>';
-                    html += '</div></div></div>';
-                }
             });
             container.innerHTML = html;
         }
@@ -1300,7 +1360,6 @@
             if(type==='stats') tempEditData.push({title:'Yeni Kategori', completed:0, total:5, emoji:'📊'});
             if(type==='tasks') tempEditData.push({task:'Yeni Görev', progress:0, status:'Yapılmadı', note:''});
             if(type==='contacts') tempEditData.push({name:'Yeni Kişi', role:'', contact:'', ref:'', note:''});
-            if(type==='interviews') tempEditData.push({code:'YENİ', name:'', interviewed:false, consent:false, transcribed:false});
             window.renderPanelDataRows(type);
         }
 
@@ -1316,7 +1375,8 @@
             if(mod) {
                 mod.title = tempEditTitle;
                 if(mod.columns) mod.columns = JSON.parse(JSON.stringify(tempEditColumns));
-                if(['calendar', 'stats', 'tasks', 'contacts', 'interviews'].includes(mod.type)) mod.data = JSON.parse(JSON.stringify(tempEditData));
+                // Süreç takibi hariç tutuldu çünkü o artık direkt satır içinden kaydediliyor.
+                if(['calendar', 'stats', 'tasks', 'contacts'].includes(mod.type)) mod.data = JSON.parse(JSON.stringify(tempEditData));
                 
                 if (mod.type === 'pomodoro' && !pomoState.isRunning) {
                     pomoState.timeLeft = mod.columns.work * 60;
@@ -1326,7 +1386,7 @@
                 else window.renderDashboard();
                 
                 window.closePanel();
-                window.saveDataToCloud(); // Değişiklikleri buluta gönder
+                window.saveDataToCloud(); 
             }
         }
 
