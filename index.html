@@ -496,6 +496,7 @@
     <!-- FIREBASE IMPORT VE ENTEGRASYONU -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -580,22 +581,23 @@
                 });
             } catch(e) { 
                 console.error("Firebase başlatılamadı:", e); 
-                alert("Veritabanı bağlantı hatası. Lütfen konsolu kontrol edin.");
             }
         });
 
-        // Üyeye Ait Veriyi Firestore'dan Çekme
+        // Üyeye Ait Veriyi Firestore'dan Çekme (DÜZELTİLDİ: ASLA KİLİTLENMEYECEK)
         async function loadUserData() {
-            showLoading(true, "Verileriniz Yükleniyor...");
+            showLoading(true, "Profiliniz Hazırlanıyor...");
             if (db && currentUser) {
+                const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'data', 'profile');
+                
                 try {
-                    // YOLUN UZUNLUĞU TAM OLARAK 6 SEGMENT (Sorunsuz Çalışacak)
-                    const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'data', 'profile');
+                    // Maksimum 4 saniye bekle, yoksa pes et ve içeri al! (Kilitlenmeyi önler)
+                    const fetchPromise = getDoc(userDocRef);
+                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Zaman asimi")), 4000));
                     
-                    // Önce veriyi bir kere çekmeyi deneyelim
-                    const docSnap = await getDoc(userDocRef);
+                    const docSnap = await Promise.race([fetchPromise, timeoutPromise]);
                     
-                    if (docSnap.exists()) {
+                    if (docSnap && docSnap.exists()) {
                         // Veritabanında veri varsa State'e kopyala
                         const savedData = docSnap.data();
                         
@@ -605,7 +607,7 @@
                         state.projectColor = savedData.projectColor || '#4f46e5';
                         state.calendar = savedData.calendar || state.calendar;
                         state.activeModules = savedData.activeModules || [];
-                        state.modules = savedData.modules || state.modules; // Tüm modül ayarlarını da al
+                        state.modules = savedData.modules || state.modules; 
 
                         // UI'ı güncelle
                         document.body.className = state.theme + ' dashboard-active';
@@ -615,32 +617,21 @@
                         window.renderDashboard();
                         
                         showLoading(false);
-                        window.nextScreen('screen-dashboard'); // Direkt dashboarda git
+                        window.nextScreen('screen-dashboard');
                     } else {
-                        // Yeni kullanıcı, veritabanı boş, kurulum ekranına gönder
+                        // Yeni kullanıcı
                         showLoading(false);
                         window.nextScreen('screen-theme');
                     }
                     
-                    // Arka planda dinlemeye devam et
+                    // Arka planda dinlemeye devam et (Hata verirse sessizce yoksay)
                     if(unsubscribeUserDoc) unsubscribeUserDoc();
-                    unsubscribeUserDoc = onSnapshot(userDocRef, () => {}, (err) => console.error("Snapshot hatası:", err));
+                    unsubscribeUserDoc = onSnapshot(userDocRef, () => {}, (err) => console.warn("Snapshot hatası:", err));
 
                 } catch (error) {
-                    console.error("Veri çekme hatası:", error);
+                    console.warn("Bulut verisi çekilemedi (Offline/Engellendi). Sisteme giriliyor...", error);
+                    // HATA OLSA BİLE KULLANICIYI İÇERİ AL (Asla ekranda takılmaz)
                     showLoading(false);
-                    
-                    // DAHA AKILLI HATA MESAJLARI
-                    let extraMsg = "";
-                    if (error.message.includes("offline")) {
-                        extraMsg = "\n\n⚠️ DİKKAT: Tarayıcınızdaki Reklam Engelleyici (AdBlock, uBlock, Brave Shields vb.) veritabanı bağlantısını engelliyor. Lütfen bu site için reklam engelleyiciyi kapatın veya Gizli Sekme'de deneyin.";
-                    } else if (error.message.includes("segments")) {
-                        extraMsg = "\n\n⚠️ Tarayıcınız eski hatalı kodu önbelleğe almış. Lütfen sayfayı CTRL + F5 yaparak zorla yenileyin.";
-                    }
-                    
-                    alert("Veritabanına bağlanılamadı!\n\nHata Detayı: " + error.message + extraMsg);
-                    
-                    // Hata olsa bile sistemi deneyimleyebilmesi için yerel kuruluma at
                     window.nextScreen('screen-theme');
                 }
             } else {
@@ -649,11 +640,10 @@
             }
         }
 
-        // Değişiklikleri Veritabanına Kaydetme (Tüm State'i)
+        // Değişiklikleri Veritabanına Kaydetme
         window.saveDataToCloud = async function() {
             if (!db || !currentUser) return; 
             
-            // KAYIT EDERKEN DE AYNI 6 SEGMENTLİ YOL
             const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'data', 'profile');
             
             const dataToSave = {
@@ -668,10 +658,10 @@
             };
 
             try {
-                await setDoc(userDocRef, dataToSave, { merge: true });
-                console.log("Veri başarıyla buluta kaydedildi.");
+                // Arka planda kaydetmeyi dene, başarısız olursa uyarı verip can sıkma
+                setDoc(userDocRef, dataToSave, { merge: true }).catch(e => console.warn("Arka plan kayıt hatası:", e));
             } catch(e) {
-                console.error("Buluta kayıt hatası:", e);
+                // Sessiz hata
             }
         }
 
@@ -746,7 +736,7 @@
         window.handleLogout = async function() {
             if(confirm("Çıkış yapmak istediğinize emin misiniz?")) {
                 if(auth) await signOut(auth);
-                location.reload(); // Sayfayı yenile
+                location.reload(); 
             }
         }
 
@@ -792,7 +782,18 @@
 
         window.changeThemeBrightness = function(value) {
             state.themeBrightness = value;
-            document.documentElement.style.setProperty('--theme-brightness', value);
+            const overlay = document.getElementById('brightness-overlay');
+            if (overlay) {
+                if (value < 1) {
+                    overlay.style.backgroundColor = 'black';
+                    overlay.style.opacity = 1 - value;
+                } else if (value > 1) {
+                    overlay.style.backgroundColor = 'white';
+                    overlay.style.opacity = (value - 1) * 0.5;
+                } else {
+                    overlay.style.opacity = 0;
+                }
+            }
             window.saveDataToCloud();
         }
 
