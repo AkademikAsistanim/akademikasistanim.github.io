@@ -164,6 +164,9 @@
 
         .btn-primary { background: #6366f1; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
         .btn-primary:hover { background: #4f46e5; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); transform: translateY(-2px); }
+        
+        .btn-danger { background: #ef4444; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
+        .btn-danger:hover { background: #dc2626; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); transform: translateY(-2px); }
 
         .screen { display: none; opacity: 0; transition: opacity 0.5s ease-in-out; }
         .screen.active { display: flex; opacity: 1; }
@@ -256,305 +259,438 @@
         .dock-btn { font-size: 1.5rem; cursor: pointer; transition: transform 0.2s ease, filter 0.2s ease; background: transparent; border: none; padding: 0.25rem; display: flex; align-items: center; justify-content: center; }
         .dock-btn:hover { transform: scale(1.3) translateY(-3px); }
         .dock-divider { width: 1px; background: rgba(150, 150, 150, 0.3); height: 24px; }
+        
+        /* Modülleri ortalamak için flex sınıfı */
+        .flex-center-content { display: flex; flex-direction: column; justify-content: center; }
+
+        /* Fullscreen spinner */
+        #loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999999; display: none; align-items: center; justify-content: center; flex-direction: column; color: white; }
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 4px solid #fff; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 1rem; }
     </style>
 </head>
 <body class="theme-light">
-<div class="theme-container p-6">
+<div class="theme-container">
+    
+    <!-- YÜKLEME EKRANI -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p class="font-bold tracking-widest text-xs uppercase" id="loading-text">Yükleniyor...</p>
+    </div>
 
     <!-- ARKA PLANLAR -->
     <div class="cinematic-bg"><div class="hills"></div><div class="sun"></div></div>
     <div class="hp-bg"><div class="hp-lightning"></div><div class="hp-castle"></div><div class="hp-train"></div></div>
 
-    <!-- ADIM 1: GİRİŞ -->
-    <div id="screen-auth" class="screen active flex-col w-full max-w-md mx-auto mt-20 z-10">
-        <div class="glass-card p-8 shadow-2xl text-center">
-            <h1 class="text-3xl font-black mb-2 text-indigo-600">Akademik Asistan</h1>
-            <p class="text-sm opacity-70 mb-8">Kayıt olun veya giriş yapın.</p>
-            <div class="space-y-4">
-                <input type="email" class="custom-input" placeholder="E-posta Adresi">
-                <input type="password" class="custom-input" placeholder="Parola">
-                <button onclick="nextScreen('screen-theme')" class="btn-primary mt-4">Giriş Yap</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ADIM 2: TEMA SEÇİMİ (30 TEMA) -->
-    <div id="screen-theme" class="screen flex-col w-full max-w-6xl mx-auto mt-10 z-10">
-        <div class="text-center mb-6 glass-card p-6 shadow-lg"><h2 class="text-3xl font-black text-indigo-600">Konseptinizi Seçin</h2></div>
-        
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3 mb-6 text-xs h-[50vh] overflow-y-auto custom-scroll p-2" id="theme-selection-grid">
-            <!-- JS ile doldurulacak -->
-        </div>
-
-        <button onclick="nextScreen('screen-project')" class="btn-primary max-w-xs mx-auto">İleri</button>
-    </div>
-
-    <!-- ADIM 3: İSİM -->
-    <div id="screen-project" class="screen flex-col w-full max-w-md mx-auto mt-20 z-10">
-        <div class="glass-card p-8 shadow-xl text-center">
-            <h2 class="text-3xl font-black text-indigo-600 mb-4">Proje İsmi</h2>
-            <input type="text" id="project-name-input" class="custom-input text-center text-xl font-bold mb-6" value="Benim İzlencem">
-            <button onclick="saveProjectName()" class="btn-primary">İleri</button>
-        </div>
-    </div>
-
-    <!-- ADIM 4: MODÜL SEÇİMİ -->
-    <div id="screen-modules" class="screen flex-col w-full max-w-5xl mx-auto mt-10 z-10">
-        <div class="text-center mb-8 glass-card p-6 shadow-lg"><h2 class="text-3xl font-black text-indigo-600">Hangi Araçları Ekleyelim?</h2></div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8" id="module-selection-grid"></div>
-        <button onclick="finishSetup()" class="btn-primary max-w-xs mx-auto">Kurulumu Tamamla 🚀</button>
-    </div>
-
-    <!-- ADIM 5: DASHBOARD -->
-    <div id="screen-dashboard" class="screen flex-col w-full max-w-[1400px] mx-auto h-full py-8 z-10">
-        
-        <!-- HEADER -->
-        <header class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-stretch gap-6">
-            <!-- BAŞLIK & TEMA GÖRSELİ KARTI -->
-            <div class="glass-card p-8 flex-1 w-full shadow-sm flex flex-col justify-center relative overflow-hidden group">
-                <div id="header-theme-icon">✨</div>
-                <div class="flex items-center gap-4 relative z-10">
-                    <h1 id="dashboard-title" class="text-4xl md:text-5xl font-black tracking-tighter uppercase leading-tight drop-shadow-lg glow-animate"></h1>
+    <div class="p-6">
+        <!-- ADIM 1: GİRİŞ / KAYIT (Firebase ile Entegre) -->
+        <div id="screen-auth" class="screen active flex-col w-full max-w-md mx-auto mt-20 z-10">
+            <div class="glass-card p-8 shadow-2xl text-center">
+                <h1 class="text-4xl font-black mb-2 text-indigo-600 tracking-tighter">Akademik<span class="text-amber-500">Asistanım</span></h1>
+                <p class="text-sm opacity-70 mb-8 font-medium">Akademik planlama ve verimlilik platformu.</p>
+                
+                <div id="auth-error" class="text-red-500 text-xs font-bold mb-4 hidden bg-red-50 p-2 rounded"></div>
+                
+                <div class="space-y-4">
+                    <input type="email" id="auth-email" class="custom-input" placeholder="E-posta Adresi">
+                    <input type="password" id="auth-password" class="custom-input" placeholder="Parola">
+                    <button onclick="handleLogin()" class="btn-primary mt-4 py-3" id="btn-login">Giriş Yap</button>
+                    <div class="text-xs font-bold opacity-60 mt-4 cursor-pointer hover:opacity-100 transition" onclick="toggleAuthMode()" id="auth-mode-text">Hesabınız yok mu? Kayıt Olun.</div>
                 </div>
-                <p class="opacity-70 text-lg mt-2 font-semibold relative z-10">Stratejik İlerleme ve Veri Analizi</p>
             </div>
-            <!-- TAKVİM -->
-            <div id="header-calendar-container" class="glass-card p-6 shadow-sm w-full md:w-96 flex flex-col justify-center z-10"></div>
-        </header>
+        </div>
 
-        <!-- SÜRÜKLENEBİLİR MODÜL ALANI -->
-        <div id="dashboard-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 relative"></div>
-    </div>
-
-    <!-- SABİT KONTROL DOCK (Ayarlar, Düzenle, Çıkış) -->
-    <div id="global-dock">
-        <button class="dock-btn" onclick="openGlobalSettings()" title="Panel Ayarları">⚙️</button>
-        <div class="dock-divider"></div>
-        <button class="dock-btn" id="dock-edit-btn" onclick="toggleEditMode()" title="Düzenleme Modu">✏️</button>
-        <div class="dock-divider"></div>
-        <button class="dock-btn" onclick="location.reload()" title="Çıkış Yap">🚪</button>
-    </div>
-
-    <!-- GENEL AYARLAR MODALI -->
-    <div id="global-settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[9999] opacity-0 transition-opacity duration-300">
-        <div class="glass-card w-full max-w-4xl m-4 max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800">
-            <div class="p-6 border-b border-black/10 flex justify-between items-center bg-indigo-600 text-white">
-                <h3 class="text-xl font-black uppercase tracking-wider">⚙️ Panel Ayarları</h3>
-                <button onclick="closeGlobalSettings()" class="text-3xl hover:scale-110 transition">&times;</button>
-            </div>
+        <!-- ADIM 2: TEMA SEÇİMİ -->
+        <div id="screen-theme" class="screen flex-col w-full max-w-6xl mx-auto mt-10 z-10">
+            <div class="text-center mb-6 glass-card p-6 shadow-lg"><h2 class="text-3xl font-black text-indigo-600">Konseptinizi Seçin</h2></div>
             
-            <div class="flex border-b border-black/10 px-6 pt-2 bg-black/5 overflow-x-auto">
-                <button onclick="switchSettingsTab('tab-general')" id="btn-tab-general" class="settings-tab-btn active whitespace-nowrap">Genel Görünüm & Tema</button>
-                <button onclick="switchSettingsTab('tab-modules')" id="btn-tab-modules" class="settings-tab-btn whitespace-nowrap">Modül Ekle</button>
-                <button onclick="switchSettingsTab('tab-account')" id="btn-tab-account" class="settings-tab-btn whitespace-nowrap">Hesap & Güvenlik</button>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3 mb-6 text-xs h-[50vh] overflow-y-auto custom-scroll p-2" id="theme-selection-grid">
+                <!-- JS ile doldurulacak -->
             </div>
 
-            <div class="p-6 overflow-y-auto flex-1 custom-scroll">
-                <div id="tab-general" class="settings-tab-content active space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 ml-1">Proje Adı</label>
-                            <input type="text" id="settings-project-name" class="custom-input mt-1 font-bold text-lg" value="">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 ml-1">Başlık Rengi</label>
-                            <div class="mt-1 flex items-center gap-4">
-                                <input type="color" id="settings-project-color" class="w-12 h-12 rounded-xl cursor-pointer border-0 p-0 shadow-sm" value="">
-                                <span class="text-xs font-bold opacity-70">İzlence isminizin parlayan rengi</span>
+            <button onclick="nextScreen('screen-project')" class="btn-primary max-w-xs mx-auto">İleri</button>
+        </div>
+
+        <!-- ADIM 3: İSİM -->
+        <div id="screen-project" class="screen flex-col w-full max-w-md mx-auto mt-20 z-10">
+            <div class="glass-card p-8 shadow-xl text-center">
+                <h2 class="text-3xl font-black text-indigo-600 mb-4">Proje İsmi</h2>
+                <input type="text" id="project-name-input" class="custom-input text-center text-xl font-bold mb-6" value="Benim İzlencem">
+                <button onclick="saveProjectName()" class="btn-primary">İleri</button>
+            </div>
+        </div>
+
+        <!-- ADIM 4: MODÜL SEÇİMİ -->
+        <div id="screen-modules" class="screen flex-col w-full max-w-5xl mx-auto mt-10 z-10">
+            <div class="text-center mb-8 glass-card p-6 shadow-lg"><h2 class="text-3xl font-black text-indigo-600">Hangi Araçları Ekleyelim?</h2></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8" id="module-selection-grid"></div>
+            <button onclick="finishSetup()" class="btn-primary max-w-xs mx-auto">Kurulumu Tamamla 🚀</button>
+        </div>
+
+        <!-- ADIM 5: DASHBOARD -->
+        <div id="screen-dashboard" class="screen flex-col w-full max-w-[1400px] mx-auto h-full py-8 z-10">
+            
+            <!-- HEADER -->
+            <header class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-stretch gap-6">
+                <!-- BAŞLIK & TEMA GÖRSELİ KARTI -->
+                <div class="glass-card p-8 flex-1 w-full shadow-sm flex flex-col justify-center relative overflow-hidden group">
+                    <div id="header-theme-icon">✨</div>
+                    <div class="flex items-center gap-4 relative z-10">
+                        <h1 id="dashboard-title" class="text-4xl md:text-5xl font-black tracking-tighter uppercase leading-tight drop-shadow-lg glow-animate"></h1>
+                    </div>
+                    <p class="opacity-70 text-lg mt-2 font-semibold relative z-10">Stratejik İlerleme ve Veri Analizi</p>
+                </div>
+                <!-- TAKVİM -->
+                <div id="header-calendar-container" class="glass-card p-6 shadow-sm w-full md:w-96 flex flex-col justify-center z-10"></div>
+            </header>
+
+            <!-- SÜRÜKLENEBİLİR MODÜL ALANI -->
+            <div id="dashboard-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 relative"></div>
+        </div>
+
+        <!-- SABİT KONTROL DOCK (Ayarlar, Düzenle, Çıkış) -->
+        <div id="global-dock">
+            <button class="dock-btn" onclick="openGlobalSettings()" title="Panel Ayarları">⚙️</button>
+            <div class="dock-divider"></div>
+            <button class="dock-btn" id="dock-edit-btn" onclick="toggleEditMode()" title="Düzenleme Modu">✏️</button>
+            <div class="dock-divider"></div>
+            <button class="dock-btn" onclick="handleLogout()" title="Çıkış Yap">🚪</button>
+        </div>
+
+        <!-- GENEL AYARLAR MODALI -->
+        <div id="global-settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[9999] opacity-0 transition-opacity duration-300">
+            <div class="glass-card w-full max-w-4xl m-4 max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800">
+                <div class="p-6 border-b border-black/10 flex justify-between items-center bg-indigo-600 text-white">
+                    <h3 class="text-xl font-black uppercase tracking-wider">⚙️ Panel Ayarları</h3>
+                    <button onclick="closeGlobalSettings()" class="text-3xl hover:scale-110 transition">&times;</button>
+                </div>
+                
+                <div class="flex border-b border-black/10 px-6 pt-2 bg-black/5 overflow-x-auto">
+                    <button onclick="switchSettingsTab('tab-general')" id="btn-tab-general" class="settings-tab-btn active whitespace-nowrap">Genel Görünüm & Tema</button>
+                    <button onclick="switchSettingsTab('tab-modules')" id="btn-tab-modules" class="settings-tab-btn whitespace-nowrap">Modül Ekle</button>
+                    <button onclick="switchSettingsTab('tab-account')" id="btn-tab-account" class="settings-tab-btn whitespace-nowrap">Hesap & Güvenlik</button>
+                </div>
+
+                <div class="p-6 overflow-y-auto flex-1 custom-scroll">
+                    <div id="tab-general" class="settings-tab-content active space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 ml-1">Proje Adı</label>
+                                <input type="text" id="settings-project-name" class="custom-input mt-1 font-bold text-lg" value="">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 ml-1">Başlık Rengi</label>
+                                <div class="mt-1 flex items-center gap-4">
+                                    <input type="color" id="settings-project-color" class="w-12 h-12 rounded-xl cursor-pointer border-0 p-0 shadow-sm" value="">
+                                    <span class="text-xs font-bold opacity-70">İzlence isminizin parlayan rengi</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="border-t border-black/10 pt-6">
-                        <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 block mb-3 ml-1">Tema Parlaklığı</label>
-                        <div class="flex items-center gap-4">
-                            <span class="text-xl">🌘</span>
-                            <input type="range" id="settings-theme-brightness" min="0.5" max="1.5" step="0.1" value="1" oninput="changeThemeBrightness(this.value)" class="w-full cursor-pointer">
-                            <span class="text-xl">☀️</span>
+                        
+                        <div class="border-t border-black/10 pt-6">
+                            <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 block mb-3 ml-1">Tema Parlaklığı</label>
+                            <div class="flex items-center gap-4">
+                                <span class="text-xl">🌘</span>
+                                <input type="range" id="settings-theme-brightness" min="0.5" max="1.5" step="0.1" value="1" oninput="changeThemeBrightness(this.value)" class="w-full cursor-pointer">
+                                <span class="text-xl">☀️</span>
+                            </div>
+                            <p class="text-xs opacity-60 mt-2 ml-1">Seçtiğiniz temanın genel tonunu daha açık veya daha koyu yapın.</p>
                         </div>
-                        <p class="text-xs opacity-60 mt-2 ml-1">Seçtiğiniz temanın genel tonunu daha açık veya daha koyu yapın.</p>
-                    </div>
 
-                    <div class="border-t border-black/10 pt-6">
-                        <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 block mb-3 ml-1">Tema Değiştir (30 Konsept)</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 text-[10px] h-48 overflow-y-auto custom-scroll p-1" id="settings-theme-grid"></div>
-                    </div>
-                </div>
-
-                <div id="tab-modules" class="settings-tab-content">
-                    <p class="text-sm font-bold opacity-70 mb-4 bg-indigo-50 text-indigo-800 p-4 rounded-xl border border-indigo-100">Ekranınızda yer almayan araçları buradan bularak tekrar aktifleştirebilirsiniz.</p>
-                    <div id="settings-available-modules" class="space-y-3"></div>
-                </div>
-
-                <div id="tab-account" class="settings-tab-content space-y-6">
-                    <div class="bg-black/5 p-5 rounded-2xl border border-black/10">
-                        <h4 class="font-black text-sm mb-4 text-slate-700 dark:text-slate-200">🔒 Şifre Güncelleme</h4>
-                        <div class="space-y-3 max-w-sm">
-                            <input type="password" id="old-pass" class="custom-input !py-3 !text-sm" placeholder="Mevcut Şifre">
-                            <input type="password" id="new-pass" class="custom-input !py-3 !text-sm" placeholder="Yeni Şifre">
-                            <button onclick="updatePassword()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-xs shadow-lg hover:bg-indigo-700 transition w-full">Şifreyi Kaydet</button>
+                        <div class="border-t border-black/10 pt-6">
+                            <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 block mb-3 ml-1">Tema Değiştir (30 Konsept)</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 text-[10px] h-48 overflow-y-auto custom-scroll p-1" id="settings-theme-grid"></div>
                         </div>
                     </div>
-                    <div class="bg-amber-50 p-5 rounded-2xl border border-amber-200 text-amber-900">
-                        <h4 class="font-black text-sm mb-2 flex items-center gap-2">💬 Dilek & Şikayet</h4>
-                        <p class="text-xs mb-4 font-semibold opacity-80">Sistemde görmek istediğiniz özellikleri doğrudan yöneticiye bildirin.</p>
-                        <a href="mailto:admin@akademikizlence.com?subject=Platform Hakkında" class="inline-block bg-white text-amber-700 px-6 py-3 rounded-xl font-bold text-xs shadow-sm hover:shadow-md transition border border-amber-200">E-posta Uygulamasını Aç</a>
+
+                    <div id="tab-modules" class="settings-tab-content">
+                        <p class="text-sm font-bold opacity-70 mb-4 bg-indigo-50 text-indigo-800 p-4 rounded-xl border border-indigo-100">Ekranınızda yer almayan araçları buradan bularak tekrar aktifleştirebilirsiniz.</p>
+                        <div id="settings-available-modules" class="space-y-3"></div>
+                    </div>
+
+                    <div id="tab-account" class="settings-tab-content space-y-6">
+                        <div class="bg-black/5 p-5 rounded-2xl border border-black/10">
+                            <h4 class="font-black text-sm mb-4 text-slate-700 dark:text-slate-200">🔒 Şifre Güncelleme</h4>
+                            <div class="space-y-3 max-w-sm">
+                                <input type="password" id="old-pass" class="custom-input !py-3 !text-sm" placeholder="Mevcut Şifre">
+                                <input type="password" id="new-pass" class="custom-input !py-3 !text-sm" placeholder="Yeni Şifre">
+                                <button onclick="updatePassword()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-xs shadow-lg hover:bg-indigo-700 transition w-full">Şifreyi Kaydet</button>
+                            </div>
+                        </div>
+                        <div class="bg-amber-50 p-5 rounded-2xl border border-amber-200 text-amber-900">
+                            <h4 class="font-black text-sm mb-2 flex items-center gap-2">💬 Dilek & Şikayet</h4>
+                            <p class="text-xs mb-4 font-semibold opacity-80">Sistemde görmek istediğiniz özellikleri doğrudan yöneticiye bildirin.</p>
+                            <a href="mailto:admin@akademikizlence.com?subject=Platform Hakkında" class="inline-block bg-white text-amber-700 px-6 py-3 rounded-xl font-bold text-xs shadow-sm hover:shadow-md transition border border-amber-200">E-posta Uygulamasını Aç</a>
+                        </div>
                     </div>
                 </div>
+                
+                <div class="p-5 border-t border-black/10 bg-black/5 flex justify-end gap-3">
+                    <button onclick="closeGlobalSettings()" class="btn-primary !w-auto !bg-slate-400">İptal</button>
+                    <button onclick="saveGlobalSettings()" class="btn-primary !w-auto">Ayarları Uygula</button>
+                </div>
             </div>
-            
-            <div class="p-5 border-t border-black/10 bg-black/5 flex justify-end gap-3">
-                <button onclick="closeGlobalSettings()" class="btn-primary !w-auto !bg-slate-400">İptal</button>
-                <button onclick="saveGlobalSettings()" class="btn-primary !w-auto">Ayarları Uygula</button>
+        </div>
+
+        <!-- DUYURU DETAY MODALI -->
+        <div id="announcement-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[9999] opacity-0 transition-opacity duration-300">
+            <div class="glass-card w-full max-w-md m-4 p-8 shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800 border-t-4 border-indigo-500">
+                <button onclick="closeAnnouncement()" class="absolute top-4 right-4 text-3xl opacity-50 hover:opacity-100 transition">&times;</button>
+                <div class="text-[10px] font-black text-indigo-500 uppercase mb-2 flex items-center gap-2"><span class="text-lg">📢</span> <span id="ann-modal-date"></span></div>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-slate-100 mb-4 leading-tight" id="ann-modal-title"></h3>
+                <div class="text-sm font-medium opacity-80 space-y-3 leading-relaxed" id="ann-modal-content"></div>
+                <button onclick="closeAnnouncement()" class="btn-primary mt-8">Anladım, Kapat</button>
             </div>
         </div>
-    </div>
 
-    <!-- DUYURU DETAY MODALI -->
-    <div id="announcement-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[9999] opacity-0 transition-opacity duration-300">
-        <div class="glass-card w-full max-w-md m-4 p-8 shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800 border-t-4 border-indigo-500">
-            <button onclick="closeAnnouncement()" class="absolute top-4 right-4 text-3xl opacity-50 hover:opacity-100 transition">&times;</button>
-            <div class="text-[10px] font-black text-indigo-500 uppercase mb-2 flex items-center gap-2"><span class="text-lg">📢</span> <span id="ann-modal-date"></span></div>
-            <h3 class="text-2xl font-black text-slate-800 dark:text-slate-100 mb-4 leading-tight" id="ann-modal-title"></h3>
-            <div class="text-sm font-medium opacity-80 space-y-3 leading-relaxed" id="ann-modal-content"></div>
-            <button onclick="closeAnnouncement()" class="btn-primary mt-8">Anladım, Kapat</button>
-        </div>
-    </div>
-
-    <!-- BİRLEŞTİRİLMİŞ SAĞ PANEL -->
-    <div id="right-panel" class="fixed top-0 right-0 h-full w-full md:w-[450px] glass-card !rounded-none !border-y-0 !border-r-0 shadow-2xl flex flex-col">
-        <div class="p-6 border-b border-black/10 flex justify-between items-center bg-indigo-600 text-white">
-            <div>
-                <h3 id="panel-title" class="text-xl font-black uppercase tracking-wider">⚙️ Modül Ayarları</h3>
+        <!-- BİRLEŞTİRİLMİŞ SAĞ PANEL -->
+        <div id="right-panel" class="fixed top-0 right-0 h-full w-full md:w-[450px] glass-card !rounded-none !border-y-0 !border-r-0 shadow-2xl flex flex-col">
+            <div class="p-6 border-b border-black/10 flex justify-between items-center bg-indigo-600 text-white">
+                <div>
+                    <h3 id="panel-title" class="text-xl font-black uppercase tracking-wider">⚙️ Modül Ayarları</h3>
+                </div>
+                <button onclick="closePanel()" class="text-3xl hover:scale-110 transition">&times;</button>
             </div>
-            <button onclick="closePanel()" class="text-3xl hover:scale-110 transition">&times;</button>
+            <div id="panel-content" class="flex-1 overflow-y-auto p-6 space-y-6 custom-scroll"></div>
+            <div class="p-6 border-t border-black/10 bg-black/5" id="panel-footer-btn">
+                <button onclick="savePanel()" class="btn-primary shadow-lg !py-4 text-lg">Tüm Değişiklikleri Kaydet</button>
+            </div>
         </div>
-        <div id="panel-content" class="flex-1 overflow-y-auto p-6 space-y-6 custom-scroll"></div>
-        <div class="p-6 border-t border-black/10 bg-black/5" id="panel-footer-btn">
-            <button onclick="savePanel()" class="btn-primary shadow-lg !py-4 text-lg">Tüm Değişiklikleri Kaydet</button>
-        </div>
-    </div>
-    <div id="panel-backdrop" onclick="closePanel()" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity"></div>
-
+        <div id="panel-backdrop" onclick="closePanel()" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity"></div>
+    </div> <!-- Padding End -->
 </div> <!-- Container End -->
 
-    <script>
-        const EMOJI_LIST = ['📌', '⏳', '🎓', '📚', '📊', '🔍', '✍️', '💡', '🚀', '🎯', '🔥', '🏆', '📝', '📅', '🧠', '⚙️', '📈', '🗣️', '💻', '☕', '👨‍🍳', '⚕️', '🏛️'];
+    <!-- FIREBASE IMPORT VE ENTEGRASYONU -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // SİZİN FIREBASE KONFİGÜRASYONUNUZ
+        const firebaseConfig = {
+          apiKey: "AIzaSyDoh8mOTAK7o61a5O0Q_2wg83OXWrqVYDo",
+          authDomain: "akademik-asistanim.firebaseapp.com",
+          projectId: "akademik-asistanim",
+          storageBucket: "akademik-asistanim.firebasestorage.app",
+          messagingSenderId: "751319130769",
+          appId: "1:751319130769:web:b0e31ed38df09541439530",
+          measurementId: "G-FT1XNHRV24"
+        };
+
+        // Uygulamanızı tanımlayan bir ID (Kullanıcı verileri bu yolla ayırt edilecek)
+        const myAppId = 'akademik-asistanim-app';
+
+        // Global Değişkenler
+        let db, auth, analytics;
+        let currentUser = null;
+        let unsubscribeUserDoc = null;
         
-        // --- 30 TEMA LİSTESİ ---
+        const EMOJI_LIST = ['📌', '⏳', '🎓', '📚', '📊', '🔍', '✍️', '💡', '🚀', '🎯', '🔥', '🏆', '📝', '📅', '🧠', '⚙️', '📈', '🗣️', '💻', '☕', '👨‍🍳', '⚕️', '🏛️'];
         const ALL_THEMES = [
-            { id: 'theme-light', name: 'Aydınlık', icon: '✨' },
-            { id: 'theme-dark', name: 'Gece Modu', icon: '🌙' },
-            { id: 'theme-nature', name: 'Doğa', icon: '🍃' },
-            { id: 'theme-gastronomy', name: 'Gastronomi', icon: '👨‍🍳' },
-            { id: 'theme-politics', name: 'Siyaset', icon: '🏛️' },
-            { id: 'theme-engineering', name: 'Mühendislik', icon: '⚙️' },
-            { id: 'theme-history', name: 'Tarih', icon: '📜' },
-            { id: 'theme-math', name: 'Matematik', icon: '📐' },
-            { id: 'theme-health', name: 'Sağlık', icon: '⚕️' },
-            { id: 'theme-communication', name: 'İletişim', icon: '📡' },
-            { id: 'theme-cat', name: 'Kedicik', icon: '🐾' },
-            { id: 'theme-space', name: 'Uzay', icon: '🚀' },
-            { id: 'theme-coffee', name: 'Kahve', icon: '☕' },
-            { id: 'theme-gaming', name: 'Oyun', icon: '🎮' },
-            { id: 'theme-music', name: 'Müzik', icon: '🎵' },
-            { id: 'theme-botany', name: 'Botanik', icon: '🪴' },
-            { id: 'theme-ocean', name: 'Okyanus', icon: '🌊' },
-            { id: 'theme-art', name: 'Sanat', icon: '🎨' },
-            { id: 'theme-magic', name: 'Sihir', icon: '🪄' },
-            { id: 'theme-summer', name: 'Yaz', icon: '🏖️' },
-            { id: 'theme-harrypotter', name: 'Harry Potter', icon: '⚡' },
-            { id: 'theme-lotr', name: 'Yüzüklerin Ef.', icon: '💍' },
-            { id: 'theme-got', name: 'Game of Thrones', icon: '🐉' },
-            { id: 'theme-astrology', name: 'Astrologlar', icon: '🔮' },
-            { id: 'theme-bjk', name: 'Beşiktaş', icon: '🦅' },
-            { id: 'theme-gs', name: 'Galatasaray', icon: '🦁' },
-            { id: 'theme-fb', name: 'Fenerbahçe', icon: '🐦' },
-            { id: 'theme-nationalist', name: 'Milliyetçi', icon: '🐺' },
-            { id: 'theme-islamic', name: 'İslamcı', icon: '🌙' },
-            { id: 'theme-kemalist', name: 'Kemalist', icon: '🇹🇷' }
+            { id: 'theme-light', name: 'Aydınlık', icon: '✨' }, { id: 'theme-dark', name: 'Gece Modu', icon: '🌙' }, { id: 'theme-nature', name: 'Doğa', icon: '🍃' },
+            { id: 'theme-gastronomy', name: 'Gastronomi', icon: '👨‍🍳' }, { id: 'theme-politics', name: 'Siyaset', icon: '🏛️' }, { id: 'theme-engineering', name: 'Mühendislik', icon: '⚙️' },
+            { id: 'theme-history', name: 'Tarih', icon: '📜' }, { id: 'theme-math', name: 'Matematik', icon: '📐' }, { id: 'theme-health', name: 'Sağlık', icon: '⚕️' },
+            { id: 'theme-communication', name: 'İletişim', icon: '📡' }, { id: 'theme-cat', name: 'Kedicik', icon: '🐾' }, { id: 'theme-space', name: 'Uzay', icon: '🚀' },
+            { id: 'theme-coffee', name: 'Kahve', icon: '☕' }, { id: 'theme-gaming', name: 'Oyun', icon: '🎮' }, { id: 'theme-music', name: 'Müzik', icon: '🎵' },
+            { id: 'theme-botany', name: 'Botanik', icon: '🪴' }, { id: 'theme-ocean', name: 'Okyanus', icon: '🌊' }, { id: 'theme-art', name: 'Sanat', icon: '🎨' },
+            { id: 'theme-magic', name: 'Sihir', icon: '🪄' }, { id: 'theme-summer', name: 'Yaz', icon: '🏖️' }, { id: 'theme-harrypotter', name: 'Harry Potter', icon: '⚡' },
+            { id: 'theme-lotr', name: 'Yüzüklerin Ef.', icon: '💍' }, { id: 'theme-got', name: 'Game of Thrones', icon: '🐉' }, { id: 'theme-astrology', name: 'Astrologlar', icon: '🔮' },
+            { id: 'theme-bjk', name: 'Beşiktaş', icon: '🦅' }, { id: 'theme-gs', name: 'Galatasaray', icon: '🦁' }, { id: 'theme-fb', name: 'Fenerbahçe', icon: '🐦' },
+            { id: 'theme-nationalist', name: 'Milliyetçi', icon: '🐺' }, { id: 'theme-islamic', name: 'İslamcı', icon: '🌙' }, { id: 'theme-kemalist', name: 'Kemalist', icon: '🇹🇷' }
         ];
 
-        let pomoState = { timeLeft: 25*60, isRunning: false, mode: 'work', interval: null, isFinished: false, isFullScreen: false };
-
-        const state = {
+        // Varsayılan State (Yeni Üyeler İçin)
+        let state = {
             theme: 'theme-light',
-            themeBrightness: 1, // Varsayılan parlaklık
+            themeBrightness: 1,
             projectName: 'Benim İzlencem',
             projectColor: '#4f46e5',
             isEditMode: false,
             editingModuleId: null,
-            
             announcements: [
-                { id: 1, date: '04 Mart 2026', title: 'Hoş geldiniz! Sistem yenilendi.', content: 'Platform tamamen güncellendi. Yeni eklenen 30 Efsanevi Tema arasından seçiminizi yaptınız mı?<br><br>Pomodoro modülü ile odaklanmaya hemen başlayın.' },
-                { id: 2, date: '28 Şubat 2026', title: 'Mobil Uyum İyileştirmeleri', content: 'Tablet ve telefonlardan girişlerde yaşanan tüm tasarım sorunları giderildi. Platform hakkındaki görüşlerinizi "Hesap" sekmesinden bize iletebilirsiniz.' }
+                { id: 1, date: '04 Mart 2026', title: 'Hoş geldiniz! Sistem yenilendi.', content: 'Platform tamamen güncellendi. Yeni eklenen 30 Efsanevi Tema arasından seçiminizi yaptınız mı?' },
+                { id: 2, date: '28 Şubat 2026', title: 'Mobil Uyum İyileştirmeleri', content: 'Tablet ve telefonlardan girişlerde yaşanan tüm tasarım sorunları giderildi.' }
             ],
-
-            calendar: {
-                id: 'header_calendar', type: 'calendar', title: 'TAKVİM',
-                data: [ { label: 'Savunma Günü', targetDate: '2026-06-15', emoji: '🎓' }, { label: 'Tez Bitişi', targetDate: '2026-05-01', emoji: '📚' } ]
-            },
-
+            calendar: { id: 'header_calendar', type: 'calendar', title: 'TAKVİM', data: [ { label: 'Savunma Günü', targetDate: '2026-06-15', emoji: '🎓' }, { label: 'Tez Bitişi', targetDate: '2026-05-01', emoji: '📚' } ] },
             modules: [
-                {
-                    id: 'gorevler', type: 'tasks', selected: true, colSpan: 'lg:col-span-12',
-                    title: 'Akademik Görevler', icon: '✅',
-                    columns: { task: 'GÖREV', progress: 'İLERLEME', note: 'NOTLAR' },
-                    data: [
-                        { task: 'Literatür Taraması (Bölüm 2)', progress: 20, status: 'Yapılmadı', note: 'Kaynaklar toplanıyor' },
-                        { task: 'Anket Formu Tasarımı', progress: 100, status: 'Yapıldı', note: 'Hocaya iletildi' }
-                    ]
-                },
-                {
-                    id: 'genel_durum', type: 'stats', selected: true, colSpan: 'lg:col-span-8',
-                    title: 'Genel Durum & Ağ Dengesi', icon: '🕸️',
-                    data: [
-                        { title: 'Akademisyenler', completed: 11, total: 11, emoji: '🎓' },
-                        { title: 'Sivil Toplum', completed: 5, total: 6, emoji: '🌳' },
-                        { title: 'Bürokratlar', completed: 4, total: 4, emoji: '🕴️' },
-                        { title: 'Milletvekilleri', completed: 2, total: 6, emoji: '🏛️' }
-                    ]
-                },
-                {
-                    id: 'pomodoro', type: 'pomodoro', selected: true, colSpan: 'lg:col-span-4',
-                    title: 'Pomodoro Tekniği', icon: '🍅',
-                    columns: { work: 25, short: 5, long: 15 },
-                    data: []
-                },
-                {
-                    id: 'mulakatlar', type: 'interviews', selected: true, colSpan: 'lg:col-span-12',
-                    title: 'Süreç Takibi', icon: '🎙️',
-                    columns: { code: 'KOD', name: 'İSİM', bool1: 'GÖRÜŞME', bool2: 'ONAM', bool3: 'METİN' },
-                    data: [
-                        { code: 'AKA 1', name: 'Prof. Dr. Ahmet Yılmaz', interviewed: true, consent: true, transcribed: false },
-                        { code: 'SİV 1', name: 'Dernek Başkanı V.', interviewed: true, consent: false, transcribed: false }
-                    ]
-                },
-                {
-                    id: 'iletisim', type: 'contacts', selected: true, colSpan: 'lg:col-span-12',
-                    title: 'İletişim Rehberi', icon: '📞',
-                    columns: { name: 'AD SOYAD', role: 'ROL', contact: 'İLETİŞİM', ref: 'REFERANS', note: 'NOTLAR' },
-                    data: [
-                        { name: 'Ayşe Demir', role: 'Akademisyen', contact: 'ayse@uni.edu.tr', ref: 'Prof. Dr. X', note: 'Salı günleri müsaittir.' }
-                    ]
-                },
-                {
-                    id: 'gunluk', type: 'journal', selected: true, colSpan: 'lg:col-span-12',
-                    title: 'Günlük', icon: '📓',
-                    columns: { placeholder: 'Bugün neler yaptın?', btnText: 'Kaydet' },
-                    data: [
-                        { date: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'}), text: 'Sistemi kurdum ve yeni arayüz ile çalışmalarıma başladım!' }
-                    ]
-                }
+                { id: 'gorevler', type: 'tasks', selected: true, colSpan: 'lg:col-span-12', title: 'Akademik Görevler', icon: '✅', columns: { task: 'GÖREV', progress: 'İLERLEME', note: 'NOTLAR' }, data: [ { task: 'Literatür Taraması (Bölüm 2)', progress: 20, status: 'Yapılmadı', note: 'Kaynaklar toplanıyor' }, { task: 'Anket Formu Tasarımı', progress: 100, status: 'Yapıldı', note: 'Hocaya iletildi' } ] },
+                { id: 'genel_durum', type: 'stats', selected: true, colSpan: 'lg:col-span-8', title: 'Genel Durum & Ağ Dengesi', icon: '🕸️', data: [ { title: 'Akademisyenler', completed: 11, total: 11, emoji: '🎓' }, { title: 'Sivil Toplum', completed: 5, total: 6, emoji: '🌳' }, { title: 'Bürokratlar', completed: 4, total: 4, emoji: '🕴️' }, { title: 'Milletvekilleri', completed: 2, total: 6, emoji: '🏛️' } ] },
+                { id: 'pomodoro', type: 'pomodoro', selected: true, colSpan: 'lg:col-span-4', title: 'Pomodoro Tekniği', icon: '🍅', columns: { work: 25, short: 5, long: 15 }, data: [] },
+                { id: 'mulakatlar', type: 'interviews', selected: true, colSpan: 'lg:col-span-12', title: 'Süreç Takibi', icon: '🎙️', columns: { code: 'KOD', name: 'İSİM', bool1: 'GÖRÜŞME', bool2: 'ONAM', bool3: 'METİN' }, data: [ { code: 'AKA 1', name: 'Prof. Dr. Ahmet Yılmaz', interviewed: true, consent: true, transcribed: false }, { code: 'SİV 1', name: 'Dernek Başkanı V.', interviewed: true, consent: false, transcribed: false } ] },
+                { id: 'iletisim', type: 'contacts', selected: true, colSpan: 'lg:col-span-12', title: 'İletişim Rehberi', icon: '📞', columns: { name: 'AD SOYAD', role: 'ROL', contact: 'İLETİŞİM', ref: 'REFERANS', note: 'NOTLAR' }, data: [ { name: 'Ayşe Demir', role: 'Akademisyen', contact: 'ayse@uni.edu.tr', ref: 'Prof. Dr. X', note: 'Salı günleri müsaittir.' } ] },
+                { id: 'gunluk', type: 'journal', selected: true, colSpan: 'lg:col-span-12', title: 'Günlük', icon: '📓', columns: { placeholder: 'Bugün neler yaptın?', btnText: 'Kaydet' }, data: [ { date: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'}), text: 'Sistemi kurdum ve yeni arayüz ile çalışmalarıma başladım!' } ] }
             ],
             activeModules: []
         };
 
-        window.onload = function() {
-            renderInitialThemes();
-        };
+        let pomoState = { timeLeft: 25*60, isRunning: false, mode: 'work', interval: null, isFinished: false, isFullScreen: false };
 
-        function renderInitialThemes() {
+        // DOM Yüklenince Sadece Temaları Çiz ve Bekle
+        window.addEventListener('DOMContentLoaded', () => {
+            window.renderInitialThemes();
+            
+            try {
+                // SİZİN BİLGİLERİNİZLE FIREBASE'İ BAŞLATMA
+                const app = initializeApp(firebaseConfig);
+                analytics = getAnalytics(app);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Auth State Dinleyici
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUser = user;
+                        loadUserData(); // Kullanıcı giriş yaptıysa verilerini çek
+                    } else {
+                        currentUser = null;
+                        if(unsubscribeUserDoc) unsubscribeUserDoc();
+                        window.nextScreen('screen-auth'); // Kullanıcı yoksa login ekranına dön
+                    }
+                });
+            } catch(e) { 
+                console.error("Firebase başlatılamadı:", e); 
+                alert("Veritabanı bağlantı hatası. Lütfen konsolu kontrol edin.");
+            }
+        });
+
+        // Üyeye Ait Veriyi Firestore'dan Çekme
+        async function loadUserData() {
+            showLoading(true, "Verileriniz Yükleniyor...");
+            if (db && currentUser) {
+                const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'user_data');
+                
+                // Gerçek zamanlı dinleme
+                unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        // Veritabanında veri varsa State'e kopyala
+                        const savedData = docSnap.data();
+                        
+                        state.theme = savedData.theme || 'theme-light';
+                        state.themeBrightness = savedData.themeBrightness || 1;
+                        state.projectName = savedData.projectName || 'Benim İzlencem';
+                        state.projectColor = savedData.projectColor || '#4f46e5';
+                        state.calendar = savedData.calendar || state.calendar;
+                        state.activeModules = savedData.activeModules || [];
+                        state.modules = savedData.modules || state.modules; // Tüm modül ayarlarını da al
+
+                        // UI'ı güncelle
+                        document.body.className = state.theme + ' dashboard-active';
+                        window.changeThemeBrightness(state.themeBrightness);
+                        window.renderMainTitle();
+                        window.renderHeaderCalendar();
+                        window.renderDashboard();
+                        
+                        showLoading(false);
+                        window.nextScreen('screen-dashboard'); // Direkt dashboarda git
+                    } else {
+                        // Yeni kullanıcı, veritabanı boş, kurulum ekranına gönder
+                        showLoading(false);
+                        window.nextScreen('screen-theme');
+                    }
+                }, (error) => {
+                    console.error("Veri çekme hatası:", error);
+                    showLoading(false);
+                });
+            } else {
+                // Local Mode: Kurulum ekranına git
+                showLoading(false);
+                window.nextScreen('screen-theme');
+            }
+        }
+
+        // Değişiklikleri Veritabanına Kaydetme (Tüm State'i)
+        window.saveDataToCloud = async function() {
+            if (!db || !currentUser) return; // Veritabanı yoksa veya üye değilse çık
+            
+            const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'user_data');
+            
+            // Sadece Firestore'a kaydedilecek verileri filtrele (pomoState gibi geçici veriler gitmesin)
+            const dataToSave = {
+                theme: state.theme,
+                themeBrightness: state.themeBrightness,
+                projectName: state.projectName,
+                projectColor: state.projectColor,
+                calendar: state.calendar,
+                activeModules: state.activeModules,
+                modules: state.modules,
+                updatedAt: new Date().toISOString()
+            };
+
+            try {
+                await setDoc(userDocRef, dataToSave, { merge: true });
+                console.log("Veri başarıyla buluta kaydedildi.");
+            } catch(e) {
+                console.error("Buluta kayıt hatası:", e);
+            }
+        }
+
+        // Auth Mode Değiştirme (Login / Register)
+        let isLoginMode = true;
+        window.toggleAuthMode = function() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('btn-login').innerText = isLoginMode ? 'Giriş Yap' : 'Kayıt Ol';
+            document.getElementById('auth-mode-text').innerText = isLoginMode ? 'Hesabınız yok mu? Kayıt Olun.' : 'Zaten hesabınız var mı? Giriş Yapın.';
+            document.getElementById('auth-error').classList.add('hidden');
+        }
+
+        // Giriş veya Kayıt İşlemi
+        window.handleLogin = async function() {
+            if(!auth) return alert("Firebase entegre değil!");
+            const email = document.getElementById('auth-email').value.trim();
+            const pass = document.getElementById('auth-password').value.trim();
+            const errorEl = document.getElementById('auth-error');
+
+            if(!email || !pass) {
+                errorEl.innerText = "Lütfen tüm alanları doldurun.";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            showLoading(true, "İşlem yapılıyor...");
+            errorEl.classList.add('hidden');
+
+            try {
+                if(isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, pass);
+                }
+                // Başarılı olursa onAuthStateChanged tetiklenir ve loadUserData çalışır.
+            } catch(e) {
+                showLoading(false);
+                let msg = "Bir hata oluştu.";
+                if(e.code === 'auth/invalid-credential') msg = "E-posta veya şifre hatalı.";
+                if(e.code === 'auth/email-already-in-use') msg = "Bu e-posta zaten kullanımda.";
+                if(e.code === 'auth/weak-password') msg = "Şifre çok zayıf. En az 6 karakter girin.";
+                errorEl.innerText = msg;
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        // Çıkış İşlemi
+        window.handleLogout = async function() {
+            if(confirm("Çıkış yapmak istediğinize emin misiniz?")) {
+                if(auth) await signOut(auth);
+                location.reload(); // Sayfayı yenile
+            }
+        }
+
+        function showLoading(show, text="Yükleniyor...") {
+            const overlay = document.getElementById('loading-overlay');
+            if(show) {
+                document.getElementById('loading-text').innerText = text;
+                overlay.style.display = 'flex';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+
+        // ==========================================
+        // ESKİ FONKSİYONLARIN GÜNCELLENMİŞ HALLERİ (CLOUD KAYDI İÇERİR)
+        // Her veri değişiminden sonra `window.saveDataToCloud()` çağrılır.
+        // ==========================================
+
+        window.renderInitialThemes = function() {
             const grid = document.getElementById('theme-selection-grid');
             let html = '';
             ALL_THEMES.forEach(t => {
@@ -567,28 +703,30 @@
             grid.innerHTML = html;
         }
 
-        function nextScreen(targetId) {
+        window.nextScreen = function(targetId) {
             document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
             document.getElementById(targetId).classList.add('active');
         }
 
-        function selectTheme(themeName, element) {
+        window.selectTheme = function(themeName, element) {
             document.body.className = themeName;
             state.theme = themeName;
             if(element) {
-                renderInitialThemes(); 
+                window.renderInitialThemes(); 
             } else {
-                renderMainTitle(); 
-                renderDashboard();
+                window.renderMainTitle(); 
+                window.renderDashboard();
             }
+            window.saveDataToCloud();
         }
 
-        function changeThemeBrightness(value) {
+        window.changeThemeBrightness = function(value) {
             state.themeBrightness = value;
             document.documentElement.style.setProperty('--theme-brightness', value);
+            window.saveDataToCloud();
         }
 
-        function saveProjectName() {
+        window.saveProjectName = function() {
             const input = document.getElementById('project-name-input').value;
             if(input.trim() !== '') state.projectName = input;
             
@@ -601,25 +739,31 @@
                 html += '</div>';
             });
             document.getElementById('module-selection-grid').innerHTML = html;
-            nextScreen('screen-modules');
+            window.nextScreen('screen-modules');
         }
 
-        function toggleModuleSelection(index) { 
+        window.toggleModuleSelection = function(index) { 
             state.modules[index].selected = !state.modules[index].selected; 
-            saveProjectName(); 
+            window.saveProjectName(); 
         }
 
-        function finishSetup() {
+        window.finishSetup = function() {
+            showLoading(true, "Çalışma alanınız kuruluyor...");
             state.activeModules = state.modules.filter(m => m.selected);
             document.body.className = state.theme + ' dashboard-active';
-            renderMainTitle(); 
-            renderHeaderCalendar(); 
-            renderDashboard(); 
-            nextScreen('screen-dashboard'); 
-            window.scrollTo(0,0);
+            
+            // İlk kurulum verisini buluta kaydet
+            window.saveDataToCloud().then(() => {
+                window.renderMainTitle(); 
+                window.renderHeaderCalendar(); 
+                window.renderDashboard(); 
+                showLoading(false);
+                window.nextScreen('screen-dashboard'); 
+                window.scrollTo(0,0);
+            });
         }
 
-        function renderMainTitle() {
+        window.renderMainTitle = function() {
             const titleEl = document.getElementById('dashboard-title');
             titleEl.style.color = state.projectColor;
             
@@ -633,29 +777,26 @@
             document.getElementById('header-theme-icon').innerText = currentThemeObj ? currentThemeObj.icon : '✨';
         }
 
-        // --- DUYURU YÖNETİMİ ---
-        function openAnnouncement(id) {
+        window.openAnnouncement = function(id) {
             const ann = state.announcements.find(a => a.id === id);
             if(!ann) return;
             document.getElementById('ann-modal-date').innerText = ann.date;
             document.getElementById('ann-modal-title').innerText = ann.title;
             document.getElementById('ann-modal-content').innerHTML = ann.content;
-
             const modal = document.getElementById('announcement-modal');
             modal.classList.replace('hidden', 'flex');
             setTimeout(() => modal.classList.replace('opacity-0', 'opacity-100'), 10);
         }
-        function closeAnnouncement() {
+        window.closeAnnouncement = function() {
             const modal = document.getElementById('announcement-modal');
             modal.classList.replace('opacity-100', 'opacity-0');
             setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
         }
 
-        // --- AYARLAR MODALI ---
-        function openGlobalSettings() {
+        window.openGlobalSettings = function() {
             document.getElementById('settings-project-name').value = state.projectName;
             document.getElementById('settings-project-color').value = state.projectColor;
-            document.getElementById('settings-theme-brightness').value = state.themeBrightness;
+            document.getElementById('settings-theme-brightness').value = state.themeBrightness || 1;
             
             let html = '';
             ALL_THEMES.forEach(t => {
@@ -666,19 +807,19 @@
             });
             document.getElementById('settings-theme-grid').innerHTML = html;
 
-            renderAvailableModules();
+            window.renderAvailableModules();
             const modal = document.getElementById('global-settings-modal');
             modal.classList.replace('hidden', 'flex');
             setTimeout(() => modal.classList.replace('opacity-0', 'opacity-100'), 10);
         }
 
-        function closeGlobalSettings() {
+        window.closeGlobalSettings = function() {
             const modal = document.getElementById('global-settings-modal');
             modal.classList.replace('opacity-100', 'opacity-0');
             setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
         }
 
-        function switchSettingsTab(tabId) {
+        window.switchSettingsTab = function(tabId) {
             ['tab-general', 'tab-modules', 'tab-account'].forEach(id => { 
                 document.getElementById(id).classList.remove('active'); 
                 document.getElementById('btn-' + id).classList.remove('active'); 
@@ -687,7 +828,7 @@
             document.getElementById('btn-' + tabId).classList.add('active');
         }
 
-        function renderAvailableModules() {
+        window.renderAvailableModules = function() {
             const container = document.getElementById('settings-available-modules');
             const inactive = state.modules.filter(m => !state.activeModules.find(active => active.id === m.id));
             if(inactive.length === 0) { 
@@ -704,85 +845,88 @@
             container.innerHTML = html;
         }
 
-        function addModuleFromSettings(modId) {
+        window.addModuleFromSettings = function(modId) {
             const mod = state.modules.find(m => m.id === modId);
-            if(mod) { state.activeModules.push(mod); renderAvailableModules(); renderDashboard(); }
+            if(mod) { 
+                state.activeModules.push(mod); 
+                window.renderAvailableModules(); 
+                window.renderDashboard(); 
+                window.saveDataToCloud();
+            }
         }
 
-        function updatePassword() {
-            const newP = document.getElementById('new-pass').value;
-            if(newP.length < 4) { alert("Şifre çok kısa!"); return; }
-            alert("Şifreniz güncellendi."); document.getElementById('old-pass').value = ''; document.getElementById('new-pass').value = '';
-        }
-
-        function saveGlobalSettings() {
+        window.saveGlobalSettings = function() {
             const newName = document.getElementById('settings-project-name').value;
             if(newName.trim() !== '') state.projectName = newName;
             state.projectColor = document.getElementById('settings-project-color').value;
-            renderMainTitle(); closeGlobalSettings();
+            window.renderMainTitle(); 
+            window.closeGlobalSettings();
+            window.saveDataToCloud();
         }
 
-        // --- POMODORO SİSTEMİ ---
+        // Pomodoro Fonksiyonları
         function formatPomoTime(seconds) {
             const m = Math.floor(seconds / 60).toString().padStart(2, '0');
             const s = (seconds % 60).toString().padStart(2, '0');
             return m + ':' + s;
         }
 
-        function updatePomoDOM() {
+        window.updatePomoDOM = function() {
             const display = document.getElementById('pomo-time-display');
             if(display) display.innerText = formatPomoTime(pomoState.timeLeft);
         }
 
-        function tickPomo() {
+        window.tickPomo = function() {
             if(pomoState.timeLeft > 0) {
                 pomoState.timeLeft--;
-                updatePomoDOM();
+                window.updatePomoDOM();
             } else {
                 clearInterval(pomoState.interval);
                 pomoState.isRunning = false;
                 pomoState.isFinished = true; 
-                renderDashboard();
+                window.renderDashboard();
             }
         }
 
-        function togglePomo() {
+        window.togglePomo = function() {
             if(pomoState.isRunning) {
                 clearInterval(pomoState.interval);
                 pomoState.isRunning = false;
             } else {
-                pomoState.interval = setInterval(tickPomo, 1000);
+                pomoState.interval = setInterval(window.tickPomo, 1000);
                 pomoState.isRunning = true;
             }
-            renderDashboard();
+            window.renderDashboard();
         }
 
-        function togglePomoFullscreen() {
+        window.togglePomoFullscreen = function() {
             pomoState.isFullScreen = !pomoState.isFullScreen;
-            renderDashboard();
+            window.renderDashboard();
         }
 
-        function resetPomo() {
+        window.resetPomo = function() {
             clearInterval(pomoState.interval);
             pomoState.isRunning = false;
             pomoState.isFinished = false;
             const mod = state.activeModules.find(m => m.type === 'pomodoro');
-            if(pomoState.mode === 'work') pomoState.timeLeft = mod.columns.work * 60;
-            else if(pomoState.mode === 'short') pomoState.timeLeft = mod.columns.short * 60;
-            else pomoState.timeLeft = mod.columns.long * 60;
-            renderDashboard();
+            if(mod) {
+                if(pomoState.mode === 'work') pomoState.timeLeft = mod.columns.work * 60;
+                else if(pomoState.mode === 'short') pomoState.timeLeft = mod.columns.short * 60;
+                else pomoState.timeLeft = mod.columns.long * 60;
+            }
+            window.renderDashboard();
         }
 
-        function setPomoMode(mode, minutes) {
+        window.setPomoMode = function(mode, minutes) {
             clearInterval(pomoState.interval);
             pomoState.isRunning = false;
             pomoState.isFinished = false;
             pomoState.mode = mode;
             pomoState.timeLeft = minutes * 60;
-            renderDashboard();
+            window.renderDashboard();
         }
 
-        function savePomoLog(modId) {
+        window.savePomoLog = function(modId) {
             const input = document.getElementById('pomo-log-input');
             const text = input ? input.value.trim() : '';
             if (!text) { alert("Lütfen çalışmalarınızı kaydetmek için bir not girin!"); return; }
@@ -802,10 +946,21 @@
             });
 
             pomoState.isFinished = false;
-            resetPomo(); 
+            window.resetPomo(); 
+            window.saveDataToCloud();
         }
 
-        function renderPomodoro(mod) {
+        window.deletePomoLogFromPanel = function(modId, index) {
+            if(confirm("Bu kaydı silmek istediğinize emin misiniz?")) {
+                const mod = state.activeModules.find(m => m.id === modId);
+                mod.data.splice(index, 1);
+                window.openPomoAnalytics(modId);
+                window.renderDashboard();
+                window.saveDataToCloud();
+            }
+        }
+
+        window.renderPomodoro = function(mod) {
             const workM = mod.columns.work || 25; const shortM = mod.columns.short || 5; const longM = mod.columns.long || 15;
             if(pomoState.timeLeft === 0 && !pomoState.isRunning && !pomoState.isFinished) pomoState.timeLeft = workM * 60;
 
@@ -818,7 +973,7 @@
                 mainContent += '<input type="text" id="pomo-log-input" class="custom-input mb-4 font-bold" placeholder="Örn: Literatür taraması yapıldı..." autofocus>';
                 mainContent += '<div class="flex gap-2 justify-center">';
                 mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-4 py-3 rounded-xl font-black text-xs hover:bg-slate-300 transition">İptal Et</button>';
-                mainContent += '<button onclick="savePomoLog(\'' + mod.id + '\')" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-black text-xs shadow-lg hover:bg-indigo-700 transition">Kaydet ve Devam</button>';
+                mainContent += '<button onclick="savePomoLog(\'' + mod.id + '\')" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-black text-xs shadow-lg hover:bg-indigo-700 transition">Kaydet</button>';
                 mainContent += '</div></div>';
             } else {
                 let wClass = pomoState.mode==='work' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-700';
@@ -844,29 +999,10 @@
                 
                 mainContent += '</div>';
             }
-
-            let historyHtml = '';
-            if (mod.data && mod.data.length > 0) {
-                historyHtml += '<div class="pomo-history w-full mt-8 pt-6 border-t border-black/10"><h4 class="text-[10px] font-black uppercase opacity-50 mb-4 tracking-widest text-left w-full flex items-center gap-2">📋 Kayıtlar</h4><div class="space-y-2 max-h-48 overflow-y-auto custom-scroll pr-2 text-left">';
-                mod.data.forEach((log, index) => {
-                    let icon = '🍅'; let color = 'text-indigo-600';
-                    if(log.mode === 'short') { icon = '☕'; color = 'text-emerald-600'; }
-                    if(log.mode === 'long') { icon = '🛋️'; color = 'text-blue-600'; }
-                    
-                    historyHtml += '<div class="bg-black/5 p-4 rounded-xl flex justify-between items-center group hover:bg-black/10 transition">';
-                    historyHtml += '<div><div class="text-[10px] font-black ' + color + ' uppercase mb-1 flex items-center gap-1">' + icon + ' ' + log.duration + ' Dakika • <span class="opacity-60 text-slate-500">' + log.date + '</span></div>';
-                    historyHtml += '<div class="text-sm font-bold opacity-80">' + log.text + '</div></div>';
-                    historyHtml += '<button onclick="deletePomoLog(\'' + mod.id + '\', ' + index + ')" class="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-red-500 bg-red-100 px-2 py-1 rounded transition hover:bg-red-200">SİL</button>';
-                    historyHtml += '</div>';
-                });
-                historyHtml += '</div></div>';
-            }
-
-            return '<div class="flex flex-col items-center justify-center py-4 w-full">' + mainContent + historyHtml + '</div>';
+            return '<div class="flex flex-col items-center justify-center py-4 w-full">' + mainContent + '</div>';
         }
 
-        // --- POMODORO ANALİZ (SAĞ PANEL) ---
-        function openPomoAnalytics(modId) {
+        window.openPomoAnalytics = function(modId) {
             const mod = state.activeModules.find(m => m.id === modId);
             if(!mod) return;
 
@@ -898,9 +1034,9 @@
             } else {
                 html += '<div class="space-y-3">';
                 mod.data.forEach((log, index) => {
-                    let icon = '🍅'; let color = 'text-indigo-600'; let bg = 'bg-indigo-50';
-                    if(log.mode === 'short') { icon = '☕'; color = 'text-emerald-600'; bg = 'bg-emerald-50'; }
-                    if(log.mode === 'long') { icon = '🛋️'; color = 'text-blue-600'; bg = 'bg-blue-50'; }
+                    let icon = '🍅'; let color = 'text-indigo-600';
+                    if(log.mode === 'short') { icon = '☕'; color = 'text-emerald-600'; }
+                    if(log.mode === 'long') { icon = '🛋️'; color = 'text-blue-600'; }
                     
                     html += '<div class="border border-black/5 p-3 rounded-xl flex justify-between items-start group hover:border-black/20 transition">';
                     html += '<div class="flex-1 pr-3">';
@@ -922,18 +1058,7 @@
             document.getElementById('right-panel').classList.add('open');
         }
 
-        function deletePomoLogFromPanel(modId, index) {
-            if(confirm("Bu kaydı silmek istediğinize emin misiniz?")) {
-                const mod = state.activeModules.find(m => m.id === modId);
-                mod.data.splice(index, 1);
-                openPomoAnalytics(modId);
-                renderDashboard();
-            }
-        }
-
-
-        // --- ÜST TAKVİM ---
-        function renderHeaderCalendar() {
+        window.renderHeaderCalendar = function() {
             const container = document.getElementById('header-calendar-container');
             const data = state.calendar.data;
             const today = new Date(); today.setHours(0,0,0,0);
@@ -960,21 +1085,31 @@
             container.innerHTML = html;
         }
 
-        // --- GÜNLÜK İŞLEMLERİ ---
-        function addJournalEntry(modId) {
+        window.addJournalEntry = function(modId) {
             const input = document.getElementById('journal-input-' + modId);
             if(!input || !input.value.trim()) return;
             const mod = state.activeModules.find(m => m.id === modId);
             const today = new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
             mod.data.unshift({ date: today, text: input.value });
-            renderDashboard();
+            window.renderDashboard();
+            window.saveDataToCloud();
         }
-        function editJournalEntry(modId, index) {
+        window.editJournalEntry = function(modId, index) {
             const mod = state.activeModules.find(m => m.id === modId);
             const newText = prompt('Notunuzu düzenleyin:', mod.data[index].text);
-            if (newText !== null && newText.trim() !== '') { mod.data[index].text = newText; renderDashboard(); }
+            if (newText !== null && newText.trim() !== '') { 
+                mod.data[index].text = newText; 
+                window.renderDashboard(); 
+                window.saveDataToCloud();
+            }
         }
-        function deleteJournalEntry(modId, index) { if(confirm('SİL?')) { state.activeModules.find(m => m.id === modId).data.splice(index, 1); renderDashboard(); } }
+        window.deleteJournalEntry = function(modId, index) { 
+            if(confirm('SİL?')) { 
+                state.activeModules.find(m => m.id === modId).data.splice(index, 1); 
+                window.renderDashboard(); 
+                window.saveDataToCloud();
+            } 
+        }
 
         function getProgressStyle(val) {
             val = parseInt(val);
@@ -985,8 +1120,7 @@
             return { color: 'bg-indigo-500', anim: '' };
         }
 
-        // --- DİĞER MODÜL RENDERERS ---
-        function renderStats(data) {
+        window.renderStats = function(data) {
             let tDone = 0, tTarget = 0;
             data.forEach(d => { tDone += d.completed; tTarget += d.total; });
             const overall = tTarget > 0 ? Math.round((tDone/tTarget)*100) : 0;
@@ -1012,7 +1146,7 @@
             return html;
         }
 
-        function renderTasks(mod) {
+        window.renderTasks = function(mod) {
             let html = '<div class="overflow-x-auto mt-4"><table class="w-full text-left border-collapse min-w-[800px]">';
             html += '<thead class="bg-black/5 uppercase text-[10px] font-black tracking-widest border-b border-black/10">';
             html += '<tr><th class="px-8 py-6 w-1/3">' + (mod.columns.task || 'GÖREV') + '</th><th class="px-8 py-6 w-1/3">' + (mod.columns.progress || 'İLERLEME') + '</th><th class="px-8 py-6 w-1/3">' + (mod.columns.note || 'NOTLAR') + '</th><th class="w-16"></th></tr></thead>';
@@ -1035,7 +1169,7 @@
             return html;
         }
 
-        function renderContacts(mod) {
+        window.renderContacts = function(mod) {
             let html = '<div class="overflow-x-auto mt-4"><table class="w-full text-left border-collapse min-w-[1000px]">';
             html += '<thead class="bg-black/5 uppercase text-[10px] font-black tracking-widest border-b border-black/10">';
             html += '<tr><th class="px-8 py-6">' + (mod.columns.name || 'AD SOYAD') + '</th><th class="px-8 py-6">' + (mod.columns.role || 'ROL') + '</th><th class="px-8 py-6">' + (mod.columns.contact || 'İLETİŞİM') + '</th><th class="px-8 py-6">' + (mod.columns.ref || 'REFERANS') + '</th><th class="px-8 py-6">' + (mod.columns.note || 'NOTLAR') + '</th><th class="w-16"></th></tr></thead>';
@@ -1055,7 +1189,7 @@
             return html;
         }
 
-        function renderInterviews(mod) {
+        window.renderInterviews = function(mod) {
             let html = '<div class="overflow-x-auto mt-4"><table class="w-full text-left text-sm whitespace-nowrap">';
             html += '<thead class="bg-black/5 uppercase text-[10px] font-black tracking-widest border-b border-black/10"><tr><th class="px-4 py-3">' + mod.columns.code + '</th><th class="px-4 py-3">' + mod.columns.name + '</th><th class="px-4 py-3 text-center">' + mod.columns.bool1 + '</th><th class="px-4 py-3 text-center">' + mod.columns.bool2 + '</th><th class="px-4 py-3 text-center">' + mod.columns.bool3 + '</th><th class="px-4 py-3"></th></tr></thead>';
             html += '<tbody class="divide-y divide-black/5">';
@@ -1074,7 +1208,7 @@
             return html;
         }
 
-        function renderJournal(mod) {
+        window.renderJournal = function(mod) {
             let listHtml = '';
             if(mod.data.length === 0) {
                 listHtml = '<p class="opacity-50 text-center py-4 text-sm font-bold">Henüz kayıt yok.</p>';
@@ -1093,29 +1227,18 @@
                 });
             }
 
-            let announcementsHtml = '';
-            state.announcements.forEach(ann => {
-                announcementsHtml += '<div onclick="openAnnouncement(' + ann.id + ')" class="bg-indigo-50 dark:bg-indigo-900/40 p-4 rounded-xl cursor-pointer hover:bg-indigo-100 transition border border-indigo-100 dark:border-indigo-700 shadow-sm mb-3">';
-                announcementsHtml += '<div class="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1 flex items-center gap-1">🔔 ' + ann.date + '</div>';
-                announcementsHtml += '<div class="text-sm font-bold text-slate-800 dark:text-slate-200">' + ann.title + '</div>';
-                announcementsHtml += '</div>';
-            });
-
             let html = '<div class="flex flex-col h-full mt-4">';
             html += '<div class="flex gap-2 mb-6 border-b border-black/10 pb-6">';
             html += '<input type="text" id="journal-input-' + mod.id + '" class="custom-input flex-1" placeholder="' + (mod.columns.placeholder || 'Bugün neler yaptın?') + '">';
             html += '<button onclick="addJournalEntry(\'' + mod.id + '\')" class="btn-primary !w-auto !py-2 !px-6 text-sm shadow-md">' + (mod.columns.btnText || 'Kaydet') + '</button>';
             html += '</div>';
             html += '<div class="flex-1 max-h-64 overflow-y-auto custom-scroll pr-2 mb-6">' + listHtml + '</div>';
-            html += '<div class="mt-auto bg-black/5 p-4 rounded-2xl border border-black/5">';
-            html += '<h4 class="text-[10px] font-black uppercase opacity-60 mb-3 tracking-widest">📢 Platform Duyuruları</h4>';
-            html += announcementsHtml;
-            html += '</div></div>';
+            html += '</div>';
             return html;
         }
 
         let radarInstance = null;
-        function initRadarChart(data) {
+        window.initRadarChart = function(data) {
             const canvas = document.getElementById('radarChart');
             if(!canvas) return;
             const ctx = canvas.getContext('2d');
@@ -1127,18 +1250,18 @@
             });
         }
 
-        function renderDashboard() {
+        window.renderDashboard = function() {
             const grid = document.getElementById('dashboard-grid');
             grid.innerHTML = '';
 
             state.activeModules.forEach((mod, index) => {
                 let contentHtml = '';
-                if(mod.type === 'stats') contentHtml = renderStats(mod.data);
-                else if(mod.type === 'pomodoro') contentHtml = renderPomodoro(mod);
-                else if(mod.type === 'interviews') contentHtml = renderInterviews(mod);
-                else if(mod.type === 'contacts') contentHtml = renderContacts(mod);
-                else if(mod.type === 'tasks') contentHtml = renderTasks(mod);
-                else if(mod.type === 'journal') contentHtml = renderJournal(mod);
+                if(mod.type === 'stats') contentHtml = window.renderStats(mod.data);
+                else if(mod.type === 'pomodoro') contentHtml = window.renderPomodoro(mod);
+                else if(mod.type === 'interviews') contentHtml = window.renderInterviews(mod);
+                else if(mod.type === 'contacts') contentHtml = window.renderContacts(mod);
+                else if(mod.type === 'tasks') contentHtml = window.renderTasks(mod);
+                else if(mod.type === 'journal') contentHtml = window.renderJournal(mod);
 
                 const titleHtml = '<h2 class="text-xl md:text-2xl font-black uppercase tracking-tight opacity-80 flex items-center gap-2">' + mod.icon + ' ' + mod.title + '</h2>';
 
@@ -1154,11 +1277,11 @@
                 div.draggable = state.isEditMode;
                 div.dataset.index = index;
                 
-                div.addEventListener('dragstart', handleDragStart);
-                div.addEventListener('dragover', handleDragOver);
-                div.addEventListener('drop', handleDrop);
-                div.addEventListener('dragenter', handleDragEnter);
-                div.addEventListener('dragend', handleDragEnd);
+                div.addEventListener('dragstart', window.handleDragStart);
+                div.addEventListener('dragover', window.handleDragOver);
+                div.addEventListener('drop', window.handleDrop);
+                div.addEventListener('dragenter', window.handleDragEnter);
+                div.addEventListener('dragend', window.handleDragEnd);
 
                 let inner = '<div class="drag-overlay" title="Tut ve Sürükle"><span class="text-4xl text-indigo-500">✥</span><span class="font-bold mt-2 bg-white px-4 py-1 rounded-full text-indigo-600 text-xs shadow-md">Sürükle & Bırak ile Taşı</span></div>';
                 inner += '<div class="mod-header flex justify-between items-start mb-2 gap-4 pb-2">' + titleHtml + controlsHtml + '</div>';
@@ -1170,11 +1293,11 @@
 
             setTimeout(() => { 
                 const statsMod = state.activeModules.find(m => m.type === 'stats');
-                if(statsMod) initRadarChart(statsMod.data); 
+                if(statsMod) window.initRadarChart(statsMod.data); 
             }, 100);
         }
 
-        function toggleEditMode() {
+        window.toggleEditMode = function() {
             state.isEditMode = !state.isEditMode;
             const editBtn = document.getElementById('dock-edit-btn');
             
@@ -1191,22 +1314,23 @@
                     editBtn.style.filter = "none";
                 }
             }
-            renderDashboard(); 
+            window.renderDashboard(); 
         }
 
         let dragStartIndex;
-        function handleDragStart(e) { if(!state.isEditMode) return e.preventDefault(); dragStartIndex = +this.dataset.index; this.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
-        function handleDragOver(e) { if(!state.isEditMode) return; e.preventDefault(); }
-        function handleDragEnter(e) { if(!state.isEditMode) return; e.preventDefault(); }
-        function handleDragEnd(e) { this.classList.remove('dragging'); }
-        function handleDrop(e) {
+        window.handleDragStart = function(e) { if(!state.isEditMode) return e.preventDefault(); dragStartIndex = +this.dataset.index; this.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+        window.handleDragOver = function(e) { if(!state.isEditMode) return; e.preventDefault(); }
+        window.handleDragEnter = function(e) { if(!state.isEditMode) return; e.preventDefault(); }
+        window.handleDragEnd = function(e) { this.classList.remove('dragging'); }
+        window.handleDrop = function(e) {
             if(!state.isEditMode) return;
             e.preventDefault();
             const dragEndIndex = +this.dataset.index;
             if(dragStartIndex !== dragEndIndex && dragStartIndex !== undefined) {
                 const item = state.activeModules.splice(dragStartIndex, 1)[0];
                 state.activeModules.splice(dragEndIndex, 0, item);
-                renderDashboard();
+                window.renderDashboard();
+                window.saveDataToCloud();
             }
         }
 
@@ -1215,7 +1339,7 @@
         let tempEditColumns = {};
         let tempEditTitle = "";
 
-        function openUnifiedPanel(moduleId) {
+        window.openUnifiedPanel = function(moduleId) {
             state.editingModuleId = moduleId;
             const mod = moduleId === 'header_calendar' ? state.calendar : state.activeModules.find(m => m.id === moduleId);
             if(!mod) return;
@@ -1259,7 +1383,7 @@
             container.innerHTML = html;
 
             if (['calendar', 'stats', 'tasks', 'contacts', 'interviews'].includes(mod.type)) {
-                renderPanelDataRows(mod.type);
+                window.renderPanelDataRows(mod.type);
             }
 
             document.getElementById('panel-footer-btn').style.display = 'block';
@@ -1269,7 +1393,7 @@
             document.getElementById('right-panel').classList.add('open');
         }
 
-        function renderPanelDataRows(type) {
+        window.renderPanelDataRows = function(type) {
             const container = document.getElementById('panel-data-container');
             if(!container) return;
             
@@ -1355,23 +1479,26 @@
             container.innerHTML = html;
         }
 
-        function updateTemp(index, field, value) { tempEditData[index][field] = value; renderPanelDataRows(state.editingModuleId === 'header_calendar' ? 'calendar' : state.activeModules.find(m => m.id === state.editingModuleId).type); }
+        window.updateTemp = function(index, field, value) { 
+            tempEditData[index][field] = value; 
+            window.renderPanelDataRows(state.editingModuleId === 'header_calendar' ? 'calendar' : state.activeModules.find(m => m.id === state.editingModuleId).type); 
+        }
         
-        function addPanelRow(type) {
+        window.addPanelRow = function(type) {
             if(type==='calendar') tempEditData.push({emoji:'📌', label:'Yeni Hedef', targetDate: new Date().toISOString().split('T')[0]});
             if(type==='stats') tempEditData.push({title:'Yeni Kategori', completed:0, total:5, emoji:'📊'});
             if(type==='tasks') tempEditData.push({task:'Yeni Görev', progress:0, status:'Yapılmadı', note:''});
             if(type==='contacts') tempEditData.push({name:'Yeni Kişi', role:'', contact:'', ref:'', note:''});
             if(type==='interviews') tempEditData.push({code:'YENİ', name:'', interviewed:false, consent:false, transcribed:false});
-            renderPanelDataRows(type);
+            window.renderPanelDataRows(type);
         }
 
-        function removePanelRow(index, type) {
+        window.removePanelRow = function(index, type) {
             tempEditData.splice(index, 1);
-            renderPanelDataRows(type);
+            window.renderPanelDataRows(type);
         }
 
-        function savePanel() {
+        window.savePanel = function() {
             const isHeaderCal = state.editingModuleId === 'header_calendar';
             const mod = isHeaderCal ? state.calendar : state.activeModules.find(m => m.id === state.editingModuleId);
             
@@ -1384,14 +1511,15 @@
                     pomoState.timeLeft = mod.columns.work * 60;
                 }
 
-                if (isHeaderCal) renderHeaderCalendar();
-                else renderDashboard();
+                if (isHeaderCal) window.renderHeaderCalendar();
+                else window.renderDashboard();
                 
-                closePanel();
+                window.closePanel();
+                window.saveDataToCloud(); // Değişiklikleri buluta gönder
             }
         }
 
-        function closePanel() {
+        window.closePanel = function() {
             document.getElementById('right-panel').classList.remove('open');
             document.getElementById('panel-backdrop').classList.replace('opacity-100', 'opacity-0');
             setTimeout(() => { document.getElementById('panel-backdrop').classList.replace('block', 'hidden'); }, 300);
