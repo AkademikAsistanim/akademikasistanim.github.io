@@ -595,7 +595,7 @@
             showLoading(true, "Verileriniz Yükleniyor...");
             if (db && currentUser) {
                 try {
-                    // DÜZELTİLEN YER: Yolun uzunluğu artık tam olarak 6 segment (Koleksiyon -> Doküman -> Koleksiyon -> Doküman -> Koleksiyon -> Doküman)
+                    // DÜZELTİLEN YER 1: Yolun uzunluğu tam olarak 6 segment
                     const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'user_data', 'profile');
                     
                     // Önce veriyi bir kere çekmeyi deneyelim
@@ -643,6 +643,34 @@
                 // Local Mode: Kurulum ekranına git
                 showLoading(false);
                 window.nextScreen('screen-theme');
+            }
+        }
+
+        // Değişiklikleri Veritabanına Kaydetme (Tüm State'i)
+        window.saveDataToCloud = async function() {
+            if (!db || !currentUser) return; // Veritabanı yoksa veya üye değilse çık
+            
+            // DÜZELTİLEN YER 2: Kayıt ederken de aynı 6 segmentli yol kullanılmalı!
+            const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'user_data', 'profile');
+            
+            // Sadece Firestore'a kaydedilecek verileri filtrele (pomoState gibi geçici veriler gitmesin)
+            const dataToSave = {
+                theme: state.theme,
+                themeBrightness: state.themeBrightness,
+                projectName: state.projectName,
+                projectColor: state.projectColor,
+                calendar: state.calendar,
+                activeModules: state.activeModules,
+                modules: state.modules,
+                updatedAt: new Date().toISOString()
+            };
+
+            try {
+                await setDoc(userDocRef, dataToSave, { merge: true });
+                console.log("Veri başarıyla buluta kaydedildi.");
+            } catch(e) {
+                console.error("Buluta kayıt hatası:", e);
+                alert("Kayıt sırasında hata oluştu: " + e.message);
             }
         }
 
