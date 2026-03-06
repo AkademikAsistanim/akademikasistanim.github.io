@@ -314,7 +314,7 @@
                 <h1 class="text-4xl font-black mb-2 text-indigo-600 tracking-tighter">Akademik<span class="text-amber-500">Asistanım</span></h1>
                 <p class="text-sm opacity-70 mb-8 font-medium">Akademik planlama ve verimlilik platformu.</p>
                 
-                <div id="auth-error" class="text-red-500 text-xs font-bold mb-4 hidden bg-red-50 p-2 rounded border border-red-200"></div>
+                <div id="auth-error" class="text-red-500 text-xs font-bold mb-4 hidden bg-red-50 p-3 rounded border border-red-200"></div>
                 
                 <div class="space-y-4">
                     <button onclick="handleGoogleLogin()" class="btn-google">
@@ -499,7 +499,6 @@
     <!-- FIREBASE IMPORT VE ENTEGRASYONU -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -510,15 +509,14 @@
           projectId: "akademik-asistanim",
           storageBucket: "akademik-asistanim.firebasestorage.app",
           messagingSenderId: "751319130769",
-          appId: "1:751319130769:web:b0e31ed38df09541439530",
-          measurementId: "G-FT1XNHRV24"
+          appId: "1:751319130769:web:b0e31ed38df09541439530"
         };
 
         // Uygulamanızı tanımlayan bir ID (Kullanıcı verileri bu yolla ayırt edilecek)
         const myAppId = 'akademik-asistanim-app';
 
         // Global Değişkenler
-        let db, auth, analytics;
+        let db, auth;
         let currentUser = null;
         let unsubscribeUserDoc = null;
         
@@ -569,7 +567,6 @@
             try {
                 // SİZİN BİLGİLERİNİZLE FIREBASE'İ BAŞLATMA
                 const app = initializeApp(firebaseConfig);
-                analytics = getAnalytics(app);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
@@ -595,7 +592,7 @@
             showLoading(true, "Verileriniz Yükleniyor...");
             if (db && currentUser) {
                 try {
-                    // DÜZELTİLEN YER: Yolun uzunluğu tam olarak 6 segment
+                    // YOLUN UZUNLUĞU TAM OLARAK 6 SEGMENT (Sorunsuz Çalışacak)
                     const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'data', 'profile');
                     
                     // Önce veriyi bir kere çekmeyi deneyelim
@@ -650,7 +647,6 @@
                     window.nextScreen('screen-theme');
                 }
             } else {
-                // Local Mode: Kurulum ekranına git
                 showLoading(false);
                 window.nextScreen('screen-theme');
             }
@@ -658,12 +654,11 @@
 
         // Değişiklikleri Veritabanına Kaydetme (Tüm State'i)
         window.saveDataToCloud = async function() {
-            if (!db || !currentUser) return; // Veritabanı yoksa veya üye değilse çık
+            if (!db || !currentUser) return; 
             
-            // DÜZELTİLEN YER: Kayıt ederken de aynı 6 segmentli yol kullanılmalı!
+            // KAYIT EDERKEN DE AYNI 6 SEGMENTLİ YOL
             const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'data', 'profile');
             
-            // Sadece Firestore'a kaydedilecek verileri filtrele (pomoState gibi geçici veriler gitmesin)
             const dataToSave = {
                 theme: state.theme,
                 themeBrightness: state.themeBrightness,
@@ -680,7 +675,6 @@
                 console.log("Veri başarıyla buluta kaydedildi.");
             } catch(e) {
                 console.error("Buluta kayıt hatası:", e);
-                // alert("Kayıt sırasında hata oluştu: " + e.message); // Kullanıcıyı rahatsız etmesin diye sessize alındı
             }
         }
 
@@ -715,7 +709,6 @@
                 } else {
                     await createUserWithEmailAndPassword(auth, email, pass);
                 }
-                // Başarılı olursa onAuthStateChanged tetiklenir ve loadUserData çalışır.
             } catch(e) {
                 showLoading(false);
                 let msg = "Hata: " + e.message; 
@@ -726,7 +719,6 @@
                 
                 errorEl.innerText = msg;
                 errorEl.classList.remove('hidden');
-                console.error("Firebase Auth Hatası:", e);
             }
         }
 
@@ -741,7 +733,6 @@
             
             try {
                 await signInWithPopup(auth, provider);
-                // Başarılı olursa onAuthStateChanged tetiklenir ve loadUserData çalışır.
             } catch(e) {
                 showLoading(false);
                 let msg = "Hata: " + e.message;
@@ -751,7 +742,6 @@
                 
                 errorEl.innerText = msg;
                 errorEl.classList.remove('hidden');
-                console.error("Google Auth Hatası:", e);
             }
         }
 
@@ -772,11 +762,6 @@
                 overlay.style.display = 'none';
             }
         }
-
-        // ==========================================
-        // ESKİ FONKSİYONLARIN GÜNCELLENMİŞ HALLERİ (CLOUD KAYDI İÇERİR)
-        // Her veri değişiminden sonra `window.saveDataToCloud()` çağrılır.
-        // ==========================================
 
         window.renderInitialThemes = function() {
             const grid = document.getElementById('theme-selection-grid');
