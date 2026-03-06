@@ -32,7 +32,7 @@
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             pointer-events: none;
-            z-index: 9999990; /* En üstün bir altı */
+            z-index: 9999990;
             background-color: black;
             opacity: 0;
             transition: opacity 0.3s ease, background-color 0.3s ease;
@@ -589,7 +589,7 @@
             showLoading(true, "Verileriniz Yükleniyor...");
             if (db && currentUser) {
                 try {
-                    // YOLUN UZUNLUĞU TAM OLARAK 6 SEGMENT
+                    // YOLUN UZUNLUĞU TAM OLARAK 6 SEGMENT (Sorunsuz Çalışacak)
                     const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'data', 'profile');
                     
                     // Önce veriyi bir kere çekmeyi deneyelim
@@ -605,7 +605,7 @@
                         state.projectColor = savedData.projectColor || '#4f46e5';
                         state.calendar = savedData.calendar || state.calendar;
                         state.activeModules = savedData.activeModules || [];
-                        state.modules = savedData.modules || state.modules;
+                        state.modules = savedData.modules || state.modules; // Tüm modül ayarlarını da al
 
                         // UI'ı güncelle
                         document.body.className = state.theme + ' dashboard-active';
@@ -615,7 +615,7 @@
                         window.renderDashboard();
                         
                         showLoading(false);
-                        window.nextScreen('screen-dashboard');
+                        window.nextScreen('screen-dashboard'); // Direkt dashboarda git
                     } else {
                         // Yeni kullanıcı, veritabanı boş, kurulum ekranına gönder
                         showLoading(false);
@@ -630,6 +630,7 @@
                     console.error("Veri çekme hatası:", error);
                     showLoading(false);
                     
+                    // DAHA AKILLI HATA MESAJLARI
                     let extraMsg = "";
                     if (error.message.includes("offline")) {
                         extraMsg = "\n\n⚠️ DİKKAT: Tarayıcınızdaki Reklam Engelleyici (AdBlock, uBlock, Brave Shields vb.) veritabanı bağlantısını engelliyor. Lütfen bu site için reklam engelleyiciyi kapatın veya Gizli Sekme'de deneyin.";
@@ -638,6 +639,8 @@
                     }
                     
                     alert("Veritabanına bağlanılamadı!\n\nHata Detayı: " + error.message + extraMsg);
+                    
+                    // Hata olsa bile sistemi deneyimleyebilmesi için yerel kuruluma at
                     window.nextScreen('screen-theme');
                 }
             } else {
@@ -743,7 +746,7 @@
         window.handleLogout = async function() {
             if(confirm("Çıkış yapmak istediğinize emin misiniz?")) {
                 if(auth) await signOut(auth);
-                location.reload(); 
+                location.reload(); // Sayfayı yenile
             }
         }
 
@@ -789,18 +792,7 @@
 
         window.changeThemeBrightness = function(value) {
             state.themeBrightness = value;
-            const overlay = document.getElementById('brightness-overlay');
-            if (overlay) {
-                if (value < 1) {
-                    overlay.style.backgroundColor = 'black';
-                    overlay.style.opacity = 1 - value;
-                } else if (value > 1) {
-                    overlay.style.backgroundColor = 'white';
-                    overlay.style.opacity = (value - 1) * 0.5;
-                } else {
-                    overlay.style.opacity = 0;
-                }
-            }
+            document.documentElement.style.setProperty('--theme-brightness', value);
             window.saveDataToCloud();
         }
 
@@ -1253,7 +1245,7 @@
                 html += '<td class="px-8 py-6"><div class="flex items-center gap-3"><div class="w-full bg-black/10 rounded-full h-2 overflow-hidden shadow-inner"><div class="h-full ' + style.color + ' ' + style.anim + ' transition-all duration-1000" style="width:' + progress + '%"></div></div><span class="text-[10px] font-black opacity-60 w-8 text-right">%' + progress + '</span></div>';
                 html += '<div class="mt-2"><span class="status-badge ' + badgeClass + ' scale-75 origin-left inline-block">' + d.status + '</span></div></td>';
                 html += '<td class="px-8 py-6 italic opacity-60 text-xs">' + (d.note || '-') + '</td>';
-                html += '<td class="px-4 py-6 text-right opacity-0 group-hover:opacity-100 transition"><button onclick="openUnifiedPanel(\'' + mod.id + '\')" class="text-xl text-indigo-600 w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-50 hover:bg-indigo-100 shadow-sm transition" title="Düzenle">⚙️</button></td>';
+                html += '<td class="px-4 py-6 text-right opacity-0 group-hover:opacity-100 transition"><button onclick="openUnifiedPanel(\'' + mod.id + '\')" class="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-[10px] font-black shadow hover:bg-indigo-100">DÜZENLE</button></td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';
@@ -1273,7 +1265,7 @@
                 html += '<td class="px-8 py-6 font-medium opacity-80">' + d.contact + '</td>';
                 html += '<td class="px-8 py-6 opacity-80">👤 ' + d.ref + '</td>';
                 html += '<td class="px-8 py-6 text-xs italic opacity-60 max-w-[200px] truncate">' + (d.note || '-') + '</td>';
-                html += '<td class="px-4 py-6 text-right opacity-0 group-hover:opacity-100 transition"><button onclick="openUnifiedPanel(\'' + mod.id + '\')" class="text-xl text-indigo-600 w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-50 hover:bg-indigo-100 shadow-sm transition" title="Düzenle">⚙️</button></td>';
+                html += '<td class="px-4 py-6 text-right opacity-0 group-hover:opacity-100 transition"><button onclick="openUnifiedPanel(\'' + mod.id + '\')" class="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-[10px] font-black shadow hover:bg-indigo-100">DÜZENLE</button></td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';
@@ -1508,6 +1500,8 @@
                 html += '</div></div>';
             }
 
+            // Süreç Takibi (interviews) artık doğrudan düzenlendiği için bu panelde "İçerik Verileri" kısmını göstermiyoruz. 
+            // Daha temiz bir görünüm sağlıyor.
             if (['calendar', 'stats', 'tasks', 'contacts'].includes(mod.type)) {
                 html += '<div id="panel-data-container"></div>';
             } else if (mod.type === 'interviews') {
