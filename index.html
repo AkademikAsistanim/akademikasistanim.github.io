@@ -594,10 +594,12 @@
         async function loadUserData() {
             showLoading(true, "Verileriniz Yükleniyor...");
             if (db && currentUser) {
-                const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'user_data');
-                
-                // Gerçek zamanlı dinleme
-                unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
+                try {
+                    const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'user_data');
+                    
+                    // Önce veriyi bir kere çekmeyi deneyelim (Veritabanı yoksa anında hata versin diye)
+                    const docSnap = await getDoc(userDocRef);
+                    
                     if (docSnap.exists()) {
                         // Veritabanında veri varsa State'e kopyala
                         const savedData = docSnap.data();
@@ -624,10 +626,18 @@
                         showLoading(false);
                         window.nextScreen('screen-theme');
                     }
-                }, (error) => {
+                    
+                    // Arka planda dinlemeye devam et
+                    if(unsubscribeUserDoc) unsubscribeUserDoc();
+                    unsubscribeUserDoc = onSnapshot(userDocRef, () => {}, (err) => console.error("Snapshot hatası:", err));
+
+                } catch (error) {
                     console.error("Veri çekme hatası:", error);
                     showLoading(false);
-                });
+                    alert("Veritabanına bağlanılamadı!\n\nLütfen Firebase konsolunda 'Firestore Database' bölümüne gidip veritabanını oluşturduğunuzdan (Test Modunda) emin olun.\n\nHata Detayı: " + error.message);
+                    // Hata olsa bile sistemi deneyimleyebilmesi için yerel kuruluma at
+                    window.nextScreen('screen-theme');
+                }
             } else {
                 // Local Mode: Kurulum ekranına git
                 showLoading(false);
