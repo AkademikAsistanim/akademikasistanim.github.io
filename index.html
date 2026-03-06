@@ -595,8 +595,8 @@
             showLoading(true, "Verileriniz Yükleniyor...");
             if (db && currentUser) {
                 try {
-                    // DÜZELTİLEN YER 1: Yolun uzunluğu tam olarak 6 segment
-                    const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'user_data', 'profile');
+                    // DÜZELTİLEN YER: Yolun uzunluğu tam olarak 6 segment
+                    const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'data', 'profile');
                     
                     // Önce veriyi bir kere çekmeyi deneyelim
                     const docSnap = await getDoc(userDocRef);
@@ -635,7 +635,17 @@
                 } catch (error) {
                     console.error("Veri çekme hatası:", error);
                     showLoading(false);
-                    alert("Veritabanına bağlanılamadı!\n\nLütfen Firebase konsolunda 'Firestore Database' bölümüne gidip veritabanını oluşturduğunuzdan (Test Modunda) emin olun.\n\nHata Detayı: " + error.message);
+                    
+                    // DAHA AKILLI HATA MESAJLARI
+                    let extraMsg = "";
+                    if (error.message.includes("offline")) {
+                        extraMsg = "\n\n⚠️ DİKKAT: Tarayıcınızdaki Reklam Engelleyici (AdBlock, uBlock, Brave Shields vb.) veritabanı bağlantısını engelliyor. Lütfen bu site için reklam engelleyiciyi kapatın veya Gizli Sekme'de deneyin.";
+                    } else if (error.message.includes("segments")) {
+                        extraMsg = "\n\n⚠️ Tarayıcınız eski hatalı kodu önbelleğe almış. Lütfen sayfayı CTRL + F5 yaparak zorla yenileyin.";
+                    }
+                    
+                    alert("Veritabanına bağlanılamadı!\n\nHata Detayı: " + error.message + extraMsg);
+                    
                     // Hata olsa bile sistemi deneyimleyebilmesi için yerel kuruluma at
                     window.nextScreen('screen-theme');
                 }
@@ -650,8 +660,8 @@
         window.saveDataToCloud = async function() {
             if (!db || !currentUser) return; // Veritabanı yoksa veya üye değilse çık
             
-            // DÜZELTİLEN YER 2: Kayıt ederken de aynı 6 segmentli yol kullanılmalı!
-            const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'user_data', 'profile');
+            // DÜZELTİLEN YER: Kayıt ederken de aynı 6 segmentli yol kullanılmalı!
+            const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'data', 'profile');
             
             // Sadece Firestore'a kaydedilecek verileri filtrele (pomoState gibi geçici veriler gitmesin)
             const dataToSave = {
@@ -670,34 +680,7 @@
                 console.log("Veri başarıyla buluta kaydedildi.");
             } catch(e) {
                 console.error("Buluta kayıt hatası:", e);
-                alert("Kayıt sırasında hata oluştu: " + e.message);
-            }
-        }
-
-        // Değişiklikleri Veritabanına Kaydetme (Tüm State'i)
-        window.saveDataToCloud = async function() {
-            if (!db || !currentUser) return; // Veritabanı yoksa veya üye değilse çık
-            
-            // DÜZELTİLEN YER
-            const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'user_data', 'profile');
-            
-            // Sadece Firestore'a kaydedilecek verileri filtrele (pomoState gibi geçici veriler gitmesin)
-            const dataToSave = {
-                theme: state.theme,
-                themeBrightness: state.themeBrightness,
-                projectName: state.projectName,
-                projectColor: state.projectColor,
-                calendar: state.calendar,
-                activeModules: state.activeModules,
-                modules: state.modules,
-                updatedAt: new Date().toISOString()
-            };
-
-            try {
-                await setDoc(userDocRef, dataToSave, { merge: true });
-                console.log("Veri başarıyla buluta kaydedildi.");
-            } catch(e) {
-                console.error("Buluta kayıt hatası:", e);
+                // alert("Kayıt sırasında hata oluştu: " + e.message); // Kullanıcıyı rahatsız etmesin diye sessize alındı
             }
         }
 
