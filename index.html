@@ -179,30 +179,66 @@
         .btn-google:hover { background: #f4f4f5; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-google img { width: 18px; height: 18px; }
 
-        /* --- YENİ: YATAY KAYDIRMA (SWIPE) EKRANLARI --- */
-        .swipe-container {
+        /* --- YENİ: OK (BUTON) YÖNLENDİRMELİ EKRANLAR --- */
+        .dashboard-container {
             display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+            overflow: hidden; /* Kaydırmayı (swipe) engeller, sadece script ile kaydırılır */
             height: 100vh;
             width: 100vw;
+            position: relative;
+            scroll-behavior: smooth;
         }
-        .swipe-container::-webkit-scrollbar { display: none; }
-        .swipe-slide {
+        .dashboard-slide {
             flex: 0 0 100vw;
             width: 100vw;
             height: 100vh;
-            scroll-snap-align: start;
-            padding: 1.5rem;
-            padding-bottom: 5rem; /* Alt gösterge için boşluk */
+            padding: 2rem;
+            padding-bottom: 6rem; /* Alt gösterge ve butonlar için boşluk */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            box-sizing: border-box;
         }
+        
+        /* Her modülün tam ekrana (full width/height) yayılmasını sağlamak için boyutlar */
+        .module-full-content {
+            width: 100%;
+            max-width: 1400px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- YÖNLENDİRME BUTONLARI (SOL - SAĞ) --- */
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.7);
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #4f46e5;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: black;
+            cursor: pointer;
+            z-index: 150;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+        }
+        body.theme-dark .nav-btn, body.theme-engineering .nav-btn, body.theme-space .nav-btn, body.theme-gaming .nav-btn, body.theme-astrology .nav-btn, body.theme-harrypotter .nav-btn {
+            background: rgba(15,23,42,0.7); border-color: rgba(255,255,255,0.1); color: #818cf8;
+        }
+        .nav-btn:hover { background: #6366f1; color: white; transform: translateY(-50%) scale(1.1); border-color: transparent;}
+        .nav-btn.left { left: 1rem; }
+        .nav-btn.right { right: 1rem; }
+        .nav-btn:disabled { opacity: 0; pointer-events: none; }
 
         /* --- SAYFA GÖSTERGELERİ (DOTS) --- */
         .slide-dots {
@@ -308,8 +344,13 @@
 
     <!-- ADIM 5: YATAY KAYDIRMALI ANA DASHBOARD -->
     <div id="screen-dashboard" class="screen relative h-full w-full">
-        <!-- Swipe Container -->
-        <div id="swipe-container" class="swipe-container" onscroll="updateIndicators()">
+        
+        <!-- Yönlendirme Okları -->
+        <button id="btn-prev" class="nav-btn left" onclick="slideBy(-1)" disabled>←</button>
+        <button id="btn-next" class="nav-btn right" onclick="slideBy(1)">→</button>
+
+        <!-- Slide Container -->
+        <div id="dashboard-container" class="dashboard-container" onscroll="handleScrollUpdate()">
             <!-- JS ile doldurulacak (Slide 1, Slide 2, ..., Settings Slide) -->
         </div>
 
@@ -365,6 +406,7 @@
         let currentUser = null;
         let unsubscribeUserDoc = null;
         let totalSlides = 0; // Navigasyon noktaları için
+        let currentSlideIndex = 0; // Geçerli slayt
         
         const EMOJI_LIST = ['📌', '⏳', '🎓', '📚', '📊', '🔍', '✍️', '💡', '🚀', '🎯', '🔥', '🏆', '📝', '📅', '🧠', '⚙️', '📈', '🗣️', '💻', '☕', '👨‍🍳', '👩‍🍳', '⚕️', '🏛️'];
         const ALL_THEMES = [
@@ -387,7 +429,7 @@
             projectColor: '#4f46e5',
             editingModuleId: null,
             announcements: [
-                { id: 1, date: '04 Mart 2026', title: 'Yeni: Kaydırmalı Arayüz', content: 'Uygulama tamamen mobil görünüme geçirildi. Ekranı sağa sola kaydırarak araçlarınız arasında hızlıca geçiş yapabilirsiniz.' },
+                { id: 1, date: '04 Mart 2026', title: 'Yeni: Tam Ekran Ok Yönlendirmesi', content: 'Çalışma alanınızı genişlettik. Artık modüller tam ekran boyutunda! Sağa/Sola ok tuşlarını kullanarak araçlarınız arasında geçiş yapabilirsiniz.' },
                 { id: 2, date: '28 Şubat 2026', title: 'Sayfa Yönetimi', content: 'En sondaki "Ayarlar & Düzenle" ekranından, araçlarınızın hangi sayfada olacağını belirleyebilirsiniz.' }
             ],
             calendar: { id: 'header_calendar', type: 'calendar', title: 'TAKVİM', data: [ { label: 'Savunma Günü', targetDate: '2026-06-15', emoji: '🎓' }, { label: 'Tez Bitişi', targetDate: '2026-05-01', emoji: '📚' } ] },
@@ -613,25 +655,49 @@
             setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
         }
 
-        // SWIPE İÇİN SAYFA DEĞİŞTİRME MANTIĞI
+        // YENİ: OK (BUTON) İLE SAYFA DEĞİŞTİRME MANTIĞI
         window.goToSlide = function(index) {
-            const container = document.getElementById('swipe-container');
-            container.scrollTo({ left: index * window.innerWidth, behavior: 'smooth' });
+            if(index < 0) index = 0;
+            if(index > totalSlides - 1) index = totalSlides - 1;
+            
+            const container = document.getElementById('dashboard-container');
+            if(container) {
+                container.scrollTo({ left: index * window.innerWidth, behavior: 'smooth' });
+            }
+            currentSlideIndex = index;
+            window.updateUINav();
         }
 
-        window.updateIndicators = function() {
-            const container = document.getElementById('swipe-container');
+        window.slideBy = function(direction) {
+            window.goToSlide(currentSlideIndex + direction);
+        }
+
+        // Ekran kaydırıldığında UI'ı (okların durumu ve noktaları) güncelle
+        window.handleScrollUpdate = function() {
+            const container = document.getElementById('dashboard-container');
             if(!container) return;
-            const index = Math.round(container.scrollLeft / window.innerWidth);
+            
+            currentSlideIndex = Math.round(container.scrollLeft / window.innerWidth);
+            window.updateUINav();
+        }
+
+        window.updateUINav = function() {
+            // Noktaları güncelle
             document.querySelectorAll('.slide-dot').forEach((dot, i) => {
-                if(i === index) dot.classList.add('active');
+                if(i === currentSlideIndex) dot.classList.add('active');
                 else dot.classList.remove('active');
             });
+            
+            // Ok butonlarını güncelle (ilk ve son sayfa kontrolü)
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            if(btnPrev) btnPrev.disabled = currentSlideIndex === 0;
+            if(btnNext) btnNext.disabled = currentSlideIndex === totalSlides - 1;
         }
 
-        // --- DASHBOARD OLUŞTURMA (Slide Sistemi) ---
+        // --- DASHBOARD OLUŞTURMA (Slide Sistemi - Tam Ekran Genişliği) ---
         window.renderDashboard = function() {
-            const container = document.getElementById('swipe-container');
+            const container = document.getElementById('dashboard-container');
             const indicators = document.getElementById('slide-indicators');
             if(!container || !indicators) return;
 
@@ -647,31 +713,32 @@
             // Takvim HTML Üretimi
             let calData = state.calendar.data;
             const today = new Date(); today.setHours(0,0,0,0);
-            let calHtml = `<div class="flex justify-between items-center mb-4 border-b border-black/10 pb-3">
-                            <h3 class="text-base font-black opacity-80 uppercase tracking-widest flex items-center gap-2">⏳ ${state.calendar.title}</h3>
-                            <button onclick="openUnifiedPanel('header_calendar')" class="text-xl bg-indigo-100 text-indigo-700 w-10 h-10 flex items-center justify-center rounded-lg hover:bg-indigo-200 transition shadow-sm">⚙️</button>
-                           </div><div class="space-y-3">`;
-            if(calData.length === 0) { calHtml += '<p class="text-xs opacity-50 font-bold">Kayıt yok.</p>'; }
+            let calHtml = `<div class="flex justify-between items-center mb-6 border-b border-black/10 pb-4 w-full">
+                            <h3 class="text-xl font-black opacity-80 uppercase tracking-widest flex items-center gap-2">⏳ ${state.calendar.title}</h3>
+                            <button onclick="openUnifiedPanel('header_calendar')" class="text-2xl bg-indigo-100 text-indigo-700 w-12 h-12 flex items-center justify-center rounded-xl hover:bg-indigo-200 transition shadow-sm">⚙️</button>
+                           </div><div class="space-y-4 w-full text-lg">`;
+            if(calData.length === 0) { calHtml += '<p class="text-sm opacity-50 font-bold">Kayıt yok.</p>'; }
             else {
                 calData.forEach(d => {
                     const tDate = new Date(d.targetDate); tDate.setHours(0,0,0,0);
                     const days = Math.ceil((tDate - today) / (1000 * 60 * 60 * 24));
                     const dayText = days > 0 ? days + ' gün' : (days === 0 ? 'BUGÜN' : 'Bitti');
-                    calHtml += `<div class="flex items-center justify-between"><span class="text-sm flex items-center gap-2">${d.emoji} <span class="font-bold opacity-80">${d.label}</span></span><span class="text-sm font-black text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 shadow-sm">${dayText}</span></div>`;
+                    calHtml += `<div class="flex items-center justify-between"><span class="flex items-center gap-3">${d.emoji} <span class="font-bold opacity-80">${d.label}</span></span><span class="font-black text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100 shadow-sm">${dayText}</span></div>`;
                 });
             }
             calHtml += '</div>';
 
-            html += `<div class="swipe-slide" id="slide-home">
-                        <div class="glass-card w-full max-w-4xl p-8 md:p-12 shadow-xl flex flex-col justify-center relative overflow-hidden group mb-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
-                            <div id="header-theme-icon" class="absolute right-[-20px] bottom-[-30px] text-[180px] opacity-5 transform rotate-15 pointer-events-none">${themeIcon}</div>
-                            <h1 class="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-tight drop-shadow-lg glow-animate" style="color: ${state.projectColor}">
+            html += `<div class="dashboard-slide" id="slide-home">
+                        <div class="module-full-content glass-card p-10 md:p-16 shadow-2xl justify-center relative overflow-hidden group bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
+                            <div id="header-theme-icon" class="absolute right-[-20px] bottom-[-30px] text-[250px] opacity-5 transform rotate-15 pointer-events-none">${themeIcon}</div>
+                            <h1 class="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-tight drop-shadow-lg glow-animate mb-4" style="color: ${state.projectColor}">
                                 <span>${firstPart}</span> <span class="italic opacity-80">${restPart}</span>
                             </h1>
-                            <p class="opacity-70 text-lg mt-2 font-semibold relative z-10 mb-8">Stratejik İlerleme ve Veri Analizi</p>
-                            ${calHtml}
+                            <p class="opacity-70 text-2xl font-semibold relative z-10 mb-12">Stratejik İlerleme ve Veri Analizi</p>
+                            <div class="bg-white/50 dark:bg-black/20 p-8 rounded-3xl backdrop-blur-sm shadow-inner max-w-2xl">
+                                ${calHtml}
+                            </div>
                         </div>
-                        <p class="text-xs font-bold opacity-50 flex items-center gap-2 animate-bounce"><span>←</span> Kaydırarak Başlayın <span>→</span></p>
                      </div>`;
 
             // --- SLIDE 2..N: AKTİF MODÜLLER ---
@@ -684,66 +751,66 @@
                 else if(mod.type === 'tasks') contentHtml = window.renderTasks(mod);
                 else if(mod.type === 'journal') contentHtml = window.renderJournal(mod);
 
-                let isFs = (mod.type === 'pomodoro' && pomoState.isFullScreen) ? 'h-full justify-center' : '';
-
-                html += `<div class="swipe-slide" id="slide-${mod.id}">
-                            <div class="glass-card w-full max-w-5xl p-6 md:p-8 shadow-xl flex flex-col h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl overflow-y-auto custom-scroll ${isFs}">
-                                <div class="mod-header flex justify-between items-start mb-2 gap-4 pb-2 border-b border-black/5">
-                                    <h2 class="text-xl md:text-2xl font-black uppercase tracking-tight opacity-80 flex items-center gap-2">${mod.icon} ${mod.title}</h2>
-                                    <button onclick="openUnifiedPanel('${mod.id}')" class="text-xl bg-indigo-100 text-indigo-700 w-10 h-10 flex items-center justify-center rounded-lg hover:bg-indigo-200 transition shrink-0">⚙️</button>
+                html += `<div class="dashboard-slide" id="slide-${mod.id}">
+                            <div class="module-full-content glass-card p-8 md:p-12 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
+                                <div class="flex justify-between items-center mb-6 pb-4 border-b border-black/10 shrink-0">
+                                    <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tight opacity-80 flex items-center gap-3">${mod.icon} ${mod.title}</h2>
+                                    <button onclick="openUnifiedPanel('${mod.id}')" class="text-2xl bg-indigo-100 text-indigo-700 w-14 h-14 flex items-center justify-center rounded-xl hover:bg-indigo-200 transition shadow-sm shrink-0">⚙️</button>
                                 </div>
-                                ${contentHtml}
+                                <div class="flex-1 overflow-hidden flex flex-col relative w-full">
+                                    ${contentHtml}
+                                </div>
                             </div>
                          </div>`;
             });
 
             // --- SLIDE N+1: AYARLAR VE DÜZENLEME ---
-            let setHtml = `<div class="swipe-slide" id="slide-settings">
-                <div class="glass-card w-full max-w-5xl p-6 md:p-8 shadow-xl flex flex-col h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl overflow-y-auto custom-scroll">
-                    <h2 class="text-2xl md:text-3xl font-black uppercase tracking-tight opacity-80 flex items-center gap-2 mb-6 border-b border-black/10 pb-4">⚙️ Ayarlar & Sayfa Düzeni</h2>
+            let setHtml = `<div class="dashboard-slide" id="slide-settings">
+                <div class="module-full-content glass-card p-8 md:p-12 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl overflow-y-auto custom-scroll">
+                    <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tight opacity-80 flex items-center gap-3 mb-8 border-b border-black/10 pb-4 shrink-0">⚙️ Ayarlar & Sayfa Düzeni</h2>
                     
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 h-full items-start">
                         <!-- SOL: SAYFA YÖNETİMİ -->
-                        <div class="space-y-4">
-                            <h3 class="text-lg font-black text-indigo-600 mb-4 flex items-center justify-between">
+                        <div class="space-y-6">
+                            <h3 class="text-xl font-black text-indigo-600 mb-4 flex items-center justify-between">
                                 📱 Sayfa Düzeni (Aktif Araçlar)
-                                <span class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-1 rounded">Sol/Sağ oklarıyla sırayı değiştirin</span>
+                                <span class="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg">Sol/Sağ oklarıyla sırayı değiştirin</span>
                             </h3>
-                            <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center opacity-70">
-                                <span class="font-bold text-sm">🏠 Ana Ekran (Takvim & Başlık)</span>
-                                <span class="text-xs font-black">Sayfa 1 (Sabit)</span>
+                            <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center opacity-70">
+                                <span class="font-bold text-base">🏠 Ana Ekran (Takvim & Başlık)</span>
+                                <span class="text-sm font-black">Sayfa 1 (Sabit)</span>
                             </div>`;
             
             state.activeModules.forEach((m, idx) => {
-                setHtml += `<div class="bg-white dark:bg-slate-700 p-3 rounded-xl border-2 border-indigo-100 dark:border-indigo-900 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <div class="font-bold flex items-center gap-2 text-sm flex-1 truncate">
-                                    <span class="text-xl w-6 text-center">${m.icon}</span> <span class="truncate">${m.title}</span>
-                                    <span class="text-[10px] ml-2 text-indigo-500 font-black bg-indigo-50 px-2 py-0.5 rounded">Sayfa ${idx+2}</span>
+                setHtml += `<div class="bg-white dark:bg-slate-700 p-4 rounded-xl border-2 border-indigo-100 dark:border-indigo-900 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div class="font-bold flex items-center gap-3 text-base flex-1 truncate">
+                                    <span class="text-2xl w-8 text-center">${m.icon}</span> <span class="truncate">${m.title}</span>
+                                    <span class="text-xs ml-3 text-indigo-500 font-black bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100">Sayfa ${idx+2}</span>
                                 </div>
-                                <div class="flex items-center gap-1 shrink-0 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
-                                    <button onclick="moveModuleList(${idx}, -1)" class="w-8 h-8 flex items-center justify-center bg-white dark:bg-slate-600 rounded shadow-sm font-bold hover:bg-indigo-50 transition" ${idx === 0 ? 'disabled opacity-30' : ''}>←</button>
-                                    <button onclick="moveModuleList(${idx}, 1)" class="w-8 h-8 flex items-center justify-center bg-white dark:bg-slate-600 rounded shadow-sm font-bold hover:bg-indigo-50 transition" ${idx === state.activeModules.length - 1 ? 'disabled opacity-30' : ''}>→</button>
-                                    <div class="w-px h-6 bg-black/10 mx-1"></div>
-                                    <button onclick="removeActiveModule('${m.id}')" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 rounded shadow-sm font-bold hover:bg-red-500 hover:text-white transition">🗑️</button>
+                                <div class="flex items-center gap-2 shrink-0 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-xl">
+                                    <button onclick="moveModuleList(${idx}, -1)" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-600 rounded-lg shadow-sm font-bold text-lg hover:bg-indigo-50 transition" ${idx === 0 ? 'disabled opacity-30' : ''}>←</button>
+                                    <button onclick="moveModuleList(${idx}, 1)" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-600 rounded-lg shadow-sm font-bold text-lg hover:bg-indigo-50 transition" ${idx === state.activeModules.length - 1 ? 'disabled opacity-30' : ''}>→</button>
+                                    <div class="w-px h-8 bg-black/10 mx-2"></div>
+                                    <button onclick="removeActiveModule('${m.id}')" class="w-10 h-10 flex items-center justify-center bg-red-50 text-red-500 rounded-lg shadow-sm font-bold text-lg hover:bg-red-500 hover:text-white transition">🗑️</button>
                                 </div>
                             </div>`;
             });
 
-            setHtml += `<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center opacity-70 mt-4">
-                            <span class="font-bold text-sm">⚙️ Ayarlar & Düzenleme</span>
-                            <span class="text-xs font-black">Sayfa ${totalSlides} (Sabit)</span>
+            setHtml += `<div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center opacity-70 mt-6">
+                            <span class="font-bold text-base">⚙️ Ayarlar & Düzenleme</span>
+                            <span class="text-sm font-black">Sayfa ${totalSlides} (Sabit)</span>
                         </div>
                         
-                        <div class="mt-8">
-                            <h3 class="text-sm font-black text-slate-500 mb-3 uppercase tracking-widest">➕ Araç Ekle (Pasif Olanlar)</h3>
-                            <div id="settings-avail-modules" class="space-y-2">`;
+                        <div class="mt-10">
+                            <h3 class="text-base font-black text-slate-500 mb-4 uppercase tracking-widest border-b border-slate-200 pb-2">➕ Araç Ekle (Pasif Olanlar)</h3>
+                            <div id="settings-avail-modules" class="space-y-3">`;
             
             const inactive = state.modules.filter(m => !state.activeModules.some(active => active.id === m.id));
-            if(inactive.length === 0) setHtml += `<p class="text-xs opacity-50 font-bold p-4 bg-black/5 rounded-xl text-center">Tüm araçlar sayfalarınızda ekli.</p>`;
+            if(inactive.length === 0) setHtml += `<p class="text-sm opacity-50 font-bold p-6 bg-black/5 rounded-2xl text-center">Tüm araçlar sayfalarınızda ekli.</p>`;
             inactive.forEach(m => {
-                setHtml += `<div class="flex items-center justify-between p-3 border-2 border-black/5 border-dashed rounded-xl transition hover:border-indigo-200">
-                                <div class="font-bold flex items-center gap-2 text-sm"><span class="text-xl">${m.icon}</span> ${m.title}</div>
-                                <button onclick="addModuleFromSettings('${m.id}')" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm transition">+ Ekle</button>
+                setHtml += `<div class="flex items-center justify-between p-4 border-2 border-black/10 border-dashed rounded-xl transition hover:border-indigo-300 bg-white/50 dark:bg-slate-800/50">
+                                <div class="font-bold flex items-center gap-3 text-base"><span class="text-2xl">${m.icon}</span> ${m.title}</div>
+                                <button onclick="addModuleFromSettings('${m.id}')" class="bg-indigo-600 text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-md transition transform hover:-translate-y-1">+ Ekle</button>
                             </div>`;
             });
 
@@ -752,35 +819,35 @@
                     </div>
 
                         <!-- SAĞ: GENEL AYARLAR -->
-                        <div class="space-y-6 bg-black/5 p-6 rounded-2xl border border-black/5 h-fit">
-                            <h3 class="text-lg font-black text-indigo-600 mb-4 border-b border-black/10 pb-2">🎨 Genel Görünüm</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div><label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 ml-1">Proje Adı</label><input type="text" id="set-proj-name" class="custom-input mt-1 font-bold" value="${state.projectName}" onchange="updateGlobalSettings()"></div>
-                                <div><label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 ml-1">Başlık Rengi</label><input type="color" id="set-proj-color" class="w-full h-10 rounded-xl cursor-pointer border-0 p-0 shadow-sm mt-1 block" value="${state.projectColor}" onchange="updateGlobalSettings()"></div>
+                        <div class="space-y-8 bg-black/5 p-8 rounded-3xl border border-black/5 h-fit shadow-inner">
+                            <h3 class="text-2xl font-black text-indigo-600 mb-6 border-b border-black/10 pb-3">🎨 Genel Görünüm</h3>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div><label class="text-xs font-black uppercase opacity-60 text-indigo-600 ml-1">Proje Adı</label><input type="text" id="set-proj-name" class="custom-input mt-2 font-bold text-lg p-3" value="${state.projectName}" onchange="updateGlobalSettings()"></div>
+                                <div><label class="text-xs font-black uppercase opacity-60 text-indigo-600 ml-1">Başlık Rengi</label><input type="color" id="set-proj-color" class="w-full h-12 rounded-xl cursor-pointer border-0 p-0 shadow-sm mt-2 block" value="${state.projectColor}" onchange="updateGlobalSettings()"></div>
                             </div>
-                            <div>
-                                <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 block mb-2 ml-1">Tema Parlaklığı</label>
-                                <div class="flex items-center gap-4 bg-white dark:bg-slate-700 p-2 rounded-xl border border-black/5 shadow-sm">
-                                    <span class="text-xl">🌘</span>
+                            <div class="pt-4">
+                                <label class="text-xs font-black uppercase opacity-60 text-indigo-600 block mb-3 ml-1">Tema Parlaklığı</label>
+                                <div class="flex items-center gap-4 bg-white dark:bg-slate-700 p-4 rounded-xl border border-black/5 shadow-sm">
+                                    <span class="text-2xl">🌘</span>
                                     <input type="range" min="0.5" max="1.5" step="0.1" value="${state.themeBrightness || 1}" oninput="changeThemeBrightness(this.value)" class="w-full cursor-pointer accent-indigo-600">
-                                    <span class="text-xl">☀️</span>
+                                    <span class="text-2xl">☀️</span>
                                 </div>
                             </div>
-                            <div>
-                                <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 block mb-2 ml-1">Tema Değiştir</label>
-                                <div class="grid grid-cols-3 sm:grid-cols-4 gap-2 text-[10px] max-h-48 overflow-y-auto custom-scroll p-1">`;
+                            <div class="pt-4">
+                                <label class="text-xs font-black uppercase opacity-60 text-indigo-600 block mb-3 ml-1">Tema Değiştir</label>
+                                <div class="grid grid-cols-3 sm:grid-cols-4 gap-3 text-xs max-h-64 overflow-y-auto custom-scroll p-2 border border-black/10 rounded-2xl bg-white/50 dark:bg-slate-800/50">`;
                                 
             ALL_THEMES.forEach(t => {
-                let bClass = state.theme === t.id ? 'border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-900/50 dark:text-indigo-200' : 'border-black/10 opacity-70 hover:opacity-100 bg-white dark:bg-slate-700';
-                setHtml += `<div onclick="selectTheme('${t.id}', false)" class="p-2 border-2 rounded-xl cursor-pointer font-bold text-center transition ${bClass} flex flex-col items-center gap-1">
-                                <span class="text-base">${t.icon}</span><span class="truncate w-full">${t.name}</span>
+                let bClass = state.theme === t.id ? 'border-indigo-600 bg-indigo-100 text-indigo-800 shadow-md dark:bg-indigo-900/80 dark:text-indigo-100 scale-105 transform' : 'border-black/10 opacity-70 hover:opacity-100 bg-white dark:bg-slate-700 hover:scale-105 transform';
+                setHtml += `<div onclick="selectTheme('${t.id}', false)" class="p-3 border-2 rounded-xl cursor-pointer font-bold text-center transition-all ${bClass} flex flex-col items-center gap-2">
+                                <span class="text-2xl">${t.icon}</span><span class="truncate w-full">${t.name}</span>
                             </div>`;
             });
             
             setHtml += `        </div>
                             </div>
-                            <div class="border-t border-black/10 pt-4 mt-6">
-                                <button onclick="handleLogout()" class="btn-danger flex justify-center items-center gap-2 py-3"><span class="text-xl">🚪</span> Çıkış Yap</button>
+                            <div class="border-t border-black/10 pt-6 mt-8">
+                                <button onclick="handleLogout()" class="btn-danger flex justify-center items-center gap-3 py-4 text-lg"><span class="text-2xl">🚪</span> Platformdan Çıkış Yap</button>
                             </div>
                         </div>
                     </div>
@@ -793,9 +860,10 @@
             // Nokta Göstergelerini Oluştur
             let dotHtml = '';
             for(let i=0; i<totalSlides; i++) {
-                dotHtml += `<div class="slide-dot ${i===0 ? 'active':''}" onclick="goToSlide(${i})"></div>`;
+                dotHtml += `<div class="slide-dot ${i===currentSlideIndex ? 'active':''}" onclick="goToSlide(${i})"></div>`;
             }
             indicators.innerHTML = dotHtml;
+            window.updateUINav(); // Butonların disabled durumunu kontrol et
 
             // Chart Render
             setTimeout(() => { 
@@ -810,7 +878,7 @@
             if(name.trim()) state.projectName = name;
             state.projectColor = document.getElementById('set-proj-color').value;
             
-            // İlk slayttaki başlığı bulup anlık güncelle (renderDashboard çağırmadan UI'ı bozmamak için)
+            // İlk slayttaki başlığı bulup anlık güncelle
             const titleEl = document.getElementById('dashboard-title');
             if(titleEl) {
                 titleEl.style.color = state.projectColor;
@@ -875,7 +943,7 @@
                 pomoState.isRunning = false;
                 pomoState.isFinished = true; 
                 window.renderDashboard();
-                // Pomodoro sayfasını bulup oraya kaydır (Eğer ekrandaysa)
+                // Pomodoro sayfasını bulup oraya kaydır
                 const pIdx = state.activeModules.findIndex(m => m.id === 'pomodoro');
                 if(pIdx !== -1) window.goToSlide(pIdx + 1);
             }
@@ -884,13 +952,6 @@
         window.togglePomo = function() {
             if(pomoState.isRunning) { clearInterval(pomoState.interval); pomoState.isRunning = false; } 
             else { pomoState.interval = setInterval(window.tickPomo, 1000); pomoState.isRunning = true; }
-            window.renderDashboard();
-            const pIdx = state.activeModules.findIndex(m => m.id === 'pomodoro');
-            if(pIdx !== -1) window.goToSlide(pIdx + 1);
-        }
-
-        window.togglePomoFullscreen = function() {
-            pomoState.isFullScreen = !pomoState.isFullScreen;
             window.renderDashboard();
             const pIdx = state.activeModules.findIndex(m => m.id === 'pomodoro');
             if(pIdx !== -1) window.goToSlide(pIdx + 1);
@@ -962,32 +1023,32 @@
             let mainContent = '';
 
             if (pomoState.isFinished) {
-                mainContent = '<div class="w-full max-w-md bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-2xl border border-indigo-200 dark:border-indigo-700 text-center animate-pulse shadow-inner">';
-                mainContent += '<h4 class="text-xl font-black text-indigo-600 dark:text-indigo-400 mb-2">🎉 Süre Doldu!</h4>';
-                mainContent += '<p class="text-sm font-bold opacity-70 mb-4">Bu oturumda ne üzerinde çalıştınız?</p>';
-                mainContent += '<input type="text" id="pomo-log-input" class="custom-input mb-4 font-bold" placeholder="Örn: Literatür taraması yapıldı..." autofocus>';
-                mainContent += '<div class="flex gap-2 justify-center">';
-                mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-4 py-3 rounded-xl font-black text-xs hover:bg-slate-300 transition">İptal Et</button>';
-                mainContent += '<button onclick="savePomoLog(\'' + mod.id + '\')" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-black text-xs shadow-lg hover:bg-indigo-700 transition">Kaydet</button>';
+                mainContent = '<div class="w-full max-w-2xl bg-indigo-50 dark:bg-indigo-900/30 p-10 rounded-3xl border-2 border-indigo-200 dark:border-indigo-700 text-center animate-pulse shadow-inner">';
+                mainContent += '<h4 class="text-4xl font-black text-indigo-600 dark:text-indigo-400 mb-4">🎉 Süre Doldu!</h4>';
+                mainContent += '<p class="text-xl font-bold opacity-70 mb-8">Bu oturumda ne üzerinde çalıştınız?</p>';
+                mainContent += '<input type="text" id="pomo-log-input" class="custom-input !py-4 !text-xl mb-8 font-bold" placeholder="Örn: Literatür taraması yapıldı..." autofocus>';
+                mainContent += '<div class="flex gap-4 justify-center">';
+                mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-8 py-4 rounded-2xl font-black text-lg hover:bg-slate-300 transition">İptal Et</button>';
+                mainContent += '<button onclick="savePomoLog(\'' + mod.id + '\')" class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-indigo-700 transition">Kaydet</button>';
                 mainContent += '</div></div>';
             } else {
                 let wClass = pomoState.mode==='work' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-700';
                 let sClass = pomoState.mode==='short' ? 'bg-emerald-500 text-white shadow-md' : 'text-slate-500 hover:text-slate-700';
                 let lClass = pomoState.mode==='long' ? 'bg-blue-500 text-white shadow-md' : 'text-slate-500 hover:text-slate-700';
                 
-                mainContent = '<div class="pomo-mode-btns flex gap-2 mb-6 bg-black/5 p-1.5 rounded-full shadow-inner mx-auto w-fit">';
-                mainContent += '<button onclick="setPomoMode(\'work\', ' + workM + ')" class="px-5 py-2 rounded-full text-xs font-bold transition ' + wClass + '">Odaklan</button>';
-                mainContent += '<button onclick="setPomoMode(\'short\', ' + shortM + ')" class="px-5 py-2 rounded-full text-xs font-bold transition ' + sClass + '">Kısa Mola</button>';
-                mainContent += '<button onclick="setPomoMode(\'long\', ' + longM + ')" class="px-5 py-2 rounded-full text-xs font-bold transition ' + lClass + '">Uzun Mola</button>';
+                mainContent = '<div class="pomo-mode-btns flex gap-3 mb-10 bg-black/5 p-2 rounded-full shadow-inner mx-auto w-fit">';
+                mainContent += '<button onclick="setPomoMode(\'work\', ' + workM + ')" class="px-8 py-3 rounded-full text-base font-bold transition ' + wClass + '">Odaklan</button>';
+                mainContent += '<button onclick="setPomoMode(\'short\', ' + shortM + ')" class="px-8 py-3 rounded-full text-base font-bold transition ' + sClass + '">Kısa Mola</button>';
+                mainContent += '<button onclick="setPomoMode(\'long\', ' + longM + ')" class="px-8 py-3 rounded-full text-base font-bold transition ' + lClass + '">Uzun Mola</button>';
                 mainContent += '</div>';
-                mainContent += '<div class="text-[15vmin] font-black font-pomodoro tracking-tighter mb-8 text-current drop-shadow-md transition-all duration-300 text-center" id="pomo-time-display">' + formatPomoTime(pomoState.timeLeft) + '</div>';
+                mainContent += '<div class="text-[25vmin] font-black font-pomodoro tracking-tighter mb-12 text-current drop-shadow-xl transition-all duration-300 text-center" id="pomo-time-display">' + formatPomoTime(pomoState.timeLeft) + '</div>';
                 
-                mainContent += '<div class="pomo-btn-group flex gap-3 w-full justify-center transition-all duration-300">';
-                mainContent += '<button onclick="togglePomo()" class="bg-indigo-600 text-white px-6 py-4 rounded-2xl font-black text-sm shadow-xl hover:bg-indigo-700 hover:-translate-y-1 transition transform flex items-center justify-center gap-2 max-w-[200px] flex-1">';
+                mainContent += '<div class="pomo-btn-group flex gap-6 w-full justify-center transition-all duration-300">';
+                mainContent += '<button onclick="togglePomo()" class="bg-indigo-600 text-white px-10 py-6 rounded-3xl font-black text-2xl shadow-2xl hover:bg-indigo-700 hover:-translate-y-2 transition transform flex items-center justify-center gap-3 w-[300px]">';
                 mainContent += pomoState.isRunning ? '⏸️ DURAKLAT' : '▶️ BAŞLAT';
                 mainContent += '</button>';
-                mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-4 py-4 rounded-2xl font-black text-sm shadow hover:bg-slate-300 transition" title="Sıfırla">🔄</button>';
-                mainContent += '<button onclick="openPomoAnalytics(\'' + mod.id + '\')" class="bg-blue-100 text-blue-700 px-4 py-4 rounded-2xl font-black text-sm shadow hover:bg-blue-200 transition" title="Kayıtlar ve Analiz">📊</button>';
+                mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-6 py-6 rounded-3xl font-black text-2xl shadow-md hover:bg-slate-300 transition" title="Sıfırla">🔄</button>';
+                mainContent += '<button onclick="openPomoAnalytics(\'' + mod.id + '\')" class="bg-blue-100 text-blue-700 px-6 py-6 rounded-3xl font-black text-2xl shadow-md hover:bg-blue-200 transition" title="Kayıtlar ve Analiz">📊</button>';
                 mainContent += '</div>';
             }
             return '<div class="flex flex-col items-center justify-center py-4 w-full h-full">' + mainContent + '</div>';
@@ -1063,31 +1124,31 @@
             data.forEach(d => { tDone += d.completed; tTarget += d.total; });
             const overall = tTarget > 0 ? Math.round((tDone/tTarget)*100) : 0;
             
-            let html = '<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">';
-            html += '<div class="glass-card p-4 text-center border border-black/5"><p class="text-[10px] font-black uppercase opacity-60">Başarı</p><p class="text-3xl font-black flame-gold mt-1">%' + overall + '</p></div>';
-            html += '<div class="glass-card p-4 text-center border border-black/5"><p class="text-[10px] font-black uppercase opacity-60">Biten</p><p class="text-3xl font-black mt-1">' + tDone + '</p></div>';
-            html += '<div class="glass-card p-4 text-center border border-black/5"><p class="text-[10px] font-black uppercase opacity-60">Kalan</p><p class="text-3xl font-black text-indigo-600 mt-1">' + (tTarget-tDone) + '</p></div>';
-            html += '<div class="glass-card p-4 text-center border border-black/5"><p class="text-[10px] font-black uppercase opacity-60">Kategori</p><p class="text-3xl font-black mt-1">' + data.length + '</p></div>';
+            let html = '<div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10 w-full shrink-0">';
+            html += '<div class="glass-card p-6 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-sm font-black uppercase opacity-60">Başarı</p><p class="text-5xl font-black flame-gold mt-2">%' + overall + '</p></div>';
+            html += '<div class="glass-card p-6 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-sm font-black uppercase opacity-60">Biten</p><p class="text-5xl font-black mt-2">' + tDone + '</p></div>';
+            html += '<div class="glass-card p-6 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-sm font-black uppercase opacity-60">Kalan</p><p class="text-5xl font-black text-indigo-600 mt-2">' + (tTarget-tDone) + '</p></div>';
+            html += '<div class="glass-card p-6 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-sm font-black uppercase opacity-60">Kategori</p><p class="text-5xl font-black mt-2">' + data.length + '</p></div>';
             html += '</div>';
             
-            html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center flex-1 h-0 min-h-[250px]">';
-            html += '<div class="w-full h-full relative flex items-center justify-center min-h-[200px]"><canvas id="radarChart"></canvas></div>';
-            html += '<div class="space-y-4 h-full overflow-y-auto pr-2 custom-scroll py-2">';
+            html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center flex-1 h-0 min-h-[300px] w-full">';
+            html += '<div class="w-full h-full relative flex items-center justify-center p-4 bg-white/50 dark:bg-black/20 rounded-3xl border border-black/5"><canvas id="radarChart"></canvas></div>';
+            html += '<div class="space-y-6 h-full overflow-y-auto pr-4 custom-scroll py-2">';
             
             data.forEach(s => {
                 const perc = s.total > 0 ? Math.round((s.completed/s.total)*100) : 0;
                 let bg = perc===100 ? 'bg-amber-400' : 'bg-indigo-600';
-                html += '<div><div class="flex justify-between text-xs font-bold mb-1 opacity-80"><span>' + s.emoji + ' ' + s.title + '</span> <span>%' + perc + '</span></div>';
-                html += '<div class="h-2 bg-black/10 rounded-full overflow-hidden"><div class="h-full ' + bg + '" style="width:' + perc + '%"></div></div></div>';
+                html += '<div><div class="flex justify-between text-base font-bold mb-2 opacity-80"><span>' + s.emoji + ' ' + s.title + '</span> <span>%' + perc + '</span></div>';
+                html += '<div class="h-4 bg-black/10 rounded-full overflow-hidden shadow-inner"><div class="h-full ' + bg + ' transition-all duration-1000" style="width:' + perc + '%"></div></div></div>';
             });
             html += '</div></div>';
             return html;
         }
 
         window.renderTasks = function(mod) {
-            let html = '<div class="overflow-x-auto overflow-y-auto mt-4 flex-1 h-0 custom-scroll"><table class="w-full text-left border-collapse min-w-[800px]">';
-            html += '<thead class="bg-black/5 uppercase text-[10px] font-black tracking-widest border-b border-black/10 sticky top-0 z-10 backdrop-blur-md">';
-            html += '<tr><th class="px-8 py-4 w-1/3">' + (mod.columns.task || 'GÖREV') + '</th><th class="px-8 py-4 w-1/3">' + (mod.columns.progress || 'İLERLEME') + '</th><th class="px-8 py-4 w-1/3">' + (mod.columns.note || 'NOTLAR') + '</th><th class="w-16"></th></tr></thead>';
+            let html = '<div class="overflow-x-auto overflow-y-auto mt-6 flex-1 h-0 custom-scroll border border-black/10 rounded-2xl bg-white/50 dark:bg-black/20"><table class="w-full text-left border-collapse min-w-[800px]">';
+            html += '<thead class="bg-black/5 uppercase text-xs font-black tracking-widest border-b border-black/10 sticky top-0 z-10 backdrop-blur-xl">';
+            html += '<tr><th class="px-8 py-6 w-1/3">' + (mod.columns.task || 'GÖREV') + '</th><th class="px-8 py-6 w-1/3">' + (mod.columns.progress || 'İLERLEME') + '</th><th class="px-8 py-6 w-1/3">' + (mod.columns.note || 'NOTLAR') + '</th><th class="w-20"></th></tr></thead>';
             html += '<tbody class="divide-y divide-black/5">';
             
             mod.data.forEach((d, i) => {
@@ -1095,12 +1156,12 @@
                 const style = getProgressStyle(progress);
                 let badgeClass = d.status === 'Yapıldı' ? 'badge-done' : (d.status === 'Diğer' ? 'badge-other' : 'badge-pending');
 
-                html += '<tr class="hover:bg-black/5 transition text-sm relative group">';
-                html += '<td class="px-8 py-6 font-bold text-slate-800 dark:text-slate-200">' + d.task + '</td>';
-                html += '<td class="px-8 py-6"><div class="flex items-center gap-3"><div class="w-full bg-black/10 rounded-full h-2 overflow-hidden shadow-inner"><div class="h-full ' + style.color + ' ' + style.anim + ' transition-all duration-1000" style="width:' + progress + '%"></div></div><span class="text-[10px] font-black opacity-60 w-8 text-right">%' + progress + '</span></div>';
-                html += '<div class="mt-2"><span class="status-badge ' + badgeClass + ' scale-75 origin-left inline-block">' + d.status + '</span></div></td>';
-                html += '<td class="px-8 py-6 italic opacity-60 text-xs">' + (d.note || '-') + '</td>';
-                html += '<td class="px-4 py-6 text-right opacity-0 group-hover:opacity-100 transition"><button onclick="openUnifiedPanel(\'' + mod.id + '\')" class="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-[10px] font-black shadow hover:bg-indigo-100">DÜZENLE</button></td>';
+                html += '<tr class="hover:bg-black/5 transition-colors text-base relative group">';
+                html += '<td class="px-8 py-8 font-bold text-slate-800 dark:text-slate-200">' + d.task + '</td>';
+                html += '<td class="px-8 py-8"><div class="flex items-center gap-4"><div class="w-full bg-black/10 rounded-full h-3 overflow-hidden shadow-inner"><div class="h-full ' + style.color + ' ' + style.anim + ' transition-all duration-1000" style="width:' + progress + '%"></div></div><span class="text-xs font-black opacity-60 w-10 text-right">%' + progress + '</span></div>';
+                html += '<div class="mt-3"><span class="status-badge ' + badgeClass + ' text-xs inline-block">' + d.status + '</span></div></td>';
+                html += '<td class="px-8 py-8 italic opacity-60 text-sm">' + (d.note || '-') + '</td>';
+                html += '<td class="px-4 py-8 text-right opacity-0 group-hover:opacity-100 transition"><button onclick="openUnifiedPanel(\'' + mod.id + '\')" class="text-indigo-600 bg-indigo-100 px-4 py-2 rounded-xl text-xs font-black shadow hover:bg-indigo-200">DÜZENLE</button></td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';
@@ -1108,42 +1169,70 @@
         }
 
         window.renderContacts = function(mod) {
-            let html = '<div class="overflow-x-auto overflow-y-auto mt-4 flex-1 h-0 custom-scroll"><table class="w-full text-left border-collapse min-w-[1000px]">';
-            html += '<thead class="bg-black/5 uppercase text-[10px] font-black tracking-widest border-b border-black/10 sticky top-0 z-10 backdrop-blur-md">';
-            html += '<tr><th class="px-8 py-4">' + (mod.columns.name || 'AD SOYAD') + '</th><th class="px-8 py-4">' + (mod.columns.role || 'ROL') + '</th><th class="px-8 py-4">' + (mod.columns.contact || 'İLETİŞİM') + '</th><th class="px-8 py-4">' + (mod.columns.ref || 'REFERANS') + '</th><th class="px-8 py-4">' + (mod.columns.note || 'NOTLAR') + '</th><th class="w-16"></th></tr></thead>';
+            let html = '<div class="overflow-x-auto overflow-y-auto mt-6 flex-1 h-0 custom-scroll border border-black/10 rounded-2xl bg-white/50 dark:bg-black/20"><table class="w-full text-left border-collapse min-w-[1000px]">';
+            html += '<thead class="bg-black/5 uppercase text-xs font-black tracking-widest border-b border-black/10 sticky top-0 z-10 backdrop-blur-xl">';
+            html += '<tr><th class="px-8 py-6">' + (mod.columns.name || 'AD SOYAD') + '</th><th class="px-8 py-6">' + (mod.columns.role || 'ROL') + '</th><th class="px-8 py-6">' + (mod.columns.contact || 'İLETİŞİM') + '</th><th class="px-8 py-6">' + (mod.columns.ref || 'REFERANS') + '</th><th class="px-8 py-6">' + (mod.columns.note || 'NOTLAR') + '</th><th class="w-20"></th></tr></thead>';
             html += '<tbody class="divide-y divide-black/5">';
             
             mod.data.forEach((d, i) => {
-                html += '<tr class="hover:bg-black/5 transition text-sm group">';
-                html += '<td class="px-8 py-6 font-bold">' + d.name + '</td>';
-                html += '<td class="px-8 py-6"><span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase">' + d.role + '</span></td>';
-                html += '<td class="px-8 py-6 font-medium opacity-80">' + d.contact + '</td>';
-                html += '<td class="px-8 py-6 opacity-80">👤 ' + d.ref + '</td>';
-                html += '<td class="px-8 py-6 text-xs italic opacity-60 max-w-[200px] truncate">' + (d.note || '-') + '</td>';
-                html += '<td class="px-4 py-6 text-right opacity-0 group-hover:opacity-100 transition"><button onclick="openUnifiedPanel(\'' + mod.id + '\')" class="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-[10px] font-black shadow hover:bg-indigo-100">DÜZENLE</button></td>';
+                html += '<tr class="hover:bg-black/5 transition-colors text-base group">';
+                html += '<td class="px-8 py-8 font-bold">' + d.name + '</td>';
+                html += '<td class="px-8 py-8"><span class="bg-indigo-100 text-indigo-600 px-4 py-1.5 rounded-xl text-xs font-black uppercase">' + d.role + '</span></td>';
+                html += '<td class="px-8 py-8 font-medium opacity-80">' + d.contact + '</td>';
+                html += '<td class="px-8 py-8 opacity-80">👤 ' + d.ref + '</td>';
+                html += '<td class="px-8 py-8 text-sm italic opacity-60 max-w-[250px] truncate">' + (d.note || '-') + '</td>';
+                html += '<td class="px-4 py-8 text-right opacity-0 group-hover:opacity-100 transition"><button onclick="openUnifiedPanel(\'' + mod.id + '\')" class="text-indigo-600 bg-indigo-100 px-4 py-2 rounded-xl text-xs font-black shadow hover:bg-indigo-200">DÜZENLE</button></td>';
                 html += '</tr>';
             });
             html += '</tbody></table></div>';
             return html;
         }
 
+        window.inlineUpdateInterview = function(modId, index, field, value) {
+            const mod = state.activeModules.find(m => m.id === modId);
+            if(mod && mod.data[index]) {
+                mod.data[index][field] = value;
+                window.saveDataToCloud();
+            }
+        }
+        
+        window.inlineAddInterview = function(modId) {
+            const mod = state.activeModules.find(m => m.id === modId);
+            if(mod) {
+                mod.data.push({code:'YENİ', name:'', interviewed:false, consent:false, transcribed:false});
+                window.renderDashboard();
+                window.saveDataToCloud();
+            }
+        }
+        
+        window.inlineDeleteInterview = function(modId, index) {
+            if(confirm('Bu kaydı silmek istediğinize emin misiniz?')) {
+                const mod = state.activeModules.find(m => m.id === modId);
+                if(mod && mod.data[index]) {
+                    mod.data.splice(index, 1);
+                    window.renderDashboard();
+                    window.saveDataToCloud();
+                }
+            }
+        }
+
         window.renderInterviews = function(mod) {
-            let html = '<div class="overflow-x-auto overflow-y-auto mt-4 flex-1 h-0 custom-scroll"><table class="w-full text-left text-sm whitespace-nowrap">';
-            html += '<thead class="bg-black/5 uppercase text-[10px] font-black tracking-widest border-b border-black/10 sticky top-0 z-10 backdrop-blur-md"><tr><th class="px-4 py-3">' + mod.columns.code + '</th><th class="px-4 py-3 w-full">' + mod.columns.name + '</th><th class="px-4 py-3 text-center">' + mod.columns.bool1 + '</th><th class="px-4 py-3 text-center">' + mod.columns.bool2 + '</th><th class="px-4 py-3 text-center">' + mod.columns.bool3 + '</th><th class="px-4 py-3 text-center">İşlem</th></tr></thead>';
+            let html = '<div class="overflow-x-auto overflow-y-auto mt-6 flex-1 h-0 custom-scroll border border-black/10 rounded-2xl bg-white/50 dark:bg-black/20"><table class="w-full text-left text-base whitespace-nowrap">';
+            html += '<thead class="bg-black/5 uppercase text-xs font-black tracking-widest border-b border-black/10 sticky top-0 z-10 backdrop-blur-xl"><tr><th class="px-6 py-6">' + mod.columns.code + '</th><th class="px-6 py-6 w-full">' + mod.columns.name + '</th><th class="px-6 py-6 text-center">' + mod.columns.bool1 + '</th><th class="px-6 py-6 text-center">' + mod.columns.bool2 + '</th><th class="px-6 py-6 text-center">' + mod.columns.bool3 + '</th><th class="px-6 py-6 text-center">İşlem</th></tr></thead>';
             html += '<tbody class="divide-y divide-black/5">';
             
             mod.data.forEach((d, i) => {
-                html += '<tr class="hover:bg-black/5 transition group">';
-                html += '<td class="px-4 py-3"><input type="text" class="bg-transparent font-black text-indigo-600 text-xs w-16 border-b border-transparent hover:border-black/20 focus:border-indigo-500 outline-none transition-colors" value="' + d.code + '" onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'code\', this.value)"></td>';
-                html += '<td class="px-4 py-3"><input type="text" class="bg-transparent font-bold w-full min-w-[150px] border-b border-transparent hover:border-black/20 focus:border-indigo-500 outline-none transition-colors" value="' + d.name + '" placeholder="İsim Girin" onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'name\', this.value)"></td>';
-                html += '<td class="px-4 py-3 text-center"><input type="checkbox" class="w-4 h-4 accent-indigo-600 cursor-pointer" ' + (d.interviewed ? 'checked' : '') + ' onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'interviewed\', this.checked)"></td>';
-                html += '<td class="px-4 py-3 text-center"><input type="checkbox" class="w-4 h-4 accent-indigo-600 cursor-pointer" ' + (d.consent ? 'checked' : '') + ' onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'consent\', this.checked)"></td>';
-                html += '<td class="px-4 py-3 text-center"><input type="checkbox" class="w-4 h-4 accent-indigo-600 cursor-pointer" ' + (d.transcribed ? 'checked' : '') + ' onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'transcribed\', this.checked)"></td>';
-                html += '<td class="px-4 py-3 text-center opacity-0 group-hover:opacity-100 transition"><button onclick="window.inlineDeleteInterview(\'' + mod.id + '\', ' + i + ')" class="text-red-500 font-bold text-[10px] bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition shadow-sm">SİL</button></td>';
+                html += '<tr class="hover:bg-black/5 transition-colors group">';
+                html += '<td class="px-6 py-6"><input type="text" class="bg-transparent font-black text-indigo-600 text-sm w-20 border-b border-transparent hover:border-black/20 focus:border-indigo-500 outline-none transition-colors" value="' + d.code + '" onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'code\', this.value)"></td>';
+                html += '<td class="px-6 py-6"><input type="text" class="bg-transparent font-bold w-full min-w-[200px] border-b border-transparent hover:border-black/20 focus:border-indigo-500 outline-none transition-colors" value="' + d.name + '" placeholder="İsim Girin" onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'name\', this.value)"></td>';
+                html += '<td class="px-6 py-6 text-center"><input type="checkbox" class="w-5 h-5 accent-indigo-600 cursor-pointer" ' + (d.interviewed ? 'checked' : '') + ' onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'interviewed\', this.checked)"></td>';
+                html += '<td class="px-6 py-6 text-center"><input type="checkbox" class="w-5 h-5 accent-indigo-600 cursor-pointer" ' + (d.consent ? 'checked' : '') + ' onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'consent\', this.checked)"></td>';
+                html += '<td class="px-6 py-6 text-center"><input type="checkbox" class="w-5 h-5 accent-indigo-600 cursor-pointer" ' + (d.transcribed ? 'checked' : '') + ' onchange="window.inlineUpdateInterview(\'' + mod.id + '\', ' + i + ', \'transcribed\', this.checked)"></td>';
+                html += '<td class="px-6 py-6 text-center opacity-0 group-hover:opacity-100 transition"><button onclick="window.inlineDeleteInterview(\'' + mod.id + '\', ' + i + ')" class="text-red-500 font-bold text-xs bg-red-100 px-4 py-2 rounded-xl hover:bg-red-200 transition shadow-sm">SİL</button></td>';
                 html += '</tr>';
             });
             
-            html += '<tr><td colspan="6" class="px-4 py-4 text-center border-t border-black/10"><button onclick="window.inlineAddInterview(\'' + mod.id + '\')" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-6 py-2.5 rounded-xl hover:bg-indigo-100 transition shadow-sm inline-flex items-center gap-2">+ Yeni Görüşme Ekle</button></td></tr>';
+            html += '<tr><td colspan="6" class="px-6 py-6 text-center border-t border-black/10"><button onclick="window.inlineAddInterview(\'' + mod.id + '\')" class="text-sm font-bold text-indigo-600 bg-indigo-100 px-8 py-3 rounded-xl hover:bg-indigo-200 transition shadow-sm inline-flex items-center gap-2">+ Yeni Görüşme Ekle</button></td></tr>';
             html += '</tbody></table></div>';
             return html;
         }
@@ -1151,28 +1240,28 @@
         window.renderJournal = function(mod) {
             let listHtml = '';
             if(mod.data.length === 0) {
-                listHtml = '<p class="opacity-50 text-center py-4 text-sm font-bold">Henüz kayıt yok.</p>';
+                listHtml = '<p class="opacity-50 text-center py-10 text-lg font-bold">Henüz kayıt yok.</p>';
             } else {
                 mod.data.forEach((d, i) => {
-                    listHtml += '<div class="glass-card p-4 rounded-xl border border-black/5 relative ml-4 mb-4 group hover:border-indigo-200 transition">';
-                    listHtml += '<div class="absolute -left-5 top-4 w-3 h-3 rounded-full bg-indigo-500 border-2 border-white shadow"></div>';
-                    listHtml += '<div class="flex justify-between items-start mb-2">';
-                    listHtml += '<div class="text-[10px] font-black text-indigo-500 uppercase">' + d.date + '</div>';
-                    listHtml += '<div class="opacity-0 group-hover:opacity-100 transition flex gap-1">';
-                    listHtml += '<button onclick="editJournalEntry(\'' + mod.id + '\', ' + i + ')" class="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded hover:bg-indigo-100">DÜZENLE</button>';
-                    listHtml += '<button onclick="deleteJournalEntry(\'' + mod.id + '\', ' + i + ')" class="text-[9px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded hover:bg-red-100">SİL</button>';
+                    listHtml += '<div class="glass-card p-6 md:p-8 rounded-3xl border border-black/5 relative ml-8 mb-6 group hover:border-indigo-300 transition bg-white/50 dark:bg-black/20">';
+                    listHtml += '<div class="absolute -left-10 top-6 w-5 h-5 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-800 shadow-md"></div>';
+                    listHtml += '<div class="flex justify-between items-start mb-4">';
+                    listHtml += '<div class="text-xs font-black text-indigo-500 uppercase tracking-widest">' + d.date + '</div>';
+                    listHtml += '<div class="opacity-0 group-hover:opacity-100 transition flex gap-2">';
+                    listHtml += '<button onclick="editJournalEntry(\'' + mod.id + '\', ' + i + ')" class="text-[10px] font-bold text-indigo-600 bg-indigo-100 px-3 py-1.5 rounded-lg hover:bg-indigo-200">DÜZENLE</button>';
+                    listHtml += '<button onclick="deleteJournalEntry(\'' + mod.id + '\', ' + i + ')" class="text-[10px] font-bold text-red-600 bg-red-100 px-3 py-1.5 rounded-lg hover:bg-red-200">SİL</button>';
                     listHtml += '</div></div>';
-                    listHtml += '<p class="text-sm font-semibold opacity-80">' + d.text + '</p>';
+                    listHtml += '<p class="text-lg font-medium opacity-90 leading-relaxed">' + d.text + '</p>';
                     listHtml += '</div>';
                 });
             }
 
-            let html = '<div class="flex flex-col h-full mt-4">';
-            html += '<div class="flex gap-2 mb-6 border-b border-black/10 pb-6">';
-            html += '<input type="text" id="journal-input-' + mod.id + '" class="custom-input flex-1" placeholder="' + (mod.columns.placeholder || 'Bugün neler yaptın?') + '">';
-            html += '<button onclick="addJournalEntry(\'' + mod.id + '\')" class="btn-primary !w-auto !py-2 !px-6 text-sm shadow-md">' + (mod.columns.btnText || 'Kaydet') + '</button>';
+            let html = '<div class="flex flex-col h-full mt-6">';
+            html += '<div class="flex gap-4 mb-10 border-b border-black/10 pb-8 shrink-0">';
+            html += '<input type="text" id="journal-input-' + mod.id + '" class="custom-input flex-1 !py-4 !text-lg !px-6 rounded-2xl shadow-inner" placeholder="' + (mod.columns.placeholder || 'Bugün neler yaptın?') + '">';
+            html += '<button onclick="addJournalEntry(\'' + mod.id + '\')" class="btn-primary !w-auto !py-4 !px-10 text-lg shadow-xl rounded-2xl hover:-translate-y-1 transform transition">' + (mod.columns.btnText || 'Kaydet') + '</button>';
             html += '</div>';
-            html += '<div class="flex-1 overflow-y-auto custom-scroll pr-2 mb-2">' + listHtml + '</div>';
+            html += '<div class="flex-1 overflow-y-auto custom-scroll pr-4 mb-2 pl-4">' + listHtml + '</div>';
             html += '</div>';
             return html;
         }
@@ -1323,6 +1412,17 @@
             setTimeout(() => { document.getElementById('panel-backdrop').classList.replace('block', 'hidden'); }, 300);
             state.editingModuleId = null;
         }
+
+        // KLAVYE OK TUŞLARI İLE GEZİNME (Opsiyonel)
+        document.addEventListener('keydown', (e) => {
+            if(document.getElementById('screen-dashboard').classList.contains('active')) {
+                // Eğer bir input alanındaysa klavye ok tuşları sayfayı değiştirmesin
+                if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+                
+                if (e.key === 'ArrowRight') window.slideBy(1);
+                if (e.key === 'ArrowLeft') window.slideBy(-1);
+            }
+        });
     </script>
 </body>
 </html>
