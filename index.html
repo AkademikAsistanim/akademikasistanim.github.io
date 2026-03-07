@@ -219,14 +219,16 @@
 
         /* --- DÜZENLEME MODU --- */
         .module-wrapper { position: relative; z-index: 1; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s; }
-        .drag-overlay { display: flex; opacity: 0; position: absolute; inset: 0; background: rgba(255,255,255,0.5); backdrop-filter: blur(2px); z-index: 10; border: 3px dashed #6366f1; border-radius: inherit; cursor: grab; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.3s ease; pointer-events: none; }
-        body.theme-dark .drag-overlay, body.theme-engineering .drag-overlay, body.theme-math .drag-overlay, body.theme-politics .drag-overlay, body.theme-harrypotter .drag-overlay, body.theme-lotr .drag-overlay, body.theme-got .drag-overlay, body.theme-astrology .drag-overlay, body.theme-gaming .drag-overlay, body.theme-cyan .drag-overlay, body.theme-emerald .drag-overlay { background: rgba(0,0,0,0.5); border-color: currentColor; }
+        .drag-overlay { display: flex; opacity: 0; position: absolute; inset: 0; background: rgba(255,255,255,0.7); backdrop-filter: blur(4px); z-index: 50; border: 3px dashed #6366f1; border-radius: inherit; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.3s ease; pointer-events: none; }
+        body.theme-dark .drag-overlay, body.theme-engineering .drag-overlay, body.theme-math .drag-overlay, body.theme-politics .drag-overlay, body.theme-harrypotter .drag-overlay, body.theme-lotr .drag-overlay, body.theme-got .drag-overlay, body.theme-astrology .drag-overlay, body.theme-gaming .drag-overlay, body.theme-cyan .drag-overlay, body.theme-emerald .drag-overlay { background: rgba(0,0,0,0.7); border-color: currentColor; }
         
         body.edit-mode-active .module-wrapper { transform: scale(0.96); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         body.edit-mode-active .drag-overlay { pointer-events: auto; }
         body.edit-mode-active .module-wrapper:hover { transform: scale(0.98); z-index: 2; }
         body.edit-mode-active .module-wrapper:hover .drag-overlay { opacity: 1; }
-        .drag-overlay:active { cursor: grabbing; background: rgba(99, 102, 241, 0.2); }
+        
+        .drag-bg-handle { position: absolute; inset:0; cursor: grab; z-index: 10; }
+        .drag-bg-handle:active { cursor: grabbing; background: rgba(99, 102, 241, 0.1); }
         .dragging { opacity: 0.4; transform: scale(0.90) !important; }
 
         /* --- SAĞ PANEL --- */
@@ -427,8 +429,8 @@
                 <div id="header-calendar-container" class="glass-card p-6 shadow-sm w-full md:w-96 flex flex-col justify-center z-10"></div>
             </header>
 
-            <!-- SÜRÜKLENEBİLİR MODÜL ALANI -->
-            <div id="dashboard-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 relative"></div>
+            <!-- SÜRÜKLENEBİLİR MODÜL ALANI (ARTIK YATAYDA 3 BİRİM) -->
+            <div id="dashboard-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 relative"></div>
         </div>
 
         <!-- SABİT KONTROL DOCK (Ayarlar, Düzenle, Çıkış) -->
@@ -450,7 +452,7 @@
                 
                 <div class="flex border-b border-black/10 px-6 pt-2 bg-black/5 overflow-x-auto">
                     <button onclick="switchSettingsTab('tab-general')" id="btn-tab-general" class="settings-tab-btn active whitespace-nowrap">Genel Görünüm & Tema</button>
-                    <button onclick="switchSettingsTab('tab-modules')" id="btn-tab-modules" class="settings-tab-btn whitespace-nowrap">Modül Ekle</button>
+                    <button onclick="switchSettingsTab('tab-modules')" id="btn-tab-modules" class="settings-tab-btn whitespace-nowrap">Modül Yönetimi</button>
                 </div>
 
                 <div class="p-6 overflow-y-auto flex-1 custom-scroll">
@@ -486,13 +488,13 @@
                     </div>
 
                     <div id="tab-modules" class="settings-tab-content">
-                        <p class="text-sm font-bold opacity-70 mb-4 bg-indigo-50 text-indigo-800 p-4 rounded-xl border border-indigo-100">Ekranınızda yer almayan araçları buradan bularak tekrar aktifleştirebilirsiniz.</p>
+                        <p class="text-sm font-bold opacity-70 mb-4 bg-indigo-50 text-indigo-800 p-4 rounded-xl border border-indigo-100">Ekranınızda yer almayan araçları buradan bularak tekrar aktifleştirebilirsiniz veya aktif olanları kaldırabilirsiniz.</p>
                         <div id="settings-available-modules" class="space-y-3"></div>
                     </div>
                 </div>
                 
                 <div class="p-5 border-t border-black/10 bg-black/5 flex justify-end gap-3">
-                    <button onclick="closeGlobalSettings()" class="btn-primary !w-auto !bg-slate-400">İptal</button>
+                    <button onclick="closeGlobalSettings()" class="btn-primary !w-auto !bg-slate-400">Pencereyi Kapat</button>
                     <button onclick="saveGlobalSettings()" class="btn-primary !w-auto">Ayarları Uygula</button>
                 </div>
             </div>
@@ -566,6 +568,7 @@
         ];
 
         // Varsayılan State (Yeni Üyeler İçin)
+        // DİKKAT: Artık colSpan değerleri lg:col-span-3, lg:col-span-2, lg:col-span-1 şeklinde (12'lik değil 3'lük grid sistemine göre)
         let state = {
             theme: 'theme-light',
             themeBrightness: 1,
@@ -579,12 +582,12 @@
             ],
             calendar: { id: 'header_calendar', type: 'calendar', title: 'TAKVİM', data: [ { label: 'Savunma Günü', targetDate: '2026-06-15', emoji: '🎓' }, { label: 'Tez Bitişi', targetDate: '2026-05-01', emoji: '📚' } ] },
             modules: [
-                { id: 'gorevler', type: 'tasks', selected: true, colSpan: 'lg:col-span-12', title: 'Akademik Görevler', icon: '✅', columns: { task: 'GÖREV', progress: 'İLERLEME', note: 'NOTLAR' }, data: [ { task: 'Literatür Taraması (Bölüm 2)', progress: 20, status: 'Yapılmadı', note: 'Kaynaklar toplanıyor' }, { task: 'Anket Formu Tasarımı', progress: 100, status: 'Yapıldı', note: 'Hocaya iletildi' } ] },
-                { id: 'genel_durum', type: 'stats', selected: true, colSpan: 'lg:col-span-8', title: 'Genel Durum & Ağ Dengesi', icon: '🕸️', data: [ { title: 'Akademisyenler', completed: 11, total: 11, emoji: '🎓' }, { title: 'Sivil Toplum', completed: 5, total: 6, emoji: '🌳' }, { title: 'Bürokratlar', completed: 4, total: 4, emoji: '🕴️' }, { title: 'Milletvekilleri', completed: 2, total: 6, emoji: '🏛️' } ] },
-                { id: 'pomodoro', type: 'pomodoro', selected: true, colSpan: 'lg:col-span-4', title: 'Pomodoro Tekniği', icon: '🍅', columns: { work: 25, short: 5, long: 15 }, data: [] },
-                { id: 'mulakatlar', type: 'interviews', selected: true, colSpan: 'lg:col-span-12', title: 'Süreç Takibi', icon: '🎙️', columns: { code: 'KOD', name: 'İSİM', bool1: 'GÖRÜŞME', bool2: 'ONAM', bool3: 'METİN' }, data: [ { code: 'AKA 1', name: 'Prof. Dr. Ahmet Yılmaz', interviewed: true, consent: true, transcribed: false }, { code: 'SİV 1', name: 'Dernek Başkanı V.', interviewed: true, consent: false, transcribed: false } ] },
-                { id: 'iletisim', type: 'contacts', selected: true, colSpan: 'lg:col-span-12', title: 'İletişim Rehberi', icon: '📞', columns: { name: 'AD SOYAD', role: 'ROL', contact: 'İLETİŞİM', ref: 'REFERANS', note: 'NOTLAR' }, data: [ { name: 'Ayşe Demir', role: 'Akademisyen', contact: 'ayse@uni.edu.tr', ref: 'Prof. Dr. X', note: 'Salı günleri müsaittir.' } ] },
-                { id: 'gunluk', type: 'journal', selected: true, colSpan: 'lg:col-span-12', title: 'Günlük', icon: '📓', columns: { placeholder: 'Bugün neler yaptın?', btnText: 'Kaydet' }, data: [ { date: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'}), text: 'Sistemi kurdum ve yeni arayüz ile çalışmalarıma başladım!' } ] }
+                { id: 'gorevler', type: 'tasks', selected: true, colSpan: 'lg:col-span-3', title: 'Akademik Görevler', icon: '✅', columns: { task: 'GÖREV', progress: 'İLERLEME', note: 'NOTLAR' }, data: [ { task: 'Literatür Taraması (Bölüm 2)', progress: 20, status: 'Yapılmadı', note: 'Kaynaklar toplanıyor' }, { task: 'Anket Formu Tasarımı', progress: 100, status: 'Yapıldı', note: 'Hocaya iletildi' } ] },
+                { id: 'genel_durum', type: 'stats', selected: true, colSpan: 'lg:col-span-2', title: 'Genel Durum & Ağ Dengesi', icon: '🕸️', data: [ { title: 'Akademisyenler', completed: 11, total: 11, emoji: '🎓' }, { title: 'Sivil Toplum', completed: 5, total: 6, emoji: '🌳' }, { title: 'Bürokratlar', completed: 4, total: 4, emoji: '🕴️' }, { title: 'Milletvekilleri', completed: 2, total: 6, emoji: '🏛️' } ] },
+                { id: 'pomodoro', type: 'pomodoro', selected: true, colSpan: 'lg:col-span-1', title: 'Pomodoro Tekniği', icon: '🍅', columns: { work: 25, short: 5, long: 15 }, data: [] },
+                { id: 'mulakatlar', type: 'interviews', selected: true, colSpan: 'lg:col-span-3', title: 'Süreç Takibi', icon: '🎙️', columns: { code: 'KOD', name: 'İSİM', bool1: 'GÖRÜŞME', bool2: 'ONAM', bool3: 'METİN' }, data: [ { code: 'AKA 1', name: 'Prof. Dr. Ahmet Yılmaz', interviewed: true, consent: true, transcribed: false }, { code: 'SİV 1', name: 'Dernek Başkanı V.', interviewed: true, consent: false, transcribed: false } ] },
+                { id: 'iletisim', type: 'contacts', selected: true, colSpan: 'lg:col-span-3', title: 'İletişim Rehberi', icon: '📞', columns: { name: 'AD SOYAD', role: 'ROL', contact: 'İLETİŞİM', ref: 'REFERANS', note: 'NOTLAR' }, data: [ { name: 'Ayşe Demir', role: 'Akademisyen', contact: 'ayse@uni.edu.tr', ref: 'Prof. Dr. X', note: 'Salı günleri müsaittir.' } ] },
+                { id: 'gunluk', type: 'journal', selected: true, colSpan: 'lg:col-span-3', title: 'Günlük', icon: '📓', columns: { placeholder: 'Bugün neler yaptın?', btnText: 'Kaydet' }, data: [ { date: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'}), text: 'Sistemi kurdum ve yeni arayüz ile çalışmalarıma başladım!' } ] }
             ],
             activeModules: []
         };
@@ -639,8 +642,25 @@
                         state.projectName = savedData.projectName || 'Benim İzlencem';
                         state.projectColor = savedData.projectColor || '#4f46e5';
                         state.calendar = savedData.calendar || state.calendar;
-                        state.activeModules = savedData.activeModules || [];
-                        state.modules = savedData.modules || state.modules; 
+                        
+                        // ESKİ VERİ GÖÇÜ (MIGRATION): lg:col-span-12'den lg:col-span-3'e çevirme işlemi
+                        const migrateColSpan = (span) => {
+                            if(span === 'lg:col-span-12') return 'lg:col-span-3';
+                            if(span === 'lg:col-span-8') return 'lg:col-span-2';
+                            if(span === 'lg:col-span-4' || span === 'lg:col-span-6') return 'lg:col-span-1';
+                            return span || 'lg:col-span-3';
+                        };
+
+                        if(savedData.modules) {
+                            savedData.modules.forEach(m => m.colSpan = migrateColSpan(m.colSpan));
+                            state.modules = savedData.modules;
+                        }
+                        if(savedData.activeModules) {
+                            savedData.activeModules.forEach(m => m.colSpan = migrateColSpan(m.colSpan));
+                            state.activeModules = savedData.activeModules;
+                        } else {
+                            state.activeModules = [];
+                        }
 
                         // UI'ı güncelle
                         document.body.className = state.theme + ' dashboard-active';
@@ -692,7 +712,6 @@
             try {
                 // await ekleyerek kaydın tamamlanmasını bekliyoruz
                 await setDoc(userDocRef, dataToSave, { merge: true });
-                console.log("Veri başarıyla buluta kaydedildi!");
             } catch(e) {
                 console.error("Arka plan kayıt hatası:", e);
             }
@@ -974,7 +993,7 @@
         }
 
         window.switchSettingsTab = function(tabId) {
-            ['tab-general', 'tab-modules', 'tab-account'].forEach(id => { 
+            ['tab-general', 'tab-modules'].forEach(id => { 
                 document.getElementById(id).classList.remove('active'); 
                 document.getElementById('btn-' + id).classList.remove('active'); 
             });
@@ -984,16 +1003,18 @@
 
         window.renderAvailableModules = function() {
             const container = document.getElementById('settings-available-modules');
-            const inactive = state.modules.filter(m => !state.activeModules.find(active => active.id === m.id));
-            if(inactive.length === 0) { 
-                container.innerHTML = '<p class="text-sm font-bold opacity-50 text-center py-8">Tüm modüller aktif!</p>'; 
-                return; 
-            }
             let html = '';
-            inactive.forEach(m => {
-                html += '<div class="flex items-center justify-between p-4 border-2 border-black/5 rounded-xl bg-white shadow-sm hover:border-indigo-200 transition">';
+            
+            state.modules.forEach(m => {
+                const isActive = state.activeModules.some(active => active.id === m.id);
+                html += '<div class="flex items-center justify-between p-4 border-2 border-black/5 rounded-xl bg-white shadow-sm transition hover:border-indigo-200">';
                 html += '<div class="font-bold flex items-center gap-3 text-sm"><span class="text-2xl">' + m.icon + '</span> ' + m.title + '</div>';
-                html += '<button onclick="addModuleFromSettings(\'' + m.id + '\')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow transition">+ Ekle</button>';
+                
+                if(isActive) {
+                    html += '<button onclick="removeActiveModule(\'' + m.id + '\')" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-100 shadow-sm transition">Kaldır</button>';
+                } else {
+                    html += '<button onclick="addModuleFromSettings(\'' + m.id + '\')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm transition">+ Ekle</button>';
+                }
                 html += '</div>';
             });
             container.innerHTML = html;
@@ -1001,7 +1022,7 @@
 
         window.addModuleFromSettings = function(modId) {
             const mod = state.modules.find(m => m.id === modId);
-            if(mod) { 
+            if(mod && !state.activeModules.some(m => m.id === modId)) { 
                 state.activeModules.push(mod); 
                 window.renderAvailableModules(); 
                 window.renderDashboard(); 
@@ -1016,8 +1037,25 @@
                 if(baseMod) baseMod.selected = false;
 
                 window.renderDashboard();
-                window.renderAvailableModules(); 
+                if (document.getElementById('global-settings-modal').classList.contains('flex')) {
+                    window.renderAvailableModules(); 
+                }
                 window.closePanel();
+                window.saveDataToCloud();
+            }
+        }
+
+        // Yeni Boyutlandırma Fonksiyonu
+        window.changeModuleSize = function(modId, size) {
+            const mod = state.activeModules.find(m => m.id === modId);
+            if(mod) {
+                mod.colSpan = 'lg:col-span-' + size;
+                
+                // Ana state'i de güncelleyelim ki kalıcı olsun
+                const baseMod = state.modules.find(m => m.id === modId);
+                if(baseMod) baseMod.colSpan = 'lg:col-span-' + size;
+                
+                window.renderDashboard();
                 window.saveDataToCloud();
             }
         }
@@ -1491,7 +1529,34 @@
                 div.addEventListener('dragenter', window.handleDragEnter);
                 div.addEventListener('dragend', window.handleDragEnd);
 
-                let inner = '<div class="drag-overlay" title="Tut ve Sürükle"><span class="text-4xl text-indigo-500">✥</span><span class="font-bold mt-2 bg-white px-4 py-1 rounded-full text-indigo-600 text-xs shadow-md">Sürükle & Bırak ile Taşı</span></div>';
+                let inner = '';
+                
+                // YENİ DÜZENLEME MODU ARAYÜZÜ (Silme ve Boyutlandırma ile)
+                if(state.isEditMode) {
+                    let btn1Class = mod.colSpan === 'lg:col-span-1' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600';
+                    let btn2Class = mod.colSpan === 'lg:col-span-2' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600';
+                    let btn3Class = mod.colSpan === 'lg:col-span-3' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600';
+
+                    inner += `
+                    <div class="drag-overlay rounded-[1.5rem]" title="Tut ve Sürükle">
+                        <div class="drag-bg-handle"></div>
+                        <span class="text-4xl text-indigo-600 dark:text-indigo-400 drop-shadow-md cursor-grab active:cursor-grabbing mb-2 relative z-20 pointer-events-none">✥</span>
+                        
+                        <div class="flex flex-col items-center gap-3 bg-white/95 dark:bg-slate-800/95 p-4 rounded-2xl shadow-2xl backdrop-blur-md relative z-20" onmousedown="event.stopPropagation()" draggable="false">
+                            <div class="text-[10px] font-black uppercase text-slate-500">Genişlik Ayarı</div>
+                            <div class="flex gap-1 bg-slate-100 dark:bg-slate-700 p-1 rounded-xl">
+                                <button type="button" onclick="changeModuleSize('${mod.id}', 1)" class="w-12 h-8 rounded-lg text-xs font-bold transition-all ${btn1Class}">1X</button>
+                                <button type="button" onclick="changeModuleSize('${mod.id}', 2)" class="w-12 h-8 rounded-lg text-xs font-bold transition-all ${btn2Class}">2X</button>
+                                <button type="button" onclick="changeModuleSize('${mod.id}', 3)" class="w-12 h-8 rounded-lg text-xs font-bold transition-all ${btn3Class}">3X</button>
+                            </div>
+                            <div class="w-full h-px bg-black/10 my-1"></div>
+                            <button type="button" onclick="removeActiveModule('${mod.id}')" class="w-full bg-red-50 text-red-600 hover:bg-red-500 hover:text-white py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2">
+                                🗑️ Modülü Kaldır
+                            </button>
+                        </div>
+                    </div>`;
+                }
+
                 inner += '<div class="mod-header flex justify-between items-start mb-2 gap-4 pb-2">' + titleHtml + controlsHtml + '</div>';
                 inner += contentHtml;
                 div.innerHTML = inner;
@@ -1598,15 +1663,9 @@
                 window.renderPanelDataRows(mod.type);
             }
 
-            // Footer (Kaydet ve Sil Butonları)
+            // Footer (Kaydet)
             document.getElementById('panel-footer-btn').style.display = 'block';
-            let isHeaderCal = state.editingModuleId === 'header_calendar';
-            let footerHtml = '';
-            
-            if (!isHeaderCal) {
-                footerHtml += '<button onclick="window.removeActiveModule(\'' + mod.id + '\')" class="bg-red-100 text-red-600 w-16 rounded-xl font-bold text-2xl shadow hover:bg-red-200 transition flex items-center justify-center" title="Bu Modülü Çalışma Alanından Kaldır">🗑️</button>';
-            }
-            footerHtml += '<button onclick="savePanel()" class="btn-primary shadow-lg !py-4 text-lg flex-1">Tüm Değişiklikleri Kaydet</button>';
+            let footerHtml = '<button onclick="savePanel()" class="btn-primary shadow-lg !py-4 text-lg flex-1">Tüm Değişiklikleri Kaydet</button>';
             
             document.getElementById('panel-footer-btn').innerHTML = '<div class="flex gap-3">' + footerHtml + '</div>';
 
