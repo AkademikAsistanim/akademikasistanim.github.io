@@ -1023,32 +1023,32 @@
             let mainContent = '';
 
             if (pomoState.isFinished) {
-                mainContent = '<div class="w-full max-w-2xl bg-indigo-50 dark:bg-indigo-900/30 p-10 rounded-3xl border-2 border-indigo-200 dark:border-indigo-700 text-center animate-pulse shadow-inner">';
-                mainContent += '<h4 class="text-4xl font-black text-indigo-600 dark:text-indigo-400 mb-4">🎉 Süre Doldu!</h4>';
-                mainContent += '<p class="text-xl font-bold opacity-70 mb-8">Bu oturumda ne üzerinde çalıştınız?</p>';
-                mainContent += '<input type="text" id="pomo-log-input" class="custom-input !py-4 !text-xl mb-8 font-bold" placeholder="Örn: Literatür taraması yapıldı..." autofocus>';
-                mainContent += '<div class="flex gap-4 justify-center">';
-                mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-8 py-4 rounded-2xl font-black text-lg hover:bg-slate-300 transition">İptal Et</button>';
-                mainContent += '<button onclick="savePomoLog(\'' + mod.id + '\')" class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-indigo-700 transition">Kaydet</button>';
+                mainContent = '<div class="w-full max-w-2xl bg-indigo-50 dark:bg-indigo-900/30 p-6 md:p-10 rounded-3xl border-2 border-indigo-200 dark:border-indigo-700 text-center animate-pulse shadow-inner">';
+                mainContent += '<h4 class="text-2xl md:text-4xl font-black text-indigo-600 dark:text-indigo-400 mb-4">🎉 Süre Doldu!</h4>';
+                mainContent += '<p class="text-sm md:text-xl font-bold opacity-70 mb-6 md:mb-8">Bu oturumda ne üzerinde çalıştınız?</p>';
+                mainContent += '<input type="text" id="pomo-log-input" class="custom-input !py-3 md:!py-4 !text-base md:!text-xl mb-6 md:mb-8 font-bold" placeholder="Örn: Literatür taraması yapıldı..." autofocus>';
+                mainContent += '<div class="flex flex-wrap gap-3 md:gap-4 justify-center">';
+                mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-black text-base md:text-lg hover:bg-slate-300 transition">İptal Et</button>';
+                mainContent += '<button onclick="savePomoLog(\'' + mod.id + '\')" class="bg-indigo-600 text-white px-8 py-3 md:px-10 md:py-4 rounded-xl md:rounded-2xl font-black text-base md:text-lg shadow-xl hover:bg-indigo-700 transition">Kaydet</button>';
                 mainContent += '</div></div>';
             } else {
                 let wClass = pomoState.mode==='work' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-700';
                 let sClass = pomoState.mode==='short' ? 'bg-emerald-500 text-white shadow-md' : 'text-slate-500 hover:text-slate-700';
                 let lClass = pomoState.mode==='long' ? 'bg-blue-500 text-white shadow-md' : 'text-slate-500 hover:text-slate-700';
                 
-                mainContent = '<div class="pomo-mode-btns flex gap-3 mb-10 bg-black/5 p-2 rounded-full shadow-inner mx-auto w-fit">';
-                mainContent += '<button onclick="setPomoMode(\'work\', ' + workM + ')" class="px-8 py-3 rounded-full text-base font-bold transition ' + wClass + '">Odaklan</button>';
-                mainContent += '<button onclick="setPomoMode(\'short\', ' + shortM + ')" class="px-8 py-3 rounded-full text-base font-bold transition ' + sClass + '">Kısa Mola</button>';
-                mainContent += '<button onclick="setPomoMode(\'long\', ' + longM + ')" class="px-8 py-3 rounded-full text-base font-bold transition ' + lClass + '">Uzun Mola</button>';
+                mainContent = '<div class="pomo-mode-btns flex flex-wrap justify-center gap-2 md:gap-3 mb-6 md:mb-8 bg-black/5 p-1.5 md:p-2 rounded-full shadow-inner mx-auto w-fit max-w-full">';
+                mainContent += '<button onclick="setPomoMode(\'work\', ' + workM + ')" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ' + wClass + '">Odaklan</button>';
+                mainContent += '<button onclick="setPomoMode(\'short\', ' + shortM + ')" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ' + sClass + '">Kısa Mola</button>';
+                mainContent += '<button onclick="setPomoMode(\'long\', ' + longM + ')" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ' + lClass + '">Uzun Mola</button>';
                 mainContent += '</div>';
-                mainContent += '<div class="text-[25vmin] font-black font-pomodoro tracking-tighter mb-12 text-current drop-shadow-xl transition-all duration-300 text-center" id="pomo-time-display">' + formatPomoTime(pomoState.timeLeft) + '</div>';
+                mainContent += '<div class="text-7xl sm:text-8xl md:text-9xl lg:text-[10rem] xl:text-[14rem] font-black font-pomodoro tracking-tighter mb-6 md:mb-10 text-current drop-shadow-xl transition-all duration-300 text-center leading-none" id="pomo-time-display">' + formatPomoTime(pomoState.timeLeft) + '</div>';
                 
-                mainContent += '<div class="pomo-btn-group flex gap-6 w-full justify-center transition-all duration-300">';
-                mainContent += '<button onclick="togglePomo()" class="bg-indigo-600 text-white px-10 py-6 rounded-3xl font-black text-2xl shadow-2xl hover:bg-indigo-700 hover:-translate-y-2 transition transform flex items-center justify-center gap-3 w-[300px]">';
+                mainContent += '<div class="pomo-btn-group flex flex-wrap gap-4 md:gap-6 w-full justify-center transition-all duration-300">';
+                mainContent += '<button onclick="togglePomo()" class="bg-indigo-600 text-white px-8 py-4 md:px-10 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-xl hover:bg-indigo-700 hover:-translate-y-1 transition transform flex items-center justify-center gap-3 min-w-[200px] md:w-[300px]">';
                 mainContent += pomoState.isRunning ? '⏸️ DURAKLAT' : '▶️ BAŞLAT';
                 mainContent += '</button>';
-                mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-6 py-6 rounded-3xl font-black text-2xl shadow-md hover:bg-slate-300 transition" title="Sıfırla">🔄</button>';
-                mainContent += '<button onclick="openPomoAnalytics(\'' + mod.id + '\')" class="bg-blue-100 text-blue-700 px-6 py-6 rounded-3xl font-black text-2xl shadow-md hover:bg-blue-200 transition" title="Kayıtlar ve Analiz">📊</button>';
+                mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-6 py-4 md:px-6 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-md hover:bg-slate-300 transition" title="Sıfırla">🔄</button>';
+                mainContent += '<button onclick="openPomoAnalytics(\'' + mod.id + '\')" class="bg-blue-100 text-blue-700 px-6 py-4 md:px-6 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-md hover:bg-blue-200 transition" title="Kayıtlar ve Analiz">📊</button>';
                 mainContent += '</div>';
             }
             return '<div class="flex flex-col items-center justify-center py-4 w-full h-full">' + mainContent + '</div>';
