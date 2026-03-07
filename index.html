@@ -179,6 +179,13 @@
         .btn-danger { background: #ef4444; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
         .btn-danger:hover { background: #dc2626; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); transform: translateY(-2px); }
 
+        /* YENİ EKLENEN İKİNCİL (DIŞ HATLI) BUTON STİLİ */
+        .btn-outline { background: transparent; color: inherit; border: 2px solid #e2e8f0; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; }
+        .btn-outline:hover { border-color: #6366f1; color: #6366f1; background: rgba(99, 102, 241, 0.05); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        /* Koyu/Alternatif temalar için btn-outline uyumluluğu */
+        body.theme-dark .btn-outline, body.theme-engineering .btn-outline, body.theme-space .btn-outline, body.theme-gaming .btn-outline, body.theme-got .btn-outline, body.theme-astrology .btn-outline, body.theme-harrypotter .btn-outline, body.theme-islamic .btn-outline, body.theme-nationalist .btn-outline, body.theme-lotr .btn-outline { border-color: rgba(255,255,255,0.2); color: white; }
+        body.theme-dark .btn-outline:hover, body.theme-engineering .btn-outline:hover, body.theme-space .btn-outline:hover, body.theme-gaming .btn-outline:hover, body.theme-got .btn-outline:hover, body.theme-astrology .btn-outline:hover, body.theme-harrypotter .btn-outline:hover, body.theme-islamic .btn-outline:hover, body.theme-nationalist .btn-outline:hover, body.theme-lotr .btn-outline:hover { border-color: #818cf8; color: #818cf8; background: rgba(129, 140, 248, 0.1); }
+
         .screen { display: none; opacity: 0; transition: opacity 0.5s ease-in-out; }
         .screen.active { display: flex; opacity: 1; }
         .selectable-box { border: 2px solid transparent; cursor: pointer; transition: 0.2s; }
@@ -345,7 +352,14 @@
                     <input type="email" id="auth-email" class="custom-input" placeholder="E-posta Adresi">
                     <input type="password" id="auth-password" class="custom-input" placeholder="Parola">
                     <button onclick="handleLogin()" class="btn-primary mt-2 py-3" id="btn-login">Giriş Yap</button>
-                    <div class="text-xs font-bold opacity-60 mt-4 cursor-pointer hover:opacity-100 transition" onclick="toggleAuthMode()" id="auth-mode-text">Hesabınız yok mu? Kayıt Olun.</div>
+                    
+                    <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-gray-300 opacity-40"></div>
+                        <span class="flex-shrink-0 mx-4 text-[10px] font-bold uppercase opacity-40">Yeni Kullanıcı Mısınız?</span>
+                        <div class="flex-grow border-t border-gray-300 opacity-40"></div>
+                    </div>
+
+                    <button onclick="handleRegister()" class="btn-outline py-3" id="btn-register">Kayıt Ol</button>
                 </div>
             </div>
         </div>
@@ -584,7 +598,7 @@
             }
         });
 
-        // Üyeye Ait Veriyi Firestore'dan Çekme (DÜZELTİLDİ: ASLA KİLİTLENMEYECEK)
+        // Üyeye Ait Veriyi Firestore'dan Çekme
         async function loadUserData() {
             showLoading(true, "Profiliniz Hazırlanıyor...");
             if (db && currentUser) {
@@ -624,13 +638,12 @@
                         window.nextScreen('screen-theme');
                     }
                     
-                    // Arka planda dinlemeye devam et (Hata verirse sessizce yoksay)
+                    // Arka planda dinlemeye devam et
                     if(unsubscribeUserDoc) unsubscribeUserDoc();
                     unsubscribeUserDoc = onSnapshot(userDocRef, () => {}, (err) => console.warn("Snapshot hatası:", err));
 
                 } catch (error) {
                     console.warn("Bulut verisi çekilemedi (Offline/Engellendi). Sisteme giriliyor...", error);
-                    // HATA OLSA BİLE KULLANICIYI İÇERİ AL (Asla ekranda takılmaz)
                     showLoading(false);
                     window.nextScreen('screen-theme');
                 }
@@ -663,21 +676,10 @@
                 console.log("Veri başarıyla buluta kaydedildi!");
             } catch(e) {
                 console.error("Arka plan kayıt hatası:", e);
-                // Eğer Firebase kurallarından veya bağlantıdan dolayı kayıt başarısız olursa kullanıcı uyarılsın
-                alert("Uyarı: Verileriniz buluta kaydedilemedi! Lütfen internet bağlantınızı veya Firebase veritabanı kurallarınızı kontrol edin.\nHata: " + e.message);
             }
         }
 
-        // Auth Mode Değiştirme (Login / Register)
-        let isLoginMode = true;
-        window.toggleAuthMode = function() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('btn-login').innerText = isLoginMode ? 'Giriş Yap' : 'Kayıt Ol';
-            document.getElementById('auth-mode-text').innerText = isLoginMode ? 'Hesabınız yok mu? Kayıt Olun.' : 'Zaten hesabınız var mı? Giriş Yapın.';
-            document.getElementById('auth-error').classList.add('hidden');
-        }
-
-        // Giriş veya Kayıt İşlemi
+        // SADECE GİRİŞ İŞLEMİ
         window.handleLogin = async function() {
             if(!auth) return alert("Firebase entegre değil!");
             const email = document.getElementById('auth-email').value.trim();
@@ -690,22 +692,46 @@
                 return;
             }
 
-            showLoading(true, "İşlem yapılıyor...");
+            showLoading(true, "Giriş yapılıyor...");
             errorEl.classList.add('hidden');
 
             try {
-                if(isLoginMode) {
-                    await signInWithEmailAndPassword(auth, email, pass);
-                } else {
-                    await createUserWithEmailAndPassword(auth, email, pass);
-                }
+                await signInWithEmailAndPassword(auth, email, pass);
             } catch(e) {
                 showLoading(false);
                 let msg = "Hata: " + e.message; 
                 if(e.code === 'auth/invalid-credential') msg = "E-posta veya şifre hatalı.";
+                if(e.code === 'auth/operation-not-allowed') msg = "Hata: E-posta ile giriş Firebase'de kapalı! Lütfen Firebase Authentication menüsünden Email seçeneğini etkinleştirin.";
+                
+                errorEl.innerText = msg;
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        // SADECE KAYIT İŞLEMİ
+        window.handleRegister = async function() {
+            if(!auth) return alert("Firebase entegre değil!");
+            const email = document.getElementById('auth-email').value.trim();
+            const pass = document.getElementById('auth-password').value.trim();
+            const errorEl = document.getElementById('auth-error');
+
+            if(!email || !pass) {
+                errorEl.innerText = "Lütfen tüm alanları doldurun.";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            showLoading(true, "Hesap oluşturuluyor...");
+            errorEl.classList.add('hidden');
+
+            try {
+                await createUserWithEmailAndPassword(auth, email, pass);
+            } catch(e) {
+                showLoading(false);
+                let msg = "Hata: " + e.message; 
                 if(e.code === 'auth/email-already-in-use') msg = "Bu e-posta zaten kullanımda.";
                 if(e.code === 'auth/weak-password') msg = "Şifre çok zayıf. En az 6 karakter girin.";
-                if(e.code === 'auth/operation-not-allowed') msg = "Hata: E-posta ile giriş Firebase'de kapalı! Lütfen Firebase Authentication menüsünden Email seçeneğini etkinleştirin.";
+                if(e.code === 'auth/operation-not-allowed') msg = "Hata: E-posta ile kayıt Firebase'de kapalı!";
                 
                 errorEl.innerText = msg;
                 errorEl.classList.remove('hidden');
