@@ -641,22 +641,32 @@
         }
 
         // Değişiklikleri Veritabanına Kaydetme
-        window.saveDataToCloud = async function() {
-            if (!db || !currentUser) return; 
-            
-            const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'data', 'profile');
-            
-            const dataToSave = {
-                theme: state.theme,
-                themeBrightness: state.themeBrightness,
-                projectName: state.projectName,
-                projectColor: state.projectColor,
-                calendar: state.calendar,
-                activeModules: state.activeModules,
-                modules: state.modules,
-                updatedAt: new Date().toISOString()
-            };
+window.saveDataToCloud = async function() {
+    if (!db || !currentUser) return; 
+    
+    const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'data', 'profile');
+    
+    const dataToSave = {
+        theme: state.theme,
+        themeBrightness: state.themeBrightness,
+        projectName: state.projectName,
+        projectColor: state.projectColor,
+        calendar: state.calendar,
+        activeModules: state.activeModules,
+        modules: state.modules,
+        updatedAt: new Date().toISOString()
+    };
 
+    try {
+        // await ekleyerek kaydın tamamlanmasını bekliyoruz
+        await setDoc(userDocRef, dataToSave, { merge: true });
+        console.log("Veri başarıyla buluta kaydedildi!");
+    } catch(e) {
+        console.error("Arka plan kayıt hatası:", e);
+        // Eğer Firebase kurallarından veya bağlantıdan dolayı kayıt başarısız olursa kullanıcı uyarılsın
+        alert("Uyarı: Verileriniz buluta kaydedilemedi! Lütfen internet bağlantınızı veya Firebase veritabanı kurallarınızı kontrol edin.\nHata: " + e.message);
+    }
+}
             try {
                 // Arka planda kaydetmeyi dene, başarısız olursa uyarı verip can sıkma
                 setDoc(userDocRef, dataToSave, { merge: true }).catch(e => console.warn("Arka plan kayıt hatası:", e));
@@ -1654,3 +1664,4 @@
     </script>
 </body>
 </html>
+
