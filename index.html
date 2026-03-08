@@ -16,15 +16,14 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             margin: 0; padding: 0; 
-            min-height: 100vh; 
-            overflow-x: hidden; 
-            overflow-y: auto; 
+            height: 100vh; /* Tam ekran sabitlik için */
+            overflow: hidden; /* Ana gövde kaydırmasını kapat */
             transition: background 0.5s ease, color 0.5s ease;
         }
 
         .theme-container {
             filter: brightness(var(--theme-brightness));
-            min-height: 100vh; width: 100%;
+            height: 100vh; width: 100vw;
             transition: filter 0.3s ease;
             position: relative;
         }
@@ -176,16 +175,17 @@
         .btn-google:hover { background: #f4f4f5; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-google img { width: 18px; height: 18px; }
 
-        /* --- YENİ: OK (BUTON) YÖNLENDİRMELİ EKRANLAR --- */
+        /* --- YENİ: OK (BUTON) YÖNLENDİRMELİ EKRANLAR (KAYDIRMA SERBEST) --- */
         .dashboard-container { width: 100%; }
         
         .dashboard-slide {
             display: none; 
             width: 100%;
-            min-height: 100vh;
+            height: 100vh;
             padding: 1rem 1rem 6rem 1rem;
             box-sizing: border-box;
             animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto; /* Dikey kaydırma sadece slayt içinde */
         }
         
         @media (min-width: 768px) { .dashboard-slide { padding: 2rem 5rem 6rem 5rem; } }
@@ -196,7 +196,7 @@
         
         .module-full-content { width: 100%; max-width: 1200px; margin-top: 2vh; display: flex; flex-direction: column; }
 
-        /* --- YÖNLENDİRME BUTONLARI (ORTALANMIŞ, SABİT) --- */
+        /* --- YÖNLENDİRME BUTONLARI (SABİT) --- */
         .nav-btn {
             position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.1);
             color: #4f46e5; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -222,7 +222,7 @@
         body.theme-light .slide-dot, body.theme-nature .slide-dot, body.theme-health .slide-dot { background: rgba(0,0,0,0.3); }
         .slide-dot.active { background: #6366f1; transform: scale(1.6); }
 
-        /* YENİ EKLENEN İÇ DÜZENLEME INPUT GÖRÜNÜMÜ */
+        /* İÇ DÜZENLEME INPUT GÖRÜNÜMÜ */
         .inline-edit-input {
             background: rgba(255,255,255,0.8); border: 2px dashed #6366f1; color: #1e293b; padding: 4px 8px; border-radius: 8px; font-weight: bold; width: 100%; outline: none; transition: 0.3s;
         }
@@ -302,7 +302,7 @@
     </div> <!-- /setup-container -->
 
     <!-- ADIM 5: SEKME/SLIDE TABANLI ANA DASHBOARD -->
-    <div id="screen-dashboard" class="screen relative w-full min-h-screen">
+    <div id="screen-dashboard" class="screen relative w-full h-full">
         
         <!-- Yönlendirme Okları (Sabit) -->
         <button id="btn-prev" class="nav-btn left" onclick="slideBy(-1)" disabled title="Önceki Sayfa">←</button>
@@ -325,7 +325,7 @@
                 <button onclick="closeGlobalSettings()" class="text-2xl md:text-3xl hover:scale-110 transition">&times;</button>
             </div>
             
-            <div class="flex border-b border-black/10 px-2 md:px-6 pt-2 bg-black/5 overflow-x-auto custom-scroll">
+            <div class="flex border-b border-black/10 px-2 md:px-6 pt-2 bg-black/5 overflow-x-auto custom-scroll shrink-0">
                 <button onclick="switchSettingsTab('tab-general')" id="btn-tab-general" class="settings-tab-btn active whitespace-nowrap">Genel Görünüm & Tema</button>
                 <button onclick="switchSettingsTab('tab-modules')" id="btn-tab-modules" class="settings-tab-btn whitespace-nowrap">Modül Yönetimi</button>
             </div>
@@ -363,7 +363,23 @@
                 </div>
 
                 <div id="tab-modules" class="settings-tab-content">
-                    <p class="text-xs md:text-sm font-bold opacity-70 mb-4 bg-indigo-50 text-indigo-800 p-3 md:p-4 rounded-xl border border-indigo-100">Sayfalarınızdaki araçları buradan yönetebilir ve sıralarını değiştirebilirsiniz.</p>
+                    <p class="text-xs md:text-sm font-bold opacity-70 mb-4 bg-indigo-50 text-indigo-800 p-3 md:p-4 rounded-xl border border-indigo-100">Sayfalarınızdaki araçları buradan yönetebilir, sıralarını değiştirebilir veya <b>yeni araçlar oluşturabilirsiniz.</b></p>
+                    
+                    <!-- YENİ MODÜL OLUŞTURMA ALANI -->
+                    <div class="bg-indigo-50/50 p-4 rounded-xl border-2 border-indigo-200 border-dashed mb-6">
+                        <h4 class="text-xs font-black text-indigo-600 mb-3 uppercase">✨ Yeni Boş Araç Oluştur</h4>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <select id="new-mod-type" class="custom-input !py-2 !text-xs sm:w-1/3 font-bold">
+                                <option value="tasks">✅ Akademik Görevler</option>
+                                <option value="stats">🕸️ Genel Durum (Ağ)</option>
+                                <option value="interviews">🎙️ Süreç Takibi</option>
+                                <option value="contacts">📞 İletişim Rehberi</option>
+                            </select>
+                            <input type="text" id="new-mod-title" class="custom-input !py-2 flex-1" placeholder="Aracın Başlığı (Örn: Makale Görevleri)">
+                            <button onclick="createNewModule()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm shrink-0">Oluştur</button>
+                        </div>
+                    </div>
+
                     <div id="settings-module-management" class="space-y-6"></div>
                 </div>
             </div>
@@ -522,7 +538,37 @@
             try { await setDoc(userDocRef, dataToSave, { merge: true }); } catch(e) {}
         }
 
-        // YENİ İÇERİDEN DÜZENLEME (INLINE EDIT) FONKSİYONU
+        // GLOBAL: YENİ MODÜL OLUŞTURMA
+        window.createNewModule = function() {
+            const type = document.getElementById('new-mod-type').value;
+            const titleInput = document.getElementById('new-mod-title').value.trim();
+            const id = type + '_' + Date.now();
+            
+            let newMod = { id: id, type: type, title: titleInput, selected: false, data: [] };
+            
+            if(type === 'tasks') {
+                newMod.title = titleInput || 'Yeni Görev Listesi';
+                newMod.icon = '✅';
+                newMod.columns = { task: 'GÖREV', progress: 'İLERLEME', note: 'NOTLAR' };
+            } else if(type === 'stats') {
+                newMod.title = titleInput || 'Yeni Ağ Dengesi';
+                newMod.icon = '🕸️';
+            } else if(type === 'interviews') {
+                newMod.title = titleInput || 'Yeni Süreç Takibi';
+                newMod.icon = '🎙️';
+                newMod.columns = { code: 'KOD', name: 'İSİM', bool1: 'GÖRÜŞME', bool2: 'ONAY', bool3: 'SONUÇ' };
+            } else if(type === 'contacts') {
+                newMod.title = titleInput || 'Yeni İletişim Rehberi';
+                newMod.icon = '📞';
+                newMod.columns = { name: 'AD SOYAD', role: 'ROL', contact: 'İLETİŞİM', ref: 'REFERANS', note: 'NOTLAR' };
+            }
+
+            state.modules.push(newMod);
+            window.renderModuleManagement();
+            window.saveDataToCloud();
+        }
+
+        // İÇERİDEN DÜZENLEME (INLINE EDIT) FONKSİYONU
         window.toggleInlineEdit = function(modId) {
             state.inlineEdit[modId] = !state.inlineEdit[modId];
             window.renderDashboard();
@@ -541,6 +587,56 @@
             if(state.calendar && state.calendar.data[index]) {
                 state.calendar.data[index][field] = value;
                 window.saveDataToCloud();
+            }
+        }
+
+        window.addNewData = function(modId, type) {
+            const mod = state.activeModules.find(m => m.id === modId);
+            if(!mod) return;
+            if(!mod.data) mod.data = [];
+
+            if(type === 'task') mod.data.push({task:'Yeni Görev', progress:0, status:'Yapılmadı', note:''});
+            if(type === 'contact') mod.data.push({name:'Yeni Kişi', role:'', contact:'', ref:'', note:''});
+            if(type === 'interview') mod.data.push({code:'YENİ', name:'', interviewed:false, consent:false, transcribed:false});
+
+            window.renderDashboard();
+            window.saveDataToCloud();
+        }
+
+        // Süreç Takibi İçin Dinamik Sütun Ekleme/Silme
+        window.addColumnToInterview = function(modId) {
+            const mod = state.activeModules.find(m => m.id === modId);
+            if(!mod) return;
+            if(!mod.columns) mod.columns = { code: 'KOD', name: 'İSİM', bool1: 'GÖRÜŞME', bool2: 'ONAM', bool3: 'METİN' };
+            
+            // Kaç tane bool var bul
+            let count = Object.keys(mod.columns).filter(k => k.startsWith('bool')).length;
+            if(count >= 6) { alert("Maksimum sütun sayısına ulaştınız."); return; } // Maks 6 ekstra sütun
+            
+            let newKey = 'bool' + (count + 1);
+            mod.columns[newKey] = 'YENİ SÜTUN';
+            
+            // Mevcut datalara yeni alanı ekle (false olarak)
+            if(mod.data) {
+                mod.data.forEach(d => { d[newKey] = false; });
+            }
+
+            window.renderDashboard();
+            window.saveDataToCloud();
+        }
+
+        window.removeColumnFromInterview = function(modId, colKey) {
+            if(confirm("Bu sütunu silmek istediğinize emin misiniz?")) {
+                const mod = state.activeModules.find(m => m.id === modId);
+                if(mod && mod.columns[colKey]) {
+                    delete mod.columns[colKey];
+                    // Datalardan da sil
+                    if(mod.data) {
+                        mod.data.forEach(d => { delete d[colKey]; });
+                    }
+                    window.renderDashboard();
+                    window.saveDataToCloud();
+                }
             }
         }
 
@@ -738,11 +834,11 @@
             calHtml += `<div class="space-y-3 md:space-y-4 w-full text-sm md:text-lg">`;
             if (isCalEdit) {
                 calData.forEach((d, i) => {
-                    calHtml += `<div class="flex items-center gap-2 mb-2">
-                        <input type="text" class="custom-input w-12 text-center !p-2" value="${d.emoji}" onchange="inlineUpdateCalendar(${i}, 'emoji', this.value)">
-                        <input type="text" class="custom-input flex-1 !p-2" value="${d.label}" onchange="inlineUpdateCalendar(${i}, 'label', this.value)">
-                        <input type="date" class="custom-input w-32 !p-2 text-xs" value="${d.targetDate}" onchange="inlineUpdateCalendar(${i}, 'targetDate', this.value)">
-                        <button onclick="state.calendar.data.splice(${i},1); window.renderDashboard(); window.saveDataToCloud()" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg font-bold">Sil</button>
+                    calHtml += `<div class="flex flex-wrap sm:flex-nowrap items-center gap-2 mb-2 bg-white/50 p-2 rounded-xl">
+                        <input type="text" class="custom-input w-16 text-center !p-2" value="${d.emoji}" onchange="inlineUpdateCalendar(${i}, 'emoji', this.value)">
+                        <input type="text" class="custom-input flex-1 !p-2 min-w-[150px]" value="${d.label}" onchange="inlineUpdateCalendar(${i}, 'label', this.value)">
+                        <input type="date" class="custom-input w-full sm:w-36 !p-2 text-xs" value="${d.targetDate}" onchange="inlineUpdateCalendar(${i}, 'targetDate', this.value)">
+                        <button onclick="state.calendar.data.splice(${i},1); window.renderDashboard(); window.saveDataToCloud()" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg font-bold w-full sm:w-auto mt-2 sm:mt-0">Sil</button>
                     </div>`;
                 });
                 calHtml += `<button onclick="if(!state.calendar.data) state.calendar.data=[]; state.calendar.data.push({emoji:'📌', label:'Yeni', targetDate:''}); window.renderDashboard(); window.saveDataToCloud()" class="w-full bg-indigo-50/50 text-indigo-600 py-3 rounded-xl font-bold border-2 border-dashed border-indigo-200 mt-2 hover:bg-indigo-100 transition">+ Yeni Tarih Ekle</button>`;
@@ -978,8 +1074,14 @@
         window.removeActiveModule = function(modId) {
             if(confirm("Bu modülü çalışma alanından (sayfalardan) kaldırmak istediğinize emin misiniz?")) {
                 state.activeModules = state.activeModules.filter(m => m.id !== modId);
-                const baseMod = state.modules.find(m => m.id === modId);
-                if(baseMod) baseMod.selected = false;
+                // Yeni oluşturulan modülleri pasif listesine atma, tamamen sil.
+                if(modId.includes('_')) {
+                    state.modules = state.modules.filter(m => m.id !== modId);
+                } else {
+                    const baseMod = state.modules.find(m => m.id === modId);
+                    if(baseMod) baseMod.selected = false;
+                }
+                
                 window.renderDashboard();
                 if(document.getElementById('global-settings-modal').classList.contains('flex')) {
                     window.renderModuleManagement();
@@ -1154,7 +1256,7 @@
             html += '<div class="grid grid-cols-2 gap-3">';
             html += `<div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-center"><p class="text-[10px] font-black uppercase text-indigo-600 opacity-70">Toplam Odak</p><p class="text-2xl font-black text-indigo-800">${totalWork}<span class="text-xs ml-1">dk</span></p></div>`;
             html += `<div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-center"><p class="text-[10px] font-black uppercase text-emerald-600 opacity-70">Toplam Mola</p><p class="text-2xl font-black text-emerald-800">${totalShort + totalLong}<span class="text-xs ml-1">dk</span></p></div>`;
-            html += `<div class="col-span-2 bg-slate-50 border border-slate-200 p-4 rounded-xl flex justify-between items-center"><span class="text-xs font-bold opacity-70">Tamamlanan Oturum:</span><span class="font-black text-lg">${totalSessions}</span></div>`;
+            html += `<div class="col-span-2 bg-slate-50 border border-slate-200 p-4 rounded-xl flex justify-between items-center"><span class="text-xs font-bold opacity-70">Tamamlanan Oturum Sayısı:</span><span class="font-black text-lg">${totalSessions}</span></div>`;
             html += '</div>';
 
             html += '<div class="border-t border-black/10 pt-4">';
@@ -1217,7 +1319,7 @@
                 });
                 
                 editHtml += `</div>
-                    <button onclick="if(!state.activeModules.find(m=>m.id==='${mod.id}').data) state.activeModules.find(m=>m.id==='${mod.id}').data=[]; state.activeModules.find(m=>m.id==='${mod.id}').data.push({title:'Yeni Kategori', completed:0, total:10, emoji:'📊'}); window.renderDashboard(); window.saveDataToCloud();" class="w-full mt-4 bg-indigo-50/50 text-indigo-600 font-bold py-3 rounded-xl border-2 border-dashed border-indigo-200 hover:bg-indigo-100 transition">+ Yeni Kategori Ekle</button>
+                    <button onclick="addNewData('${mod.id}', 'stat')" class="w-full mt-4 bg-indigo-50/50 text-indigo-600 font-bold py-3 rounded-xl border-2 border-dashed border-indigo-200 hover:bg-indigo-100 transition">+ Yeni Kategori Ekle</button>
                 </div>`;
                 return editHtml;
             }
@@ -1234,7 +1336,7 @@
             html += '</div>';
             
             html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-start w-full min-h-[300px]">';
-            html += `<div class="w-full relative flex items-center justify-center p-2 md:p-4 bg-white/50 dark:bg-black/20 rounded-3xl border border-black/5" style="height:350px;"><canvas id="radarChart"></canvas></div>`;
+            html += `<div class="w-full h-[250px] md:h-[350px] relative flex items-center justify-center p-2 md:p-4 bg-white/50 dark:bg-black/20 rounded-3xl border border-black/5"><canvas id="radarChart"></canvas></div>`;
             html += '<div class="space-y-4 md:space-y-6 w-full max-h-[350px] overflow-y-auto custom-scroll pr-2">';
             
             data.forEach(s => {
@@ -1289,9 +1391,7 @@
                 html += `</div>`;
             });
             
-            // Sabit Ekleme Butonu (Mülakatlardaki gibi)
-            html += `<button onclick="if(!state.activeModules.find(m=>m.id==='${mod.id}').data) state.activeModules.find(m=>m.id==='${mod.id}').data=[]; state.activeModules.find(m=>m.id==='${mod.id}').data.push({task:'Yeni Görev', progress:0, status:'Yapılmadı', note:''}); window.renderDashboard(); window.saveDataToCloud();" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Görev Ekle</button>`;
-            
+            html += `<button onclick="addNewData('${mod.id}', 'task')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Görev Ekle</button>`;
             html += '</div>';
             return html;
         }
@@ -1323,9 +1423,7 @@
                 html += `</div>`;
             });
             
-            // Sabit Ekleme Butonu
-            html += `<button onclick="if(!state.activeModules.find(m=>m.id==='${mod.id}').data) state.activeModules.find(m=>m.id==='${mod.id}').data=[]; state.activeModules.find(m=>m.id==='${mod.id}').data.push({name:'Yeni Kişi', role:'', contact:'', ref:'', note:''}); window.renderDashboard(); window.saveDataToCloud();" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Kişi Ekle</button>`;
-
+            html += `<button onclick="addNewData('${mod.id}', 'contact')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Kişi Ekle</button>`;
             html += '</div>';
             return html;
         }
@@ -1333,65 +1431,59 @@
         window.renderInterviews = function(mod, isEdit) {
             let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full pb-4">';
             
-            // Sütun Başlıkları Düzenleme Alanı (Eğer isEdit ise tablonun en üstünde belirir)
             if(isEdit) {
                 html += `<div class="bg-indigo-50 dark:bg-slate-800 p-4 rounded-2xl mb-4 border border-indigo-200 flex flex-wrap gap-4 items-center">
-                            <span class="text-xs font-black text-indigo-600 w-full md:w-auto">Sütun İsimlerini Düzenle:</span>
-                            <input type="text" class="custom-input !py-1 text-xs w-24" value="${mod.columns?.bool1 || 'GÖRÜŞME'}" onchange="mod.columns.bool1=this.value; window.saveDataToCloud()">
-                            <input type="text" class="custom-input !py-1 text-xs w-24" value="${mod.columns?.bool2 || 'ONAM'}" onchange="mod.columns.bool2=this.value; window.saveDataToCloud()">
-                            <input type="text" class="custom-input !py-1 text-xs w-24" value="${mod.columns?.bool3 || 'METİN'}" onchange="mod.columns.bool3=this.value; window.saveDataToCloud()">
-                         </div>`;
+                            <span class="text-xs font-black text-indigo-600 w-full md:w-auto">Sütun İsimlerini Düzenle:</span>`;
+                
+                Object.keys(mod.columns).forEach(key => {
+                    if(key.startsWith('bool')) {
+                        html += `<div class="flex items-center gap-1">
+                                    <input type="text" class="custom-input !py-1 text-xs w-24" value="${mod.columns[key]}" onchange="mod.columns['${key}']=this.value; window.saveDataToCloud()">
+                                    ${key !== 'bool1' && key !== 'bool2' && key !== 'bool3' ? `<button onclick="removeColumnFromInterview('${mod.id}', '${key}')" class="text-red-500 px-2 py-1 bg-red-100 rounded-lg hover:bg-red-200 font-bold">X</button>` : ''}
+                                 </div>`;
+                    }
+                });
+                
+                html += `<button onclick="addColumnToInterview('${mod.id}')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700">+ Sütun Ekle</button>`;
+                html += `</div>`;
             }
+
+            // Sütun başlıklarını çek
+            let boolKeys = Object.keys(mod.columns).filter(k => k.startsWith('bool'));
 
             mod.data.forEach((d, i) => {
-                html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-3 md:p-5 flex flex-col xl:flex-row xl:items-center gap-3 md:gap-5 relative group transition hover:bg-black/10 border border-transparent hover:border-black/10">`;
-                html += `<div class="flex w-full xl:w-1/3 gap-2">`;
-                html += `<input type="text" class="bg-white/60 dark:bg-black/30 p-2 md:p-3 rounded-lg md:rounded-xl font-black text-indigo-600 text-xs md:text-sm w-16 md:w-20 outline-none border border-transparent focus:border-indigo-400 text-center" value="${d.code}" onchange="window.inlineUpdateInterview('${mod.id}', ${i}, 'code', this.value)">`;
-                html += `<input type="text" class="bg-white/60 dark:bg-black/30 p-2 md:p-3 rounded-lg md:rounded-xl font-bold text-xs md:text-sm flex-1 outline-none border border-transparent focus:border-indigo-400" value="${d.name}" placeholder="İsim Girin" onchange="window.inlineUpdateInterview('${mod.id}', ${i}, 'name', this.value)">`;
-                html += `</div>`;
+                html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-3 md:p-5 flex flex-col xl:flex-row xl:items-center gap-3 md:gap-5 relative group transition ${isEdit ? 'border-indigo-300 bg-indigo-50/30' : 'border border-transparent hover:border-black/10'}">`;
+                
+                if(isEdit) {
+                    html += `<div class="flex w-full xl:w-1/3 gap-2">`;
+                    html += `<input type="text" class="inline-edit-input w-20 text-center" value="${d.code}" onchange="inlineUpdateData('${mod.id}', ${i}, 'code', this.value)">`;
+                    html += `<input type="text" class="inline-edit-input flex-1" value="${d.name}" placeholder="İsim Girin" onchange="inlineUpdateData('${mod.id}', ${i}, 'name', this.value)">`;
+                    html += `</div>`;
+                } else {
+                    html += `<div class="flex w-full xl:w-1/3 gap-2">`;
+                    html += `<div class="bg-white/60 dark:bg-black/30 p-2 md:p-3 rounded-lg md:rounded-xl font-black text-indigo-600 text-xs md:text-sm w-16 md:w-20 text-center">${d.code}</div>`;
+                    html += `<div class="bg-white/60 dark:bg-black/30 p-2 md:p-3 rounded-lg md:rounded-xl font-bold text-xs md:text-sm flex-1 truncate">${d.name}</div>`;
+                    html += `</div>`;
+                }
                 
                 html += `<div class="flex flex-wrap sm:flex-nowrap items-center justify-between w-full xl:w-auto gap-2 md:gap-4 flex-1 bg-white/40 dark:bg-black/20 p-2 md:p-3 rounded-xl border border-white/20">`;
-                html += `<label class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold cursor-pointer hover:opacity-80 transition"><input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d.interviewed ? 'checked' : ''} onchange="window.inlineUpdateInterview('${mod.id}', ${i}, 'interviewed', this.checked)"> ${mod.columns?.bool1 || 'GÖRÜŞME'}</label>`;
-                html += `<label class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold cursor-pointer hover:opacity-80 transition"><input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d.consent ? 'checked' : ''} onchange="window.inlineUpdateInterview('${mod.id}', ${i}, 'consent', this.checked)"> ${mod.columns?.bool2 || 'ONAM'}</label>`;
-                html += `<label class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold cursor-pointer hover:opacity-80 transition"><input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d.transcribed ? 'checked' : ''} onchange="window.inlineUpdateInterview('${mod.id}', ${i}, 'transcribed', this.checked)"> ${mod.columns?.bool3 || 'METİN'}</label>`;
+                
+                boolKeys.forEach(key => {
+                    html += `<label class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold cursor-pointer hover:opacity-80 transition">
+                                <input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d[key] ? 'checked' : ''} onchange="inlineUpdateData('${mod.id}', ${i}, '${key}', this.checked)"> ${mod.columns[key]}
+                             </label>`;
+                });
+                
                 html += `</div>`;
                 
-                html += `<button onclick="window.inlineDeleteInterview('${mod.id}', ${i})" class="text-red-500 font-bold text-[10px] md:text-xs bg-red-100/80 px-4 py-2.5 md:px-5 md:py-3 rounded-xl hover:bg-red-200 transition shadow-sm w-full xl:w-auto xl:opacity-0 group-hover:opacity-100 ${isEdit?'!opacity-100':''}">SİL</button>`;
+                if(isEdit) {
+                    html += `<button onclick="if(confirm('Bu kaydı silmek istediğinize emin misiniz?')){ state.activeModules.find(m=>m.id==='${mod.id}').data.splice(${i},1); window.renderDashboard(); window.saveDataToCloud(); }" class="text-red-500 font-bold text-[10px] md:text-xs bg-red-100/80 px-4 py-2.5 md:px-5 md:py-3 rounded-xl hover:bg-red-200 transition shadow-sm w-full xl:w-auto">SİL</button>`;
+                }
                 html += `</div>`;
             });
-            html += `<button onclick="window.inlineAddInterview('${mod.id}')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 md:py-5 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Görüşme Ekle</button>`;
+            html += `<button onclick="addNewData('${mod.id}', 'interview')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 md:py-5 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Görüşme Ekle</button>`;
             html += '</div>';
             return html;
-        }
-
-        window.addJournalEntry = function(modId) {
-            const input = document.getElementById('journal-input-' + modId);
-            if(!input || !input.value.trim()) return;
-            const mod = state.activeModules.find(m => m.id === modId);
-            if(!mod.data) mod.data = [];
-            const today = new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
-            mod.data.unshift({ date: today, text: input.value.trim() });
-            input.value = '';
-            window.renderDashboard();
-            window.saveDataToCloud();
-        }
-        
-        window.editJournalEntry = function(modId, index) {
-            const mod = state.activeModules.find(m => m.id === modId);
-            const newText = prompt('Notunuzu düzenleyin:', mod.data[index].text);
-            if (newText !== null && newText.trim() !== '') { 
-                mod.data[index].text = newText; 
-                window.renderDashboard(); 
-                window.saveDataToCloud();
-            }
-        }
-        
-        window.deleteJournalEntry = function(modId, index) { 
-            if(confirm('Bu günlüğü silmek istediğinize emin misiniz?')) { 
-                state.activeModules.find(m => m.id === modId).data.splice(index, 1); 
-                window.renderDashboard(); 
-                window.saveDataToCloud();
-            } 
         }
 
         window.renderJournal = function(mod, isEdit) {
@@ -1403,12 +1495,22 @@
                     listHtml += '<div class="glass-card p-4 md:p-8 rounded-2xl md:rounded-3xl border border-black/5 relative ml-4 md:ml-8 mb-4 md:mb-6 group hover:border-indigo-300 transition bg-white/50 dark:bg-black/20">';
                     listHtml += '<div class="absolute -left-[1.15rem] md:-left-10 top-5 md:top-6 w-4 h-4 md:w-5 md:h-5 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-800 shadow-md"></div>';
                     listHtml += '<div class="flex justify-between items-start mb-2 md:mb-4">';
-                    listHtml += '<div class="text-[10px] md:text-xs font-black text-indigo-500 uppercase tracking-widest">' + d.date + '</div>';
+                    
+                    if(isEdit) {
+                        listHtml += `<input type="text" class="inline-edit-input text-[10px] md:text-xs text-indigo-500 w-1/2" value="${d.date}" onchange="inlineUpdateData('${mod.id}', ${i}, 'date', this.value)">`;
+                    } else {
+                        listHtml += `<div class="text-[10px] md:text-xs font-black text-indigo-500 uppercase tracking-widest">${d.date}</div>`;
+                    }
+                    
                     listHtml += `<div class="transition flex gap-2 ${isEdit ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}">`;
-                    listHtml += `<button onclick="editJournalEntry('${mod.id}', ${i})" class="text-[9px] md:text-[10px] font-bold text-indigo-600 bg-indigo-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-indigo-200">DÜZENLE</button>`;
-                    listHtml += `<button onclick="deleteJournalEntry('${mod.id}', ${i})" class="text-[9px] md:text-[10px] font-bold text-red-600 bg-red-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-red-200">SİL</button>`;
+                    listHtml += `<button onclick="if(confirm('SİL?')){ state.activeModules.find(m=>m.id==='${mod.id}').data.splice(${i},1); window.renderDashboard(); window.saveDataToCloud(); }" class="text-[9px] md:text-[10px] font-bold text-red-600 bg-red-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-red-200">SİL</button>`;
                     listHtml += '</div></div>';
-                    listHtml += '<p class="text-sm md:text-lg font-medium opacity-90 leading-relaxed">' + d.text + '</p>';
+                    
+                    if(isEdit) {
+                        listHtml += `<textarea class="inline-edit-input text-sm md:text-lg w-full h-24" onchange="inlineUpdateData('${mod.id}', ${i}, 'text', this.value)">${d.text}</textarea>`;
+                    } else {
+                        listHtml += `<p class="text-sm md:text-lg font-medium opacity-90 leading-relaxed">${d.text}</p>`;
+                    }
                     listHtml += '</div>';
                 });
             }
@@ -1423,11 +1525,10 @@
             return html;
         }
 
-        // KLAVYE OK TUŞLARI İLE GEZİNME (Opsiyonel)
+        // KLAVYE OK TUŞLARI İLE GEZİNME
         document.addEventListener('keydown', (e) => {
             if(document.getElementById('screen-dashboard').classList.contains('active')) {
                 if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
-                
                 if (e.key === 'ArrowRight') window.slideBy(1);
                 if (e.key === 'ArrowLeft') window.slideBy(-1);
             }
