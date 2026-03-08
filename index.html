@@ -13,9 +13,13 @@
             --theme-brightness: 1; 
         }
 
+        /* YENİ: overflow: hidden kaldırıldı, sayfa doğal kaydırmaya (scroll) açıldı. */
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden;
+            margin: 0; padding: 0; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            overflow-y: auto; 
             transition: background 0.5s ease, color 0.5s ease;
         }
 
@@ -33,13 +37,13 @@
         }
 
         /* --- SİNEMATİK ARKA PLANLAR --- */
-        .cinematic-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; background: linear-gradient(90deg, #bef264 0%, #a7f3d0 35%, #64748b 65%, #0f172a 100%); }
+        .cinematic-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; overflow: hidden; background: linear-gradient(90deg, #bef264 0%, #a7f3d0 35%, #64748b 65%, #0f172a 100%); }
         body.theme-nature .cinematic-bg { display: block; }
         .hills { position: absolute; bottom: -80px; left: 0; width: 55%; height: 250px; background: #84cc16; border-radius: 100% 100% 0 0; opacity: 0.5; }
         .sun { position: absolute; top: 5%; left: 10%; width: 100px; height: 100px; background: radial-gradient(circle, rgba(253,224,71,0.8) 0%, rgba(253,224,71,0) 70%); animation: sun-glow 6s infinite alternate; }
         @keyframes sun-glow { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.15); opacity: 0.85; } }
 
-        .hp-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; background: linear-gradient(to bottom, #0f172a, #1e1b4b); }
+        .hp-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; overflow: hidden; background: linear-gradient(to bottom, #0f172a, #1e1b4b); }
         body.theme-harrypotter .hp-bg { display: block; }
         .hp-lightning { position: absolute; top: 0; left: 40%; width: 2px; height: 100vh; background: #fff; box-shadow: 0 0 20px #fff, 0 0 40px #fff; opacity: 0; transform: rotate(15deg); animation: lightning 8s infinite; }
         @keyframes lightning { 0%, 95%, 100% { opacity: 0; } 96%, 98% { opacity: 1; } 97% { opacity: 0; } }
@@ -131,14 +135,14 @@
         body.theme-crimson .custom-input { background: #f8fafc; border-color: #dc2626; }
 
         /* --- ORTAK UI BİLEŞENLERİ --- */
-        .glass-card { transition: box-shadow 0.4s ease; border-radius: 1.25rem; }
-        .custom-input { width: 100%; padding: 10px 12px; border-radius: 10px; outline: none; border: 2px solid #e2e8f0; transition: 0.3s; background: #fff; color:#1e293b; font-size: 14px; }
+        .glass-card { transition: box-shadow 0.4s ease; border-radius: 1.5rem; }
+        .custom-input { width: 100%; padding: 12px 16px; border-radius: 12px; outline: none; border: 2px solid #e2e8f0; transition: 0.3s; background: #fff; color:#1e293b; font-size: 15px; }
         .custom-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
-        .btn-primary { background: #6366f1; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
+        .btn-primary { background: #6366f1; color: white; padding: 14px 24px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
         .btn-primary:hover { background: #4f46e5; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); transform: translateY(-2px); }
-        .btn-danger { background: #ef4444; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
+        .btn-danger { background: #ef4444; color: white; padding: 14px 24px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
         .btn-danger:hover { background: #dc2626; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); transform: translateY(-2px); }
-        .btn-outline { background: transparent; color: inherit; border: 2px solid #e2e8f0; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; }
+        .btn-outline { background: transparent; color: inherit; border: 2px solid #e2e8f0; padding: 14px 24px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; }
         .btn-outline:hover { border-color: #6366f1; color: #6366f1; background: rgba(99, 102, 241, 0.05); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         body.theme-dark .btn-outline, body.theme-engineering .btn-outline, body.theme-space .btn-outline, body.theme-gaming .btn-outline, body.theme-got .btn-outline, body.theme-astrology .btn-outline, body.theme-harrypotter .btn-outline, body.theme-emerald .btn-outline, body.theme-cyan .btn-outline, body.theme-lotr .btn-outline { border-color: rgba(255,255,255,0.2); color: white; }
         body.theme-dark .btn-outline:hover, body.theme-engineering .btn-outline:hover, body.theme-space .btn-outline:hover, body.theme-gaming .btn-outline:hover, body.theme-got .btn-outline:hover, body.theme-astrology .btn-outline:hover, body.theme-harrypotter .btn-outline:hover, body.theme-emerald .btn-outline:hover, body.theme-cyan .btn-outline:hover, body.theme-lotr .btn-outline:hover { border-color: #818cf8; color: #818cf8; background: rgba(129, 140, 248, 0.1); }
@@ -152,7 +156,7 @@
         @keyframes textGlow { from { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; opacity: 0.8;} to { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor; opacity: 1;} }
 
         /* STATUS BADGES & FLAMES */
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
         .badge-done { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; } 
         .badge-pending { background: #fef9c3; color: #a16207; border: 1px solid #fde047; } 
         .badge-other { background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; }
@@ -163,40 +167,47 @@
         #header-theme-icon { position: absolute; right: -20px; bottom: -30px; font-size: 180px; opacity: 0.08; transform: rotate(15deg); pointer-events: none; transition: 0.5s; z-index: 0; }
         .font-pomodoro { font-family: 'Space Mono', monospace; }
         
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
 
         /* Fullscreen spinner */
         #loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999999; display: none; align-items: center; justify-content: center; flex-direction: column; color: white; }
         .spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 4px solid #fff; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 1rem; }
 
         .btn-google {
-            background: white; color: #3f3f46; border: 1px solid #e4e4e7; padding: 12px 24px; border-radius: 12px;
+            background: white; color: #3f3f46; border: 1px solid #e4e4e7; padding: 14px 24px; border-radius: 14px;
             font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center;
             display: flex; align-items: center; justify-content: center; gap: 10px;
         }
         .btn-google:hover { background: #f4f4f5; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-google img { width: 18px; height: 18px; }
 
-        /* --- YENİ: OK (BUTON) YÖNLENDİRMELİ EKRANLAR (SERBEST KAYDIRMA OPTİMİZE) --- */
+        /* --- YENİ: OK (BUTON) YÖNLENDİRMELİ EKRANLAR (SERBEST KAYDIRMA) --- */
         .dashboard-container {
-            width: 100vw;
+            width: 100%;
         }
         
         .dashboard-slide {
-            display: none; /* Javascript ile değiştirilecek */
-            width: 100vw;
+            display: none; 
+            width: 100%;
             min-height: 100vh;
-            padding: 1rem;
-            padding-bottom: 5rem; /* Alt nav-bar için boşluk */
+            padding: 1rem 3rem 6rem 3rem; /* Yanlardan oklar için boşluk, alttan noktalar için */
             box-sizing: border-box;
-            animation: fadeIn 0.3s ease-in-out;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        
+        @media (max-width: 768px) {
+            .dashboard-slide {
+                padding: 1rem 1rem 6rem 1rem; /* Mobilde oklar zaten içerde olduğu için dar padding */
+            }
+        }
+
         .dashboard-slide.active {
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
         }
         
         @keyframes fadeIn {
@@ -204,37 +215,20 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        @media (min-width: 768px) {
-            .dashboard-slide {
-                padding: 2rem;
-                padding-bottom: 6rem;
-            }
-        }
-        
         .module-full-content {
             width: 100%;
-            max-width: 1400px;
-            flex-grow: 1; /* Sayfa yüksekliğine göre uzamasına izin verir */
+            max-width: 1200px;
+            margin-top: 2vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* --- YÖNLENDİRME BUTONLARI & ALT NAV BAR --- */
-        .bottom-nav-bar {
-            position: fixed;
-            bottom: 1rem;
-            left: 0;
-            width: 100vw;
-            padding: 0 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 9000;
-            pointer-events: none; /* Arka plana tıklamayı engellememek için */
-        }
-
+        /* --- YÖNLENDİRME BUTONLARI (ORTALANMIŞ, SABİT) --- */
         .nav-btn {
-            background: rgba(255,255,255,0.8);
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.85);
             border: 1px solid rgba(0,0,0,0.1);
             color: #4f46e5;
             width: 44px;
@@ -246,65 +240,49 @@
             font-size: 20px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 150;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             transition: all 0.2s ease;
             backdrop-filter: blur(5px);
-            pointer-events: auto; /* Sadece butonlar tıklanabilir */
         }
         body.theme-dark .nav-btn, body.theme-engineering .nav-btn, body.theme-space .nav-btn, body.theme-gaming .nav-btn, body.theme-astrology .nav-btn, body.theme-harrypotter .nav-btn {
-            background: rgba(15,23,42,0.8); border-color: rgba(255,255,255,0.2); color: #818cf8;
+            background: rgba(15,23,42,0.85); border-color: rgba(255,255,255,0.2); color: #818cf8;
         }
-        .nav-btn:hover:not(:disabled) { background: #6366f1; color: white; transform: scale(1.1); border-color: transparent;}
+        .nav-btn:hover:not(:disabled) { background: #6366f1; color: white; transform: translateY(-50%) scale(1.15); border-color: transparent;}
         .nav-btn:disabled { opacity: 0; cursor: default; pointer-events: none; }
         
+        .nav-btn.left { left: 0.5rem; }
+        .nav-btn.right { right: 0.5rem; }
+
         @media (min-width: 768px) {
-            .bottom-nav-bar { 
-                bottom: 2rem; 
-                justify-content: center; /* Desktop'ta noktaları ortala */
-            }
-            /* Masaüstünde okları dikeyde ortaya al */
-            .nav-btn { 
-                position: fixed; 
-                top: 50%; 
-                transform: translateY(-50%);
-                width: 60px; 
-                height: 60px; 
-                font-size: 28px; 
-            }
-            .nav-btn:hover:not(:disabled) { transform: translateY(-50%) scale(1.1); }
-            .nav-btn.left { left: 2rem; }
-            .nav-btn.right { right: 2rem; }
+            .nav-btn { width: 56px; height: 56px; font-size: 26px; }
+            .nav-btn.left { left: 1.5rem; }
+            .nav-btn.right { right: 1.5rem; }
         }
 
         /* --- SAYFA GÖSTERGELERİ (DOTS) --- */
         .slide-dots {
+            position: fixed;
+            bottom: max(1.5rem, env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            gap: 6px;
+            gap: 8px;
             background: rgba(0,0,0,0.1);
-            padding: 8px 12px;
-            border-radius: 20px;
-            backdrop-filter: blur(5px);
-            pointer-events: auto;
+            padding: 10px 16px;
+            border-radius: 30px;
+            backdrop-filter: blur(8px);
+            z-index: 100;
         }
         body.theme-dark .slide-dots, body.theme-engineering .slide-dots, body.theme-space .slide-dots, body.theme-gaming .slide-dots, body.theme-astrology .slide-dots {
             background: rgba(255,255,255,0.1);
         }
         .slide-dot {
-            width: 6px; height: 6px; border-radius: 50%;
-            background: rgba(255,255,255,0.4); cursor: pointer; transition: 0.3s;
+            width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.3s;
         }
-        body.theme-light .slide-dot, body.theme-nature .slide-dot, body.theme-health .slide-dot { background: rgba(0,0,0,0.2); }
-        .slide-dot.active { background: #6366f1; transform: scale(1.5); }
-        
-        @media (min-width: 768px) {
-            .slide-dots { gap: 8px; padding: 10px 16px; }
-            .slide-dot { width: 8px; height: 8px; }
-        }
-
-        /* --- SAĞ PANEL (SADECE İÇERİK DÜZENLEME İÇİN) --- */
-        #right-panel { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 9999; }
-        #right-panel.open { transform: translateX(0); }
-        .panel-row { background: rgba(0,0,0,0.03); padding: 12px; border-radius: 12px; margin-bottom: 12px; position: relative; border: 1px solid rgba(0,0,0,0.05); }
+        body.theme-light .slide-dot, body.theme-nature .slide-dot, body.theme-health .slide-dot { background: rgba(0,0,0,0.3); }
+        .slide-dot.active { background: #6366f1; transform: scale(1.6); }
 
     </style>
 </head>
@@ -326,7 +304,7 @@
     <div class="p-6 fixed inset-0 z-50 pointer-events-none" id="setup-container">
         <!-- ADIM 1: GİRİŞ / KAYIT -->
         <div id="screen-auth" class="screen active flex-col w-full max-w-md mx-auto mt-20 pointer-events-auto">
-            <div class="glass-card shadow-2xl overflow-hidden bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
+            <div class="glass-card shadow-2xl overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
                 <div class="flex border-b border-black/10">
                     <button onclick="toggleAuthTab('login')" id="tab-btn-login" class="flex-1 py-4 font-black text-sm text-indigo-600 bg-indigo-50/50 transition duration-300">Giriş Yap</button>
                     <button onclick="toggleAuthTab('register')" id="tab-btn-register" class="flex-1 py-4 font-black text-sm opacity-50 hover:bg-black/5 transition duration-300">Kayıt Ol</button>
@@ -357,14 +335,14 @@
 
         <!-- ADIM 2: TEMA SEÇİMİ -->
         <div id="screen-theme" class="screen flex-col w-full max-w-6xl mx-auto mt-10 pointer-events-auto">
-            <div class="text-center mb-6 glass-card p-6 shadow-lg bg-white/90 dark:bg-slate-900/90 backdrop-blur-md"><h2 class="text-3xl font-black text-indigo-600">Konseptinizi Seçin</h2></div>
+            <div class="text-center mb-6 glass-card p-6 shadow-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl"><h2 class="text-3xl font-black text-indigo-600">Konseptinizi Seçin</h2></div>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3 mb-6 text-xs h-[50vh] overflow-y-auto custom-scroll p-2" id="theme-selection-grid"></div>
             <button onclick="nextScreen('screen-project')" class="btn-primary max-w-xs mx-auto shadow-lg">İleri</button>
         </div>
 
         <!-- ADIM 3: İSİM -->
         <div id="screen-project" class="screen flex-col w-full max-w-md mx-auto mt-20 pointer-events-auto">
-            <div class="glass-card p-8 shadow-xl text-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
+            <div class="glass-card p-8 shadow-xl text-center bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
                 <h2 class="text-3xl font-black text-indigo-600 mb-4">Proje İsmi</h2>
                 <input type="text" id="project-name-input" class="custom-input text-center text-xl font-bold mb-6" value="Benim İzlencem">
                 <button onclick="saveProjectName()" class="btn-primary shadow-lg">İleri</button>
@@ -373,7 +351,7 @@
 
         <!-- ADIM 4: MODÜL SEÇİMİ -->
         <div id="screen-modules" class="screen flex-col w-full max-w-5xl mx-auto mt-10 pointer-events-auto">
-            <div class="text-center mb-8 glass-card p-6 shadow-lg bg-white/90 dark:bg-slate-900/90 backdrop-blur-md"><h2 class="text-3xl font-black text-indigo-600">Hangi Araçları Ekleyelim?</h2></div>
+            <div class="text-center mb-8 glass-card p-6 shadow-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl"><h2 class="text-3xl font-black text-indigo-600">Hangi Araçları Ekleyelim?</h2></div>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8" id="module-selection-grid"></div>
             <button onclick="finishSetup()" class="btn-primary max-w-xs mx-auto shadow-lg">Kurulumu Tamamla 🚀</button>
         </div>
@@ -382,17 +360,17 @@
     <!-- ADIM 5: SEKME/SLIDE TABANLI ANA DASHBOARD -->
     <div id="screen-dashboard" class="screen relative h-full w-full">
         
+        <!-- Yönlendirme Okları (Sabit) -->
+        <button id="btn-prev" class="nav-btn left" onclick="slideBy(-1)" disabled title="Önceki Sayfa">←</button>
+        <button id="btn-next" class="nav-btn right" onclick="slideBy(1)" title="Sonraki Sayfa">→</button>
+
         <!-- Ana İçerik Konteyneri -->
         <div id="dashboard-container" class="dashboard-container">
-            <!-- JS ile tek bir slide "active" sınıfı alarak doldurulacak -->
+            <!-- JS ile tek bir slide "active" sınıfı alarak gösterilecek -->
         </div>
 
-        <!-- Alt Navigasyon Barı (Oklar ve Noktalar) -->
-        <div class="bottom-nav-bar">
-            <button id="btn-prev" class="nav-btn left" onclick="slideBy(-1)" disabled title="Önceki Sayfa">←</button>
-            <div id="slide-indicators" class="slide-dots"></div>
-            <button id="btn-next" class="nav-btn right" onclick="slideBy(1)" title="Sonraki Sayfa">→</button>
-        </div>
+        <!-- Alt Noktalar -->
+        <div id="slide-indicators" class="slide-dots"></div>
     </div>
 
     <!-- GENEL AYARLAR MODALI -->
@@ -452,6 +430,20 @@
         </div>
     </div>
 
+    <!-- VERİ/İÇERİK DÜZENLEME MODALI (Eski Sağ Panel) -->
+    <div id="module-settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[9999] opacity-0 transition-opacity duration-300 p-4">
+        <div class="glass-card w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden bg-white dark:bg-slate-900">
+            <div class="p-4 md:p-6 border-b border-black/10 flex justify-between items-center bg-indigo-600 text-white">
+                <div><h3 id="panel-title" class="text-lg md:text-xl font-black uppercase tracking-wider">⚙️ Veri Düzenle</h3></div>
+                <button onclick="closePanel()" class="text-2xl md:text-3xl hover:scale-110 transition">&times;</button>
+            </div>
+            <div id="panel-content" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 custom-scroll"></div>
+            <div class="p-4 md:p-6 border-t border-black/10 bg-black/5" id="panel-footer-btn">
+                <button onclick="savePanel()" class="btn-primary shadow-lg !py-3 md:!py-4 text-base md:text-lg">Tüm Değişiklikleri Kaydet</button>
+            </div>
+        </div>
+    </div>
+
     <!-- DUYURU / BİLGİLENDİRME MODALI -->
     <div id="announcement-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[9999] opacity-0 transition-opacity duration-300 p-4">
         <div class="glass-card w-full max-w-md p-6 md:p-8 shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800 border-t-4 border-indigo-500">
@@ -463,18 +455,6 @@
         </div>
     </div>
 
-    <!-- VERİ/İÇERİK DÜZENLEME SAĞ PANEL (Unified Panel) -->
-    <div id="right-panel" class="fixed top-0 right-0 h-full w-full md:w-[450px] glass-card !rounded-none !border-y-0 !border-r-0 shadow-2xl flex flex-col bg-white dark:bg-slate-900">
-        <div class="p-6 border-b border-black/10 flex justify-between items-center bg-indigo-600 text-white">
-            <div><h3 id="panel-title" class="text-xl font-black uppercase tracking-wider">⚙️ Veri Düzenle</h3></div>
-            <button onclick="closePanel()" class="text-3xl hover:scale-110 transition">&times;</button>
-        </div>
-        <div id="panel-content" class="flex-1 overflow-y-auto p-6 space-y-6 custom-scroll"></div>
-        <div class="p-6 border-t border-black/10 bg-black/5" id="panel-footer-btn">
-            <button onclick="savePanel()" class="btn-primary shadow-lg !py-4 text-lg">Tüm Değişiklikleri Kaydet</button>
-        </div>
-    </div>
-    <div id="panel-backdrop" onclick="closePanel()" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] hidden opacity-0 transition-opacity"></div>
 </div> <!-- Container End -->
 
     <!-- FIREBASE IMPORT VE ENTEGRASYONU -->
@@ -498,8 +478,8 @@
         let db, auth;
         let currentUser = null;
         let unsubscribeUserDoc = null;
-        let totalSlides = 0; // Navigasyon noktaları için
-        let currentSlideIndex = 0; // Geçerli slayt
+        let totalSlides = 0; 
+        let currentSlideIndex = 0; 
         
         const EMOJI_LIST = ['📌', '⏳', '🎓', '📚', '📊', '🔍', '✍️', '💡', '🚀', '🎯', '🔥', '🏆', '📝', '📅', '🧠', '⚙️', '📈', '🗣️', '💻', '☕', '👨‍🍳', '👩‍🍳', '⚕️', '🏛️'];
         const ALL_THEMES = [
@@ -521,9 +501,7 @@
             projectName: 'Benim İzlencem',
             projectColor: '#4f46e5',
             editingModuleId: null,
-            announcements: [
-                { id: 1, date: '04 Mart 2026', title: 'Tam Ekran & Gelişmiş Mobil Arayüz', content: 'Çalışma alanınızı genişlettik. Tablolar akıllı kartlara dönüştürüldü ve modüller ekranın tüm genişliğini kullanacak şekilde yenilendi. İyi çalışmalar dileriz.' }
-            ],
+            announcements: [],
             calendar: { id: 'header_calendar', type: 'calendar', title: 'TAKVİM', data: [ { label: 'Savunma Günü', targetDate: '2026-06-15', emoji: '🎓' }, { label: 'Tez Bitişi', targetDate: '2026-05-01', emoji: '📚' } ] },
             modules: [
                 { id: 'gorevler', type: 'tasks', selected: true, title: 'Akademik Görevler', icon: '✅', columns: { task: 'GÖREV', progress: 'İLERLEME', note: 'NOTLAR' }, data: [ { task: 'Literatür Taraması (Bölüm 2)', progress: 20, status: 'Yapılmadı', note: 'Kaynaklar toplanıyor' }, { task: 'Anket Formu Tasarımı', progress: 100, status: 'Yapıldı', note: 'Hocaya iletildi' } ] },
@@ -536,7 +514,7 @@
             activeModules: []
         };
 
-        let pomoState = { timeLeft: 25*60, isRunning: false, mode: 'work', interval: null, isFinished: false, isFullScreen: false };
+        let pomoState = { timeLeft: 25*60, isRunning: false, mode: 'work', interval: null, isFinished: false };
 
         window.addEventListener('DOMContentLoaded', () => {
             window.renderInitialThemes();
@@ -750,21 +728,20 @@
             setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
         }
 
-        // YENİ: SEKME (TAB) GİBİ SAYFA DEĞİŞTİRME MANTIĞI (Kaydırmadan Bağımsız)
+        // TAB MANTIĞI İLE SAYFA DEĞİŞTİRME (Display ile Geçiş, Scrolling Serbest)
         window.goToSlide = function(index) {
             if(index < 0) index = 0;
             if(index > totalSlides - 1) index = totalSlides - 1;
             
             currentSlideIndex = index;
             
-            // Container yerine tüm slaytların görünürlüğünü CSS "display" sınıfıyla değiştiriyoruz.
             document.querySelectorAll('.dashboard-slide').forEach((slide, i) => {
                 if(i === currentSlideIndex) slide.classList.add('active');
                 else slide.classList.remove('active');
             });
             
             window.updateUINav();
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // Sayfa değişince en üste kaydır
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
         window.slideBy = function(direction) {
@@ -772,27 +749,25 @@
         }
 
         window.updateUINav = function() {
-            // Noktaları güncelle
             document.querySelectorAll('.slide-dot').forEach((dot, i) => {
                 if(i === currentSlideIndex) dot.classList.add('active');
                 else dot.classList.remove('active');
             });
             
-            // Ok butonlarını güncelle (ilk ve son sayfa kontrolü)
             const btnPrev = document.getElementById('btn-prev');
             const btnNext = document.getElementById('btn-next');
             if(btnPrev) btnPrev.disabled = currentSlideIndex === 0;
             if(btnNext) btnNext.disabled = currentSlideIndex === totalSlides - 1;
         }
 
-        // --- DASHBOARD OLUŞTURMA (Geniş & Sekmeli Sistem) ---
+        // --- DASHBOARD OLUŞTURMA (Tam Serbest Yükseklik) ---
         window.renderDashboard = function() {
             const container = document.getElementById('dashboard-container');
             const indicators = document.getElementById('slide-indicators');
             if(!container || !indicators) return;
 
             let html = '';
-            totalSlides = state.activeModules.length + 2; // Home + Modules + Menu
+            totalSlides = state.activeModules.length + 2; 
             
             // --- SLIDE 1: ANA EKRAN ---
             let parts = state.projectName.split(' ');
@@ -800,7 +775,6 @@
             let currentThemeObj = ALL_THEMES.find(t => t.id === state.theme);
             let themeIcon = currentThemeObj ? currentThemeObj.icon : '✨';
 
-            // Takvim HTML Üretimi
             let calData = state.calendar.data || [];
             const today = new Date(); today.setHours(0,0,0,0);
             let calHtml = `<div class="flex justify-between items-center mb-4 md:mb-6 border-b border-black/10 pb-3 md:pb-4 w-full">
@@ -842,7 +816,7 @@
                 else if(mod.type === 'journal') contentHtml = window.renderJournal(mod);
 
                 html += `<div class="dashboard-slide ${currentSlideIndex === index + 1 ? 'active' : ''}" id="slide-${mod.id}">
-                            <div class="module-full-content glass-card p-3 sm:p-6 md:p-10 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
+                            <div class="module-full-content glass-card p-4 sm:p-6 md:p-10 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
                                 <div class="flex justify-between items-center mb-3 md:mb-6 pb-2 md:pb-4 border-b border-black/10 shrink-0">
                                     <h2 class="text-xl md:text-4xl font-black uppercase tracking-tight opacity-80 flex items-center gap-2 md:gap-3">${mod.icon} ${mod.title}</h2>
                                     <button onclick="openUnifiedPanel('${mod.id}')" class="text-xl md:text-2xl bg-indigo-100 text-indigo-700 w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-xl hover:bg-indigo-200 transition shadow-sm shrink-0 pointer-events-auto relative z-50">⚙️</button>
@@ -859,7 +833,7 @@
                 <div class="module-full-content glass-card p-6 sm:p-10 md:p-16 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
                     <h2 class="text-2xl md:text-5xl font-black text-indigo-600 dark:text-indigo-400 mb-6 md:mb-12 border-b border-black/10 pb-4 w-full text-center">Platform Menüsü</h2>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-8 w-full max-w-3xl relative z-10 pointer-events-auto">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 w-full max-w-3xl relative z-10 pointer-events-auto">
                         <!-- Ayarlar ve Düzenle -->
                         <button onclick="openGlobalSettings()" class="bg-indigo-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-indigo-100 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
                             <span class="text-3xl md:text-5xl group-hover:scale-110 transition">⚙️</span>
@@ -917,7 +891,7 @@
             let html = '';
             ALL_THEMES.forEach(t => {
                 let borderClass = state.theme === t.id ? 'border-indigo-600 bg-indigo-100 text-indigo-800 shadow-md dark:bg-indigo-900/80 dark:text-indigo-100 scale-105 transform' : 'border-black/10 opacity-70 hover:opacity-100 bg-white dark:bg-slate-700 hover:scale-105 transform';
-                html += `<div onclick="selectTheme('${t.id}', false)" class="p-2 md:p-3 border-2 rounded-xl cursor-pointer font-bold text-center transition-all ${bClass} flex flex-col items-center gap-1 md:gap-2">
+                html += `<div onclick="selectTheme('${t.id}', false)" class="p-2 md:p-3 border-2 rounded-xl cursor-pointer font-bold text-center transition-all ${borderClass} flex flex-col items-center gap-1 md:gap-2">
                             <span class="text-xl md:text-2xl">${t.icon}</span><span class="truncate w-full">${t.name}</span>
                         </div>`;
             });
@@ -945,7 +919,6 @@
             document.getElementById('btn-' + tabId).classList.add('active');
         }
 
-        // YENİ: Ayarlar içerisindeki Modül Yönetimi sekmesinin oluşturulması
         window.renderModuleManagement = function() {
             const container = document.getElementById('settings-module-management');
             let html = '';
@@ -1029,7 +1002,6 @@
                 const baseMod = state.modules.find(m => m.id === modId);
                 if(baseMod) baseMod.selected = false;
                 window.renderDashboard();
-                window.closePanel();
                 if(document.getElementById('global-settings-modal').classList.contains('flex')) {
                     window.renderModuleManagement();
                 }
@@ -1077,9 +1049,9 @@
             pomoState.isFinished = false;
             const mod = state.activeModules.find(m => m.type === 'pomodoro');
             if(mod) {
-                if(pomoState.mode === 'work') pomoState.timeLeft = (mod.columns.work || 25) * 60;
-                else if(pomoState.mode === 'short') pomoState.timeLeft = (mod.columns.short || 5) * 60;
-                else pomoState.timeLeft = (mod.columns.long || 15) * 60;
+                if(pomoState.mode === 'work') pomoState.timeLeft = (mod.columns?.work || 25) * 60;
+                else if(pomoState.mode === 'short') pomoState.timeLeft = (mod.columns?.short || 5) * 60;
+                else pomoState.timeLeft = (mod.columns?.long || 15) * 60;
             }
             window.renderDashboard();
             const pIdx = state.activeModules.findIndex(m => m.id === 'pomodoro');
@@ -1103,9 +1075,9 @@
             if (!text) { alert("Lütfen çalışmalarınızı kaydetmek için bir not girin!"); return; }
 
             const mod = state.activeModules.find(m => m.id === modId);
-            let duration = mod.columns.work || 25;
-            if (pomoState.mode === 'short') duration = mod.columns.short || 5;
-            if (pomoState.mode === 'long') duration = mod.columns.long || 15;
+            let duration = mod.columns?.work || 25;
+            if (pomoState.mode === 'short') duration = mod.columns?.short || 5;
+            if (pomoState.mode === 'long') duration = mod.columns?.long || 15;
 
             if(!mod.data) mod.data = [];
             mod.data.unshift({
@@ -1131,7 +1103,7 @@
         }
 
         window.renderPomodoro = function(mod) {
-            const workM = mod.columns.work || 25; const shortM = mod.columns.short || 5; const longM = mod.columns.long || 15;
+            const workM = mod.columns?.work || 25; const shortM = mod.columns?.short || 5; const longM = mod.columns?.long || 15;
             if(pomoState.timeLeft === 0 && !pomoState.isRunning && !pomoState.isFinished) pomoState.timeLeft = workM * 60;
 
             let mainContent = '';
@@ -1155,7 +1127,7 @@
                 mainContent += `<button onclick="setPomoMode('short', ${shortM})" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ${sClass}">Kısa Mola</button>`;
                 mainContent += `<button onclick="setPomoMode('long', ${longM})" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ${lClass}">Uzun Mola</button>`;
                 mainContent += '</div>';
-                mainContent += `<div class="text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] font-black font-pomodoro tracking-tighter mb-6 md:mb-10 text-current drop-shadow-xl transition-all duration-300 text-center leading-none" id="pomo-time-display">${formatPomoTime(pomoState.timeLeft)}</div>`;
+                mainContent += `<div class="text-6xl sm:text-8xl md:text-9xl font-black font-pomodoro tracking-tighter mb-6 md:mb-10 text-current drop-shadow-xl transition-all duration-300 text-center leading-none" id="pomo-time-display">${formatPomoTime(pomoState.timeLeft)}</div>`;
                 
                 mainContent += '<div class="pomo-btn-group flex flex-wrap gap-4 md:gap-6 w-full justify-center transition-all duration-300">';
                 mainContent += `<button onclick="togglePomo()" class="bg-indigo-600 text-white px-8 py-4 md:px-10 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-xl hover:bg-indigo-700 hover:-translate-y-1 transition transform flex items-center justify-center gap-3 min-w-[200px] md:w-[300px]">`;
@@ -1221,7 +1193,9 @@
 
             document.getElementById('panel-backdrop').classList.replace('hidden', 'block');
             setTimeout(() => { document.getElementById('panel-backdrop').classList.replace('opacity-0', 'opacity-100'); }, 10);
-            document.getElementById('right-panel').classList.add('open');
+            document.getElementById('module-settings-modal').classList.add('open'); // Fallback trigger
+            document.getElementById('module-settings-modal').classList.replace('hidden', 'flex');
+            setTimeout(() => { document.getElementById('module-settings-modal').classList.replace('opacity-0', 'opacity-100'); }, 10);
         }
 
         function getProgressStyle(val) {
@@ -1344,9 +1318,9 @@
                 html += `</div>`;
                 
                 html += `<div class="flex flex-wrap sm:flex-nowrap items-center justify-between w-full xl:w-auto gap-2 md:gap-4 flex-1 bg-white/40 dark:bg-black/20 p-2 md:p-3 rounded-xl border border-white/20">`;
-                html += `<label class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold cursor-pointer hover:opacity-80 transition"><input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d.interviewed ? 'checked' : ''} onchange="window.inlineUpdateInterview('${mod.id}', ${i}, 'interviewed', this.checked)"> ${mod.columns.bool1}</label>`;
-                html += `<label class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold cursor-pointer hover:opacity-80 transition"><input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d.consent ? 'checked' : ''} onchange="window.inlineUpdateInterview('${mod.id}', ${i}, 'consent', this.checked)"> ${mod.columns.bool2}</label>`;
-                html += `<label class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold cursor-pointer hover:opacity-80 transition"><input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d.transcribed ? 'checked' : ''} onchange="window.inlineUpdateInterview('${mod.id}', ${i}, 'transcribed', this.checked)"> ${mod.columns.bool3}</label>`;
+                html += `<label class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold cursor-pointer hover:opacity-80 transition"><input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d.interviewed ? 'checked' : ''} onchange="window.inlineUpdateInterview('${mod.id}', ${i}, 'interviewed', this.checked)"> ${mod.columns?.bool1 || 'GÖRÜŞME'}</label>`;
+                html += `<label class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold cursor-pointer hover:opacity-80 transition"><input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d.consent ? 'checked' : ''} onchange="window.inlineUpdateInterview('${mod.id}', ${i}, 'consent', this.checked)"> ${mod.columns?.bool2 || 'ONAM'}</label>`;
+                html += `<label class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold cursor-pointer hover:opacity-80 transition"><input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d.transcribed ? 'checked' : ''} onchange="window.inlineUpdateInterview('${mod.id}', ${i}, 'transcribed', this.checked)"> ${mod.columns?.bool3 || 'METİN'}</label>`;
                 html += `</div>`;
                 
                 html += `<button onclick="window.inlineDeleteInterview('${mod.id}', ${i})" class="text-red-500 font-bold text-[10px] md:text-xs bg-red-100/80 px-4 py-2.5 md:px-5 md:py-3 rounded-xl hover:bg-red-200 transition shadow-sm w-full xl:w-auto xl:opacity-0 group-hover:opacity-100">SİL</button>`;
@@ -1386,7 +1360,7 @@
             return html;
         }
 
-        // --- VERİ DÜZENLEME PANELİ (Sağ Panel) ---
+        // --- VERİ DÜZENLEME PANELİ YERİNE MODAL EKRANI AÇILIYOR ---
         window.openUnifiedPanel = function(moduleId) {
             try {
                 state.editingModuleId = moduleId;
@@ -1434,12 +1408,10 @@
                 if (['calendar', 'stats', 'tasks', 'contacts'].includes(mod.type)) window.renderPanelDataRows(mod.type);
 
                 document.getElementById('panel-footer-btn').style.display = 'block';
-                let footerHtml = '<button onclick="savePanel()" class="btn-primary shadow-lg !py-4 text-lg flex-1">Tüm Değişiklikleri Kaydet</button>';
-                document.getElementById('panel-footer-btn').innerHTML = `<div class="flex gap-3">${footerHtml}</div>`;
                 
-                document.getElementById('panel-backdrop').classList.replace('hidden', 'block');
-                setTimeout(() => { document.getElementById('panel-backdrop').classList.replace('opacity-0', 'opacity-100'); }, 10);
-                document.getElementById('right-panel').classList.add('open');
+                const modal = document.getElementById('module-settings-modal');
+                modal.classList.replace('hidden', 'flex');
+                setTimeout(() => modal.classList.replace('opacity-0', 'opacity-100'), 10);
             } catch (err) {
                 console.error('Ayarlar paneli açılırken hata:', err);
             }
@@ -1460,7 +1432,7 @@
             tempEditData.forEach((row, i) => {
                 if(type === 'calendar') {
                     let emojis = ''; EMOJI_LIST.forEach(e => { emojis += `<option value="${e}" ${row.emoji === e ? 'selected' : ''}>${e}</option>`; });
-                    html += `<div class="panel-row"><button onclick="removePanelRow(${i}, '${type}')" class="absolute top-2 right-2 text-red-500 font-bold text-xs hover:text-red-700">SİL</button>
+                    html += `<div class="panel-row bg-white dark:bg-slate-800 p-4 rounded-xl border border-black/10 relative shadow-sm mb-4"><button onclick="removePanelRow(${i}, '${type}')" class="absolute top-2 right-2 text-red-500 font-bold text-xs hover:text-red-700">SİL</button>
                     <div class="grid grid-cols-4 gap-2 mt-2">
                     <div class="col-span-1"><label class="text-[10px] font-bold opacity-60">Emoji</label><select class="custom-input !py-1 !text-xl text-center" onchange="updateTemp(${i}, 'emoji', this.value)">${emojis}</select></div>
                     <div class="col-span-3"><label class="text-[10px] font-bold opacity-60">Etiket</label><input type="text" class="custom-input !py-1" value="${row.label}" onchange="updateTemp(${i}, 'label', this.value)"></div>
@@ -1469,14 +1441,14 @@
                 }
                 else if(type === 'stats') {
                     let emojis = ''; EMOJI_LIST.forEach(e => { emojis += `<option value="${e}" ${row.emoji === e ? 'selected' : ''}>${e}</option>`; });
-                    html += `<div class="panel-row"><button onclick="removePanelRow(${i}, '${type}')" class="absolute top-2 right-2 text-red-500 font-bold text-xs hover:text-red-700">SİL</button>
+                    html += `<div class="panel-row bg-white dark:bg-slate-800 p-4 rounded-xl border border-black/10 relative shadow-sm mb-4"><button onclick="removePanelRow(${i}, '${type}')" class="absolute top-2 right-2 text-red-500 font-bold text-xs hover:text-red-700">SİL</button>
                     <div class="space-y-2 mt-2">
                     <div class="flex gap-2"><select class="custom-input !py-1 w-16 !text-xl text-center" onchange="updateTemp(${i}, 'emoji', this.value)">${emojis}</select><input type="text" class="custom-input !py-1 flex-1" value="${row.title}" placeholder="Kategori Adı" onchange="updateTemp(${i}, 'title', this.value)"></div>
                     <div class="grid grid-cols-2 gap-2"><div><label class="text-[10px] font-bold opacity-60">Biten</label><input type="number" class="custom-input !py-1" value="${row.completed}" onchange="updateTemp(${i}, 'completed', parseInt(this.value))"></div><div><label class="text-[10px] font-bold opacity-60">Hedef Toplam</label><input type="number" class="custom-input !py-1" value="${row.total}" onchange="updateTemp(${i}, 'total', parseInt(this.value))"></div></div>
                     </div></div>`;
                 }
                 else if(type === 'tasks') {
-                    html += `<div class="panel-row"><button onclick="removePanelRow(${i}, '${type}')" class="absolute top-2 right-2 text-red-500 font-bold text-xs hover:text-red-700">SİL</button>
+                    html += `<div class="panel-row bg-white dark:bg-slate-800 p-4 rounded-xl border border-black/10 relative shadow-sm mb-4"><button onclick="removePanelRow(${i}, '${type}')" class="absolute top-2 right-2 text-red-500 font-bold text-xs hover:text-red-700">SİL</button>
                     <div class="space-y-2 mt-2">
                     <input type="text" class="custom-input !py-1 font-bold" value="${row.task}" placeholder="Görev Açıklaması" onchange="updateTemp(${i}, 'task', this.value)">
                     <div class="flex gap-3 items-center"><input type="range" class="w-full" min="0" max="100" step="10" value="${row.progress}" onchange="updateTemp(${i}, 'progress', parseInt(this.value))"><span class="text-[10px] font-bold w-6">%${row.progress}</span></div>
@@ -1486,7 +1458,7 @@
                     </div></div>`;
                 }
                 else if(type === 'contacts') {
-                    html += `<div class="panel-row"><button onclick="removePanelRow(${i}, '${type}')" class="absolute top-2 right-2 text-red-500 font-bold text-xs hover:text-red-700">SİL</button>
+                    html += `<div class="panel-row bg-white dark:bg-slate-800 p-4 rounded-xl border border-black/10 relative shadow-sm mb-4"><button onclick="removePanelRow(${i}, '${type}')" class="absolute top-2 right-2 text-red-500 font-bold text-xs hover:text-red-700">SİL</button>
                     <div class="space-y-2 mt-2">
                     <input type="text" class="custom-input !py-1 font-bold" value="${row.name}" placeholder="Ad Soyad" onchange="updateTemp(${i}, 'name', this.value)">
                     <div class="grid grid-cols-2 gap-2"><input type="text" class="custom-input !py-1 !text-xs" value="${row.role}" placeholder="Rol" onchange="updateTemp(${i}, 'role', this.value)"><input type="text" class="custom-input !py-1 !text-xs" value="${row.contact}" placeholder="İletişim" onchange="updateTemp(${i}, 'contact', this.value)"></div>
@@ -1532,9 +1504,11 @@
         }
 
         window.closePanel = function() {
-            document.getElementById('right-panel').classList.remove('open');
-            document.getElementById('panel-backdrop').classList.replace('opacity-100', 'opacity-0');
-            setTimeout(() => { document.getElementById('panel-backdrop').classList.replace('block', 'hidden'); }, 300);
+            const modal = document.getElementById('module-settings-modal');
+            if(modal) {
+                modal.classList.replace('opacity-100', 'opacity-0');
+                setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
+            }
             state.editingModuleId = null;
         }
 
