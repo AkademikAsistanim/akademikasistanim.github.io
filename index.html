@@ -140,8 +140,6 @@
         .btn-primary:hover { background: #4f46e5; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); transform: translateY(-2px); }
         .btn-danger { background: #ef4444; color: white; padding: 14px 24px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
         .btn-danger:hover { background: #dc2626; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); transform: translateY(-2px); }
-        .btn-outline { background: transparent; color: inherit; border: 2px solid #e2e8f0; padding: 14px 24px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; }
-        .btn-outline:hover { border-color: #6366f1; color: #6366f1; background: rgba(99, 102, 241, 0.05); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         
         .screen { display: none; opacity: 0; transition: opacity 0.5s ease-in-out; }
         .screen.active { display: flex; opacity: 1; }
@@ -151,7 +149,7 @@
         .glow-animate { animation: textGlow 2s infinite alternate; }
         @keyframes textGlow { from { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; opacity: 0.8;} to { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor; opacity: 1;} }
 
-        /* STATUS BADGES & FLAMES */
+        /* STATUS BADGES */
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
         .badge-done { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; } 
         .badge-pending { background: #fef9c3; color: #a16207; border: 1px solid #fde047; } 
@@ -163,7 +161,7 @@
         #header-theme-icon { position: absolute; right: -20px; bottom: -30px; font-size: 180px; opacity: 0.08; transform: rotate(15deg); pointer-events: none; transition: 0.5s; z-index: 0; }
         .font-pomodoro { font-family: 'Space Mono', monospace; }
         
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
 
@@ -224,7 +222,7 @@
 
         /* İÇ DÜZENLEME INPUT GÖRÜNÜMÜ */
         .inline-edit-input {
-            background: rgba(255,255,255,0.8); border: 2px dashed #6366f1; color: #1e293b; padding: 4px 8px; border-radius: 8px; font-weight: bold; width: 100%; outline: none; transition: 0.3s;
+            background: rgba(255,255,255,0.8); border: 2px dashed #6366f1; color: #1e293b; padding: 6px 12px; border-radius: 8px; font-weight: bold; width: 100%; outline: none; transition: 0.3s;
         }
         .inline-edit-input:focus { border-style: solid; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
         body.theme-dark .inline-edit-input { background: rgba(0,0,0,0.5); color: #fff; border-color: #818cf8; }
@@ -426,6 +424,7 @@
         let unsubscribeUserDoc = null;
         let totalSlides = 0; 
         let currentSlideIndex = 0; 
+        let radarInstances = {}; // Grafiklerin ezilmesini önlemek için
         
         const EMOJI_LIST = ['📌', '⏳', '🎓', '📚', '📊', '🔍', '✍️', '💡', '🚀', '🎯', '🔥', '🏆', '📝', '📅', '🧠', '⚙️', '📈', '🗣️', '💻', '☕', '👨‍🍳', '👩‍🍳', '⚕️', '🏛️'];
         const ALL_THEMES = [
@@ -446,7 +445,8 @@
             themeBrightness: 1,
             projectName: 'Benim İzlencem',
             projectColor: '#4f46e5',
-            inlineEdit: {}, // İçeriden düzenleme modlarını tutar
+            inlineEdit: {}, // Tüm modülün düzenleme modunu tutar (başlık vb.)
+            itemEdit: {},   // YENİ: Sadece tıklanan satırın düzenleme modunu tutar
             announcements: [
                 { id: 1, date: '04 Mart 2026', title: 'Tam Ekran & İçeriden Düzenleme', content: 'Sayfa scroll kilidi kaldırıldı! Artık normal bir websitesi gibi sayfalarınızı aşağı doğru rahatça kaydırabilirsiniz. Ayrıca ayarlar butonlarına basarak her aracı olduğu yerde kolayca düzenleyebilirsiniz.' }
             ],
@@ -575,6 +575,15 @@
             window.saveDataToCloud();
         }
 
+        // YENİ: SATIR BAZINDA DÜZENLEME (ITEM EDIT) FONKSİYONU
+        window.toggleItemEdit = function(modId, index) {
+            let key = modId + '_' + index;
+            state.itemEdit = state.itemEdit || {};
+            state.itemEdit[key] = !state.itemEdit[key];
+            window.renderDashboard();
+            window.saveDataToCloud();
+        }
+
         window.inlineUpdateData = function(modId, index, field, value) {
             const mod = state.activeModules.find(m => m.id === modId);
             if(mod && mod.data[index]) {
@@ -595,13 +604,20 @@
             if(!mod) return;
             if(!mod.data) mod.data = [];
 
+            let newIdx = mod.data.length;
+
             if(type === 'task') mod.data.push({task:'Yeni Görev', progress:0, status:'Yapılmadı', note:''});
             if(type === 'contact') mod.data.push({name:'Yeni Kişi', role:'', contact:'', ref:'', note:''});
             if(type === 'interview') mod.data.push({code:'YENİ', name:'', interviewed:false, consent:false, transcribed:false});
             if(type === 'stat') mod.data.push({title:'Yeni Kategori', completed:0, total:10, emoji:'📊'});
 
-            // Ekleme yapıldığında ilgili modülü otomatik olarak düzenleme moduna al
-            state.inlineEdit[modId] = true;
+            // Yeni eklenen öğeyi direkt düzenleme moduna al (Satır bazı olanlar için itemEdit, Modül bazı olanlar için inlineEdit)
+            if (type === 'task' || type === 'contact') {
+                state.itemEdit = state.itemEdit || {};
+                state.itemEdit[modId + '_' + newIdx] = true;
+            } else {
+                state.inlineEdit[modId] = true;
+            }
 
             window.renderDashboard();
             window.saveDataToCloud();
@@ -838,10 +854,10 @@
             calHtml += `<div class="space-y-3 md:space-y-4 w-full text-sm md:text-lg">`;
             if (isCalEdit) {
                 calData.forEach((d, i) => {
-                    calHtml += `<div class="flex flex-wrap sm:flex-nowrap items-center gap-2 mb-2 bg-white/50 p-2 rounded-xl">
-                        <input type="text" class="custom-input w-16 text-center !p-2" value="${d.emoji}" onchange="inlineUpdateCalendar(${i}, 'emoji', this.value)">
-                        <input type="text" class="custom-input flex-1 !p-2 min-w-[150px]" value="${d.label}" onchange="inlineUpdateCalendar(${i}, 'label', this.value)">
-                        <input type="date" class="custom-input w-full sm:w-36 !p-2 text-xs" value="${d.targetDate}" onchange="inlineUpdateCalendar(${i}, 'targetDate', this.value)">
+                    calHtml += `<div class="flex flex-wrap sm:flex-nowrap items-center gap-2 mb-2 bg-white/50 p-2 rounded-xl border border-black/5">
+                        <input type="text" class="custom-input w-16 text-center !p-2" value="${d.emoji}" onchange="window.inlineUpdateCalendar(${i}, 'emoji', this.value)">
+                        <input type="text" class="custom-input flex-1 !p-2 min-w-[150px]" value="${d.label}" onchange="window.inlineUpdateCalendar(${i}, 'label', this.value)">
+                        <input type="date" class="custom-input w-full sm:w-36 !p-2 text-xs" value="${d.targetDate}" onchange="window.inlineUpdateCalendar(${i}, 'targetDate', this.value)">
                         <button onclick="state.calendar.data.splice(${i},1); window.renderDashboard(); window.saveDataToCloud()" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg font-bold w-full sm:w-auto mt-2 sm:mt-0">Sil</button>
                     </div>`;
                 });
@@ -884,7 +900,7 @@
                 else if(mod.type === 'tasks') contentHtml = window.renderTasks(mod, isEdit);
                 else if(mod.type === 'journal') contentHtml = window.renderJournal(mod, isEdit);
 
-                // Modül Başlığı
+                // Modül Başlığı (Contacts ve Tasks modüllerinde isim düzenleme ana ⚙️ tuşundan yapılıyor)
                 let titleHtml = '';
                 if(isEdit) {
                     titleHtml = `<div class="flex items-center gap-2 w-2/3"><span class="text-2xl md:text-4xl">${mod.icon}</span> <input type="text" class="custom-input text-lg md:text-2xl font-black uppercase !py-2" value="${mod.title}" onchange="state.activeModules.find(m=>m.id==='${mod.id}').title=this.value; window.saveDataToCloud()"></div>`;
@@ -917,18 +933,18 @@
                         <button onclick="openGlobalSettings()" class="bg-indigo-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-indigo-100 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
                             <span class="text-3xl md:text-5xl group-hover:scale-110 transition">⚙️</span>
                             <span class="font-black text-base md:text-xl text-indigo-900 dark:text-indigo-100">Ayarlar & Düzenle</span>
-                            <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-indigo-700 dark:text-indigo-300">Tema, Modül Sırası ve Araç Ekleme</span>
+                            <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-indigo-700 dark:text-indigo-300">Tema, Modül Sırası ve Yeni Araç</span>
                         </button>
                         
                         <!-- İletişim -->
-                        <button onclick="showDialog('İletişim', 'Sorularınız, önerileriniz veya iş birlikleri için bize ulaşın:<br><br><b>Destek E-Posta:</b> destek@akademikasistanim.com<br><b>Telefon:</b> +90 850 123 45 67')" class="bg-emerald-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-emerald-100 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
+                        <button onclick="window.showDialog('İletişim', 'Sorularınız, önerileriniz veya iş birlikleri için bize ulaşın:<br><br><b>Destek E-Posta:</b> destek@akademikasistanim.com<br><b>Telefon:</b> +90 850 123 45 67')" class="bg-emerald-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-emerald-100 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
                             <span class="text-3xl md:text-5xl group-hover:scale-110 transition">📞</span>
                             <span class="font-black text-base md:text-xl text-emerald-900 dark:text-emerald-100">İletişim</span>
                             <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-emerald-700 dark:text-emerald-300">Destek ve Sorularınız İçin</span>
                         </button>
                         
                         <!-- Şikayet -->
-                        <button onclick="showDialog('Şikayet & Geri Bildirim', 'Karşılaştığınız sorunları veya platformla ilgili şikayetlerinizi doğrudan ekibimize iletebilirsiniz.<br><br><b>Şikayet Hattı:</b> sikayet@akademikasistanim.com<br>Veya panel üzerinden formu kullanabilirsiniz.')" class="bg-amber-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-amber-100 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
+                        <button onclick="window.showDialog('Şikayet & Geri Bildirim', 'Karşılaştığınız sorunları veya platformla ilgili şikayetlerinizi doğrudan ekibimize iletebilirsiniz.<br><br><b>Şikayet Hattı:</b> sikayet@akademikasistanim.com<br>Veya panel üzerinden formu kullanabilirsiniz.')" class="bg-amber-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-amber-100 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
                             <span class="text-3xl md:text-5xl group-hover:scale-110 transition">⚠️</span>
                             <span class="font-black text-base md:text-xl text-amber-900 dark:text-amber-100">Şikayet / Bildirim</span>
                             <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-amber-700 dark:text-amber-300">Sorun Bildirin veya Öneri Sunun</span>
@@ -949,16 +965,35 @@
             // Nokta Göstergelerini Oluştur
             let dotHtml = '';
             for(let i=0; i<totalSlides; i++) {
-                dotHtml += `<div class="slide-dot ${i===currentSlideIndex ? 'active':''}" onclick="goToSlide(${i})"></div>`;
+                dotHtml += `<div class="slide-dot ${i===currentSlideIndex ? 'active':''}" onclick="window.goToSlide(${i})"></div>`;
             }
             indicators.innerHTML = dotHtml;
             window.updateUINav();
 
-            // Chart Render
+            // Chart Render - Canvas'ın Document'ta renderlandığına emin olmak için küçük bekleme
             setTimeout(() => { 
-                const statsMod = state.activeModules.find(m => m.type === 'stats');
-                if(statsMod && document.getElementById('radarChart')) window.initRadarChart(statsMod.data || []); 
-            }, 100);
+                state.activeModules.forEach(m => {
+                    if(m.type === 'stats' && !state.inlineEdit[m.id]) {
+                        window.initRadarChart(m.data || [], 'radarChart-' + m.id);
+                    }
+                });
+            }, 150);
+        }
+
+        window.initRadarChart = function(data, canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if(!canvas || canvas.offsetParent === null) return;
+            const ctx = canvas.getContext('2d');
+            if(radarInstances[canvasId]) radarInstances[canvasId].destroy();
+            
+            radarInstances[canvasId] = new Chart(ctx, {
+                type: 'radar',
+                data: { 
+                    labels: data.map(d=>d.title), 
+                    datasets: [{ label: '% Başarı', data: data.map(d=>d.total > 0 ? Math.round((d.completed/d.total)*100) : 0), backgroundColor: 'rgba(99, 102, 241, 0.2)', borderColor: '#6366f1', borderWidth: 2 }] 
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { min: 0, max: 100, ticks: { display: false } } } }
+            });
         }
 
         // --- GLOBAL AYARLAR (MODAL İÇİ) ---
@@ -1009,10 +1044,10 @@
                 html += `<div class="flex items-center justify-between p-3 border-2 border-indigo-100 dark:border-indigo-900/50 rounded-xl bg-white dark:bg-slate-800 shadow-sm">
                     <div class="font-bold text-sm flex items-center gap-3 flex-1 truncate"><span class="text-xl md:text-2xl w-8 text-center">${m.icon}</span> <span class="truncate">${m.title}</span> <span class="hidden sm:inline-block text-[10px] ml-2 text-indigo-500 font-black bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">Sayfa ${idx+2}</span></div>
                     <div class="flex items-center gap-1 shrink-0 bg-slate-50 dark:bg-slate-700 p-1 rounded-lg">
-                        <button onclick="moveModuleList(${idx}, -1)" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-white dark:bg-slate-600 rounded shadow-sm font-bold hover:bg-indigo-50" ${idx===0?'disabled opacity-30':''}>←</button>
-                        <button onclick="moveModuleList(${idx}, 1)" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-white dark:bg-slate-600 rounded shadow-sm font-bold hover:bg-indigo-50" ${idx===state.activeModules.length-1?'disabled opacity-30':''}>→</button>
+                        <button onclick="window.moveModuleList(${idx}, -1)" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-white dark:bg-slate-600 rounded shadow-sm font-bold hover:bg-indigo-50" ${idx===0?'disabled opacity-30':''}>←</button>
+                        <button onclick="window.moveModuleList(${idx}, 1)" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-white dark:bg-slate-600 rounded shadow-sm font-bold hover:bg-indigo-50" ${idx===state.activeModules.length-1?'disabled opacity-30':''}>→</button>
                         <div class="w-px h-6 bg-black/10 mx-1"></div>
-                        <button onclick="removeActiveModule('${m.id}')" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-red-50 text-red-500 rounded shadow-sm font-bold hover:bg-red-500 hover:text-white">🗑️</button>
+                        <button onclick="window.removeActiveModule('${m.id}')" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-red-50 text-red-500 rounded shadow-sm font-bold hover:bg-red-500 hover:text-white">🗑️</button>
                     </div>
                 </div>`;
             });
@@ -1025,7 +1060,7 @@
             inactive.forEach(m => {
                 html += `<div class="flex flex-wrap sm:flex-nowrap items-center justify-between p-3 md:p-4 border-2 border-black/10 border-dashed rounded-xl bg-white/50 dark:bg-slate-800/50 transition hover:border-indigo-300 gap-2">
                     <div class="font-bold text-sm md:text-base flex items-center gap-3"><span class="text-xl md:text-2xl w-8 text-center">${m.icon}</span> ${m.title}</div>
-                    <button onclick="addModuleFromSettings('${m.id}')" class="bg-indigo-600 text-white w-full sm:w-auto px-5 py-2 rounded-lg text-xs md:text-sm font-bold hover:bg-indigo-700 shadow-sm">+ Ekle</button>
+                    <button onclick="window.addModuleFromSettings('${m.id}')" class="bg-indigo-600 text-white w-full sm:w-auto px-5 py-2 rounded-lg text-xs md:text-sm font-bold hover:bg-indigo-700 shadow-sm">+ Ekle</button>
                 </div>`;
             });
             html += '</div>';
@@ -1201,7 +1236,7 @@
                         <div><label class="text-xs font-bold opacity-70 mb-2 block">Kısa Mola</label><input type="number" class="custom-input !py-3 text-center text-lg font-black" value="${shortM}" onchange="mod.columns.short=parseInt(this.value); window.saveDataToCloud()"></div>
                         <div><label class="text-xs font-bold opacity-70 mb-2 block">Uzun Mola</label><input type="number" class="custom-input !py-3 text-center text-lg font-black" value="${longM}" onchange="mod.columns.long=parseInt(this.value); window.saveDataToCloud()"></div>
                     </div>
-                    <button onclick="toggleInlineEdit('${mod.id}')" class="w-full mt-6 btn-primary">Değişiklikleri Tamamla</button>
+                    <button onclick="window.toggleInlineEdit('${mod.id}')" class="w-full mt-6 btn-primary">Değişiklikleri Tamamla</button>
                 </div>`;
                 return `<div class="flex flex-col items-center justify-start w-full h-full">${mainContent}</div>`;
             }
@@ -1212,8 +1247,8 @@
                 mainContent += '<p class="text-sm md:text-xl font-bold opacity-70 mb-6 md:mb-8">Bu oturumda ne üzerinde çalıştınız?</p>';
                 mainContent += '<input type="text" id="pomo-log-input" class="custom-input !py-3 md:!py-4 !text-base md:!text-xl mb-6 md:mb-8 font-bold" placeholder="Örn: Literatür taraması yapıldı..." autofocus>';
                 mainContent += '<div class="flex flex-wrap gap-3 md:gap-4 justify-center">';
-                mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-black text-base md:text-lg hover:bg-slate-300 transition">İptal Et</button>';
-                mainContent += `<button onclick="savePomoLog('${mod.id}')" class="bg-indigo-600 text-white px-8 py-3 md:px-10 md:py-4 rounded-xl md:rounded-2xl font-black text-base md:text-lg shadow-xl hover:bg-indigo-700 transition">Kaydet</button>`;
+                mainContent += '<button onclick="window.resetPomo()" class="bg-slate-200 text-slate-700 px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-black text-base md:text-lg hover:bg-slate-300 transition">İptal Et</button>';
+                mainContent += `<button onclick="window.savePomoLog('${mod.id}')" class="bg-indigo-600 text-white px-8 py-3 md:px-10 md:py-4 rounded-xl md:rounded-2xl font-black text-base md:text-lg shadow-xl hover:bg-indigo-700 transition">Kaydet</button>`;
                 mainContent += '</div></div>';
             } else {
                 let wClass = pomoState.mode==='work' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-700';
@@ -1221,18 +1256,18 @@
                 let lClass = pomoState.mode==='long' ? 'bg-blue-500 text-white shadow-md' : 'text-slate-500 hover:text-slate-700';
                 
                 mainContent = '<div class="pomo-mode-btns flex flex-wrap justify-center gap-2 md:gap-3 mb-6 md:mb-8 bg-black/5 p-1.5 md:p-2 rounded-full shadow-inner mx-auto w-fit max-w-full">';
-                mainContent += `<button onclick="setPomoMode('work', ${workM})" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ${wClass}">Odaklan</button>`;
-                mainContent += `<button onclick="setPomoMode('short', ${shortM})" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ${sClass}">Kısa Mola</button>`;
-                mainContent += `<button onclick="setPomoMode('long', ${longM})" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ${lClass}">Uzun Mola</button>`;
+                mainContent += `<button onclick="window.setPomoMode('work', ${workM})" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ${wClass}">Odaklan</button>`;
+                mainContent += `<button onclick="window.setPomoMode('short', ${shortM})" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ${sClass}">Kısa Mola</button>`;
+                mainContent += `<button onclick="window.setPomoMode('long', ${longM})" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ${lClass}">Uzun Mola</button>`;
                 mainContent += '</div>';
                 mainContent += `<div class="text-[25vw] md:text-[15rem] font-black font-pomodoro tracking-tighter mb-6 md:mb-10 text-current drop-shadow-xl transition-all duration-300 text-center leading-none" id="pomo-time-display">${formatPomoTime(pomoState.timeLeft)}</div>`;
                 
                 mainContent += '<div class="pomo-btn-group flex flex-wrap gap-4 md:gap-6 w-full justify-center transition-all duration-300">';
-                mainContent += `<button onclick="togglePomo()" class="bg-indigo-600 text-white px-8 py-4 md:px-10 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-xl hover:bg-indigo-700 hover:-translate-y-1 transition transform flex items-center justify-center gap-3 min-w-[200px] md:w-[300px]">`;
+                mainContent += `<button onclick="window.togglePomo()" class="bg-indigo-600 text-white px-8 py-4 md:px-10 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-xl hover:bg-indigo-700 hover:-translate-y-1 transition transform flex items-center justify-center gap-3 min-w-[200px] md:w-[300px]">`;
                 mainContent += pomoState.isRunning ? '⏸️ DURAKLAT' : '▶️ BAŞLAT';
                 mainContent += '</button>';
-                mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-6 py-4 md:px-6 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-md hover:bg-slate-300 transition" title="Sıfırla">🔄</button>';
-                mainContent += `<button onclick="openPomoAnalytics('${mod.id}')" class="bg-blue-100 text-blue-700 px-6 py-4 md:px-6 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-md hover:bg-blue-200 transition" title="Kayıtlar ve Analiz">📊</button>`;
+                mainContent += '<button onclick="window.resetPomo()" class="bg-slate-200 text-slate-700 px-6 py-4 md:px-6 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-md hover:bg-slate-300 transition" title="Sıfırla">🔄</button>';
+                mainContent += `<button onclick="window.openPomoAnalytics('${mod.id}')" class="bg-blue-100 text-blue-700 px-6 py-4 md:px-6 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-md hover:bg-blue-200 transition" title="Kayıtlar ve Analiz">📊</button>`;
                 mainContent += '</div>';
             }
             return `<div class="flex flex-col items-center justify-center py-4 w-full h-full">${mainContent}</div>`;
@@ -1279,7 +1314,7 @@
                     html += `<div class="text-[10px] font-black ${color} uppercase mb-1 flex items-center gap-1">${icon} ${log.duration} Dakika <span class="opacity-40 text-slate-500 ml-1 font-normal">• ${log.date}</span></div>`;
                     html += `<div class="text-xs font-bold opacity-80">${log.text}</div>`;
                     html += '</div>';
-                    html += `<button onclick="deletePomoLogFromPanel('${mod.id}', ${index})" class="opacity-0 group-hover:opacity-100 text-[9px] font-bold text-red-500 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition shrink-0">SİL</button>`;
+                    html += `<button onclick="window.deletePomoLogFromPanel('${mod.id}', ${index})" class="opacity-0 group-hover:opacity-100 text-[9px] font-bold text-red-500 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition shrink-0">SİL</button>`;
                     html += '</div>';
                 });
                 html += '</div>';
@@ -1292,15 +1327,6 @@
             setTimeout(() => modal.classList.replace('opacity-0', 'opacity-100'), 10);
         }
 
-        function getProgressStyle(val) {
-            val = parseInt(val);
-            if (val < 30) return { color: 'bg-red-500', anim: 'animate-pulse' };
-            if (val >= 30 && val < 60) return { color: 'bg-orange-500', anim: '' };
-            if (val >= 60 && val < 100) return { color: 'bg-amber-400', anim: '' };
-            if (val === 100) return { color: 'bg-emerald-500', anim: 'animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]' };
-            return { color: 'bg-indigo-500', anim: '' };
-        }
-
         window.renderStats = function(mod, isEdit) {
             let data = mod.data || [];
             if(isEdit) {
@@ -1311,19 +1337,20 @@
                 data.forEach((d, i) => {
                     let emojis = ''; EMOJI_LIST.forEach(e => { emojis += `<option value="${e}" ${d.emoji === e ? 'selected' : ''}>${e}</option>`; });
                     editHtml += `<div class="flex flex-wrap md:flex-nowrap items-center gap-2 p-3 bg-white dark:bg-slate-700 rounded-xl shadow-sm border border-black/5">
-                        <select class="custom-input !py-2 !px-1 w-12 md:w-16 text-center text-xl" onchange="inlineUpdateData('${mod.id}', ${i}, 'emoji', this.value)">${emojis}</select>
-                        <input type="text" class="custom-input !py-2 flex-1" value="${d.title}" placeholder="Kategori Adı" onchange="inlineUpdateData('${mod.id}', ${i}, 'title', this.value)">
+                        <select class="custom-input !py-2 !px-1 w-12 md:w-16 text-center text-xl" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'emoji', this.value)">${emojis}</select>
+                        <input type="text" class="custom-input !py-2 flex-1" value="${d.title}" placeholder="Kategori Adı" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'title', this.value)">
                         <div class="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
-                            <input type="number" class="custom-input !py-2 w-20 text-center" value="${d.completed}" title="Tamamlanan" onchange="inlineUpdateData('${mod.id}', ${i}, 'completed', parseInt(this.value))">
+                            <input type="number" class="custom-input !py-2 w-20 text-center" value="${d.completed}" title="Tamamlanan" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'completed', parseInt(this.value))">
                             <span class="font-black opacity-50">/</span>
-                            <input type="number" class="custom-input !py-2 w-20 text-center" value="${d.total}" title="Hedef" onchange="inlineUpdateData('${mod.id}', ${i}, 'total', parseInt(this.value))">
+                            <input type="number" class="custom-input !py-2 w-20 text-center" value="${d.total}" title="Hedef" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'total', parseInt(this.value))">
                             <button onclick="if(confirm('Kategoriyi silmek istediğinize emin misiniz?')){ state.activeModules.find(m=>m.id==='${mod.id}').data.splice(${i},1); window.renderDashboard(); window.saveDataToCloud(); }" class="bg-red-100 text-red-600 px-4 py-2 rounded-xl hover:bg-red-200">🗑️</button>
                         </div>
                     </div>`;
                 });
                 
                 editHtml += `</div>
-                    <button onclick="addNewData('${mod.id}', 'stat')" class="w-full mt-4 bg-indigo-50/50 text-indigo-600 font-bold py-3 rounded-xl border-2 border-dashed border-indigo-200 hover:bg-indigo-100 transition">+ Yeni Kategori Ekle</button>
+                    <button onclick="window.addNewData('${mod.id}', 'stat')" class="w-full mt-4 bg-indigo-50/50 text-indigo-600 font-bold py-3 rounded-xl border-2 border-dashed border-indigo-200 hover:bg-indigo-100 transition">+ Yeni Kategori Ekle</button>
+                    <button onclick="window.toggleInlineEdit('${mod.id}')" class="w-full mt-4 btn-primary">Düzenlemeyi Bitir</button>
                 </div>`;
                 return editHtml;
             }
@@ -1340,63 +1367,64 @@
             html += '</div>';
             
             html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-start w-full min-h-[300px]">';
-            html += `<div class="w-full h-[250px] md:h-[350px] relative flex items-center justify-center p-2 md:p-4 bg-white/50 dark:bg-black/20 rounded-3xl border border-black/5"><canvas id="radarChart"></canvas></div>`;
+            html += `<div class="w-full h-[250px] md:h-[350px] relative flex items-center justify-center p-2 md:p-4 bg-white/50 dark:bg-black/20 rounded-3xl border border-black/5"><canvas id="radarChart-${mod.id}"></canvas></div>`;
             html += '<div class="space-y-4 md:space-y-6 w-full max-h-[350px] overflow-y-auto custom-scroll pr-2">';
             
             data.forEach(s => {
                 const perc = s.total > 0 ? Math.round((s.completed/s.total)*100) : 0;
-                let bg = perc===100 ? 'bg-amber-400' : 'bg-indigo-600';
                 html += `<div><div class="flex justify-between text-sm md:text-base font-bold mb-2 opacity-80"><span>${s.emoji} ${s.title} <span class="opacity-50 text-xs ml-2">(${s.completed}/${s.total})</span></span> <span>%${perc}</span></div>`;
-                html += `<div class="h-3 md:h-4 bg-black/10 rounded-full overflow-hidden shadow-inner"><div class="h-full ${bg} transition-all duration-1000" style="width:${perc}%"></div></div></div>`;
+                html += `<div class="h-3 md:h-4 bg-black/10 rounded-full overflow-hidden shadow-inner"><div class="h-full transition-all duration-1000" style="width:${perc}%; background-color: hsl(${perc * 1.2}, 80%, 45%);"></div></div></div>`;
             });
             html += '</div></div>';
             return html;
         }
 
-        // Tümüyle Kart Görünümüne (Mobil Optimize) Geçirilen Tablolar
         window.renderTasks = function(mod, isEdit) {
             let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full pb-8">';
             mod.data.forEach((d, i) => {
                 const progress = parseInt(d.progress || 0);
-                const style = getProgressStyle(progress);
                 let badgeClass = d.status === 'Yapıldı' ? 'badge-done' : (d.status === 'Diğer' ? 'badge-other' : 'badge-pending');
+                let isItemEdit = state.itemEdit && state.itemEdit[mod.id + '_' + i];
 
-                html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 relative transition border border-transparent ${isEdit ? 'border-indigo-300 bg-indigo-50/30' : 'hover:border-black/5'}">`;
-                
-                if (isEdit) {
+                if (isItemEdit) {
+                    html += `<div class="bg-indigo-50/50 dark:bg-slate-800/80 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 border border-indigo-300 shadow-inner">`;
                     html += `<div class="flex-1 space-y-2 w-full">
-                                <input type="text" class="inline-edit-input text-sm md:text-base" value="${d.task}" placeholder="Görev Başlığı" onchange="inlineUpdateData('${mod.id}', ${i}, 'task', this.value)">
-                                <input type="text" class="inline-edit-input text-xs font-normal italic opacity-80" value="${d.note || ''}" placeholder="Kısa bir not ekle..." onchange="inlineUpdateData('${mod.id}', ${i}, 'note', this.value)">
+                                <input type="text" class="inline-edit-input text-sm md:text-base" value="${d.task}" placeholder="Görev Başlığı" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'task', this.value)">
+                                <input type="text" class="inline-edit-input text-xs font-normal italic opacity-80" value="${d.note || ''}" placeholder="Kısa bir not ekle..." onchange="window.inlineUpdateData('${mod.id}', ${i}, 'note', this.value)">
                              </div>`;
                     html += `<div class="w-full md:w-1/3 flex items-center gap-3">
-                                <input type="range" class="w-full accent-indigo-600" min="0" max="100" step="5" value="${progress}" onchange="inlineUpdateData('${mod.id}', ${i}, 'progress', parseInt(this.value))">
+                                <input type="range" class="w-full" style="accent-color: hsl(${progress * 1.2}, 80%, 45%);" min="0" max="100" step="5" value="${progress}" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'progress', parseInt(this.value))" oninput="this.nextElementSibling.innerText = '%' + this.value; this.style.accentColor = 'hsl(' + (this.value * 1.2) + ', 80%, 45%)'">
                                 <span class="text-xs font-black opacity-60 w-10 text-right">%${progress}</span>
                              </div>`;
                     html += `<div class="flex items-center justify-between md:justify-end gap-2 mt-2 md:mt-0">
-                                <select class="custom-input !py-2 !px-2 text-xs w-28" onchange="inlineUpdateData('${mod.id}', ${i}, 'status', this.value)">
+                                <select class="custom-input !py-2 !px-2 text-xs w-28" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'status', this.value)">
                                     <option ${d.status==='Yapılmadı'?'selected':''}>Yapılmadı</option>
                                     <option ${d.status==='Yapıldı'?'selected':''}>Yapıldı</option>
                                     <option ${d.status==='Diğer'?'selected':''}>Diğer</option>
                                 </select>
                                 <button onclick="if(confirm('Görevi silmek istediğinize emin misiniz?')){ state.activeModules.find(m=>m.id==='${mod.id}').data.splice(${i},1); window.renderDashboard(); window.saveDataToCloud(); }" class="text-red-500 bg-red-100 px-3 py-2 rounded-xl font-bold hover:bg-red-200">SİL</button>
+                                <button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-white bg-emerald-500 px-3 py-2 rounded-xl font-bold hover:bg-emerald-600 shadow-md">KAYDET</button>
                              </div>`;
+                    html += `</div>`;
                 } else {
+                    html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 relative group transition border border-transparent hover:border-black/5">`;
                     html += `<div class="flex-1">
                                 <div class="font-bold text-sm md:text-base text-slate-800 dark:text-slate-200">${d.task}</div>
                                 <div class="italic opacity-60 text-[11px] md:text-xs mt-1">${d.note || '-'}</div>
                              </div>`;
                     html += `<div class="w-full md:w-1/3 flex items-center gap-3">
-                                <div class="w-full bg-black/10 rounded-full h-2 md:h-3 overflow-hidden shadow-inner"><div class="h-full ${style.color} ${style.anim} transition-all duration-1000" style="width:${progress}%"></div></div>
-                                <span class="text-xs font-black opacity-60 w-10 text-right">%${progress}</span>
+                                <div class="w-full bg-black/10 rounded-full h-2 md:h-3 overflow-hidden shadow-inner"><div class="h-full transition-all duration-1000" style="width:${progress}%; background-color: hsl(${progress * 1.2}, 80%, 45%);"></div></div>
+                                <span class="text-xs font-black w-10 text-right" style="color: hsl(${progress * 1.2}, 80%, 40%);">%${progress}</span>
                              </div>`;
                     html += `<div class="flex items-center justify-end gap-3 mt-2 md:mt-0">
                                 <span class="status-badge ${badgeClass} text-[10px] md:text-xs">${d.status}</span>
+                                <button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-indigo-600 bg-indigo-100 px-4 py-2 rounded-xl text-[10px] md:text-xs font-black shadow hover:bg-indigo-200 transition opacity-100 md:opacity-0 group-hover:opacity-100">DÜZENLE</button>
                              </div>`;
+                    html += `</div>`;
                 }
-                html += `</div>`;
             });
             
-            html += `<button onclick="addNewData('${mod.id}', 'task')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Görev Ekle</button>`;
+            html += `<button onclick="window.addNewData('${mod.id}', 'task')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Görev Ekle</button>`;
             html += '</div>';
             return html;
         }
@@ -1404,31 +1432,38 @@
         window.renderContacts = function(mod, isEdit) {
             let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full pb-8">';
             mod.data.forEach((d, i) => {
-                html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 relative transition ${isEdit ? 'border-indigo-300 bg-indigo-50/30' : 'border border-transparent hover:border-black/5'}">`;
+                let isItemEdit = state.itemEdit && state.itemEdit[mod.id + '_' + i];
                 
-                if(isEdit) {
+                if (isItemEdit) {
+                    html += `<div class="bg-indigo-50/50 dark:bg-slate-800/80 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 border border-indigo-300 shadow-inner">`;
                     html += `<div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full">`;
-                    html += `<div><input type="text" class="inline-edit-input" value="${d.name}" placeholder="Ad Soyad" onchange="inlineUpdateData('${mod.id}', ${i}, 'name', this.value)"></div>`;
-                    html += `<div><input type="text" class="inline-edit-input" value="${d.role}" placeholder="Rol" onchange="inlineUpdateData('${mod.id}', ${i}, 'role', this.value)"></div>`;
-                    html += `<div><input type="text" class="inline-edit-input" value="${d.contact}" placeholder="Telefon/E-Posta" onchange="inlineUpdateData('${mod.id}', ${i}, 'contact', this.value)"></div>`;
-                    html += `<div><input type="text" class="inline-edit-input" value="${d.ref}" placeholder="Referans" onchange="inlineUpdateData('${mod.id}', ${i}, 'ref', this.value)"></div>`;
-                    html += `<div class="sm:col-span-2"><input type="text" class="inline-edit-input font-normal italic" value="${d.note||''}" placeholder="Özel Notlar..." onchange="inlineUpdateData('${mod.id}', ${i}, 'note', this.value)"></div>`;
+                    html += `<div><input type="text" class="inline-edit-input" value="${d.name}" placeholder="Ad Soyad" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'name', this.value)"></div>`;
+                    html += `<div><input type="text" class="inline-edit-input" value="${d.role}" placeholder="Rol" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'role', this.value)"></div>`;
+                    html += `<div><input type="text" class="inline-edit-input" value="${d.contact}" placeholder="Telefon/E-Posta" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'contact', this.value)"></div>`;
+                    html += `<div><input type="text" class="inline-edit-input" value="${d.ref}" placeholder="Referans" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'ref', this.value)"></div>`;
+                    html += `<div class="sm:col-span-2"><input type="text" class="inline-edit-input font-normal italic" value="${d.note||''}" placeholder="Özel Notlar..." onchange="window.inlineUpdateData('${mod.id}', ${i}, 'note', this.value)"></div>`;
                     html += `</div>`;
-                    html += `<div class="w-full md:w-auto flex justify-end mt-2 md:mt-0">
+                    html += `<div class="w-full md:w-auto flex justify-end gap-2 mt-2 md:mt-0">
                                 <button onclick="if(confirm('Kişiyi silmek istediğinize emin misiniz?')){ state.activeModules.find(m=>m.id==='${mod.id}').data.splice(${i},1); window.renderDashboard(); window.saveDataToCloud(); }" class="text-red-500 bg-red-100 px-4 py-2.5 rounded-xl font-bold hover:bg-red-200">SİL</button>
+                                <button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-white bg-emerald-500 px-4 py-2.5 rounded-xl font-bold hover:bg-emerald-600 shadow-md">KAYDET</button>
                              </div>`;
+                    html += `</div>`;
                 } else {
+                    html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 relative group transition border border-transparent hover:border-black/5">`;
                     html += `<div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full">`;
                     html += `<div><div class="font-bold text-sm md:text-base flex items-center flex-wrap gap-2">${d.name} ${d.role ? `<span class="bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-md text-[9px] font-black uppercase">${d.role}</span>` : ''}</div></div>`;
                     html += `<div class="text-xs md:text-sm font-medium opacity-80 flex items-center gap-1">${d.contact ? '📞 '+d.contact : ''}</div>`;
                     html += `<div class="text-xs md:text-sm opacity-80 flex items-center gap-1">${d.ref ? '👤 '+d.ref : ''}</div>`;
                     html += `</div>`;
                     html += `<div class="w-full md:w-1/4 text-xs md:text-sm italic opacity-60 line-clamp-2 md:truncate">${d.note || '-'}</div>`;
+                    html += `<div class="w-full md:w-auto flex justify-end mt-2 md:mt-0 opacity-100 md:opacity-0 group-hover:opacity-100 transition">
+                                <button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-indigo-600 bg-indigo-100 px-4 py-2 rounded-xl text-[10px] md:text-xs font-black shadow hover:bg-indigo-200">DÜZENLE</button>
+                             </div>`;
+                    html += `</div>`;
                 }
-                html += `</div>`;
             });
             
-            html += `<button onclick="addNewData('${mod.id}', 'contact')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Kişi Ekle</button>`;
+            html += `<button onclick="window.addNewData('${mod.id}', 'contact')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Kişi Ekle</button>`;
             html += '</div>';
             return html;
         }
@@ -1444,16 +1479,16 @@
                     if(key.startsWith('bool')) {
                         html += `<div class="flex items-center gap-1">
                                     <input type="text" class="custom-input !py-1 text-xs w-24" value="${mod.columns[key]}" onchange="mod.columns['${key}']=this.value; window.saveDataToCloud()">
-                                    ${key !== 'bool1' && key !== 'bool2' && key !== 'bool3' ? `<button onclick="removeColumnFromInterview('${mod.id}', '${key}')" class="text-red-500 px-2 py-1 bg-red-100 rounded-lg hover:bg-red-200 font-bold">X</button>` : ''}
+                                    ${key !== 'bool1' && key !== 'bool2' && key !== 'bool3' ? `<button onclick="window.removeColumnFromInterview('${mod.id}', '${key}')" class="text-red-500 px-2 py-1 bg-red-100 rounded-lg hover:bg-red-200 font-bold">X</button>` : ''}
                                  </div>`;
                     }
                 });
                 
-                html += `<button onclick="addColumnToInterview('${mod.id}')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700">+ Sütun Ekle</button>`;
+                html += `<button onclick="window.addColumnToInterview('${mod.id}')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700">+ Sütun Ekle</button>`;
+                html += `<button onclick="window.toggleInlineEdit('${mod.id}')" class="bg-emerald-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-600 shadow-sm ml-auto">Kapat</button>`;
                 html += `</div>`;
             }
 
-            // Sütun başlıklarını çek
             let boolKeys = Object.keys(mod.columns).filter(k => k.startsWith('bool'));
 
             mod.data.forEach((d, i) => {
@@ -1461,8 +1496,8 @@
                 
                 if(isEdit) {
                     html += `<div class="flex w-full xl:w-1/3 gap-2">`;
-                    html += `<input type="text" class="inline-edit-input w-20 text-center" value="${d.code}" onchange="inlineUpdateData('${mod.id}', ${i}, 'code', this.value)">`;
-                    html += `<input type="text" class="inline-edit-input flex-1" value="${d.name}" placeholder="İsim Girin" onchange="inlineUpdateData('${mod.id}', ${i}, 'name', this.value)">`;
+                    html += `<input type="text" class="inline-edit-input w-20 text-center" value="${d.code}" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'code', this.value)">`;
+                    html += `<input type="text" class="inline-edit-input flex-1" value="${d.name}" placeholder="İsim Girin" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'name', this.value)">`;
                     html += `</div>`;
                 } else {
                     html += `<div class="flex w-full xl:w-1/3 gap-2">`;
@@ -1475,7 +1510,7 @@
                 
                 boolKeys.forEach(key => {
                     html += `<label class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold cursor-pointer hover:opacity-80 transition">
-                                <input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d[key] ? 'checked' : ''} onchange="inlineUpdateData('${mod.id}', ${i}, '${key}', this.checked)"> ${mod.columns[key]}
+                                <input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d[key] ? 'checked' : ''} onchange="window.inlineUpdateData('${mod.id}', ${i}, '${key}', this.checked)"> ${mod.columns[key]}
                              </label>`;
                 });
                 
@@ -1486,9 +1521,39 @@
                 }
                 html += `</div>`;
             });
-            html += `<button onclick="addNewData('${mod.id}', 'interview')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 md:py-5 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Görüşme Ekle</button>`;
+            html += `<button onclick="window.addNewData('${mod.id}', 'interview')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 md:py-5 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Görüşme Ekle</button>`;
             html += '</div>';
             return html;
+        }
+
+        window.addJournalEntry = function(modId) {
+            const input = document.getElementById('journal-input-' + modId);
+            if(!input || !input.value.trim()) return;
+            const mod = state.activeModules.find(m => m.id === modId);
+            if(!mod.data) mod.data = [];
+            const today = new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
+            mod.data.unshift({ date: today, text: input.value.trim() });
+            input.value = '';
+            window.renderDashboard();
+            window.saveDataToCloud();
+        }
+        
+        window.editJournalEntry = function(modId, index) {
+            const mod = state.activeModules.find(m => m.id === modId);
+            const newText = prompt('Notunuzu düzenleyin:', mod.data[index].text);
+            if (newText !== null && newText.trim() !== '') { 
+                mod.data[index].text = newText; 
+                window.renderDashboard(); 
+                window.saveDataToCloud();
+            }
+        }
+        
+        window.deleteJournalEntry = function(modId, index) { 
+            if(confirm('Bu günlüğü silmek istediğinize emin misiniz?')) { 
+                state.activeModules.find(m => m.id === modId).data.splice(index, 1); 
+                window.renderDashboard(); 
+                window.saveDataToCloud();
+            } 
         }
 
         window.renderJournal = function(mod, isEdit) {
@@ -1502,17 +1567,18 @@
                     listHtml += '<div class="flex justify-between items-start mb-2 md:mb-4">';
                     
                     if(isEdit) {
-                        listHtml += `<input type="text" class="inline-edit-input text-[10px] md:text-xs text-indigo-500 w-1/2" value="${d.date}" onchange="inlineUpdateData('${mod.id}', ${i}, 'date', this.value)">`;
+                        listHtml += `<input type="text" class="inline-edit-input text-[10px] md:text-xs text-indigo-500 w-1/2" value="${d.date}" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'date', this.value)">`;
                     } else {
                         listHtml += `<div class="text-[10px] md:text-xs font-black text-indigo-500 uppercase tracking-widest">${d.date}</div>`;
                     }
                     
                     listHtml += `<div class="transition flex gap-2 ${isEdit ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}">`;
-                    listHtml += `<button onclick="if(confirm('SİL?')){ state.activeModules.find(m=>m.id==='${mod.id}').data.splice(${i},1); window.renderDashboard(); window.saveDataToCloud(); }" class="text-[9px] md:text-[10px] font-bold text-red-600 bg-red-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-red-200">SİL</button>`;
+                    listHtml += `<button onclick="window.editJournalEntry('${mod.id}', ${i})" class="text-[9px] md:text-[10px] font-bold text-indigo-600 bg-indigo-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-indigo-200">DÜZENLE</button>`;
+                    listHtml += `<button onclick="window.deleteJournalEntry('${mod.id}', ${i})" class="text-[9px] md:text-[10px] font-bold text-red-600 bg-red-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-red-200">SİL</button>`;
                     listHtml += '</div></div>';
                     
                     if(isEdit) {
-                        listHtml += `<textarea class="inline-edit-input text-sm md:text-lg w-full h-24" onchange="inlineUpdateData('${mod.id}', ${i}, 'text', this.value)">${d.text}</textarea>`;
+                        listHtml += `<textarea class="inline-edit-input text-sm md:text-lg w-full h-24" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'text', this.value)">${d.text}</textarea>`;
                     } else {
                         listHtml += `<p class="text-sm md:text-lg font-medium opacity-90 leading-relaxed">${d.text}</p>`;
                     }
@@ -1522,8 +1588,8 @@
 
             let html = '<div class="flex flex-col h-full mt-4 md:mt-6 w-full">';
             html += '<div class="flex flex-col md:flex-row gap-3 md:gap-4 mb-6 md:mb-10 border-b border-black/10 pb-4 md:pb-8 shrink-0">';
-            html += `<input type="text" id="journal-input-${mod.id}" class="custom-input flex-1 !py-3 md:!py-4 text-sm md:!text-lg !px-4 md:!px-6 rounded-xl md:rounded-2xl shadow-inner" placeholder="${mod.columns?.placeholder || 'Bugün neler yaptın?'}" onkeypress="if(event.key==='Enter') addJournalEntry('${mod.id}')">`;
-            html += `<button onclick="addJournalEntry('${mod.id}')" class="btn-primary !w-full md:!w-auto !py-3 md:!py-4 md:!px-10 text-sm md:text-lg shadow-xl rounded-xl md:rounded-2xl hover:-translate-y-1 transform transition">${mod.columns?.btnText || 'Kaydet'}</button>`;
+            html += `<input type="text" id="journal-input-${mod.id}" class="custom-input flex-1 !py-3 md:!py-4 text-sm md:!text-lg !px-4 md:!px-6 rounded-xl md:rounded-2xl shadow-inner" placeholder="${mod.columns?.placeholder || 'Bugün neler yaptın?'}" onkeydown="if(event.key==='Enter') window.addJournalEntry('${mod.id}')">`;
+            html += `<button onclick="window.addJournalEntry('${mod.id}')" class="btn-primary !w-full md:!w-auto !py-3 md:!py-4 md:!px-10 text-sm md:text-lg shadow-xl rounded-xl md:rounded-2xl hover:-translate-y-1 transform transition">${mod.columns?.btnText || 'Kaydet'}</button>`;
             html += '</div>';
             html += '<div class="flex-1 w-full pl-3 md:pl-4 border-l-2 border-black/10">' + listHtml + '</div>';
             html += '</div>';
