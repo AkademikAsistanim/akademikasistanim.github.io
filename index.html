@@ -446,7 +446,7 @@
             themeBrightness: 1,
             projectName: 'Benim İzlencem',
             projectColor: '#4f46e5',
-            inlineEdit: {}, // YENİ: İçeriden düzenleme modlarını tutar
+            inlineEdit: {}, // İçeriden düzenleme modlarını tutar
             announcements: [
                 { id: 1, date: '04 Mart 2026', title: 'Tam Ekran & İçeriden Düzenleme', content: 'Sayfa scroll kilidi kaldırıldı! Artık normal bir websitesi gibi sayfalarınızı aşağı doğru rahatça kaydırabilirsiniz. Ayrıca ayarlar butonlarına basarak her aracı olduğu yerde kolayca düzenleyebilirsiniz.' }
             ],
@@ -598,6 +598,10 @@
             if(type === 'task') mod.data.push({task:'Yeni Görev', progress:0, status:'Yapılmadı', note:''});
             if(type === 'contact') mod.data.push({name:'Yeni Kişi', role:'', contact:'', ref:'', note:''});
             if(type === 'interview') mod.data.push({code:'YENİ', name:'', interviewed:false, consent:false, transcribed:false});
+            if(type === 'stat') mod.data.push({title:'Yeni Kategori', completed:0, total:10, emoji:'📊'});
+
+            // Ekleme yapıldığında ilgili modülü otomatik olarak düzenleme moduna al
+            state.inlineEdit[modId] = true;
 
             window.renderDashboard();
             window.saveDataToCloud();
@@ -841,7 +845,7 @@
                         <button onclick="state.calendar.data.splice(${i},1); window.renderDashboard(); window.saveDataToCloud()" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg font-bold w-full sm:w-auto mt-2 sm:mt-0">Sil</button>
                     </div>`;
                 });
-                calHtml += `<button onclick="if(!state.calendar.data) state.calendar.data=[]; state.calendar.data.push({emoji:'📌', label:'Yeni', targetDate:''}); window.renderDashboard(); window.saveDataToCloud()" class="w-full bg-indigo-50/50 text-indigo-600 py-3 rounded-xl font-bold border-2 border-dashed border-indigo-200 mt-2 hover:bg-indigo-100 transition">+ Yeni Tarih Ekle</button>`;
+                calHtml += `<button onclick="if(!state.calendar.data) state.calendar.data=[]; state.calendar.data.push({emoji:'📌', label:'Yeni', targetDate:''}); state.inlineEdit['header_calendar']=true; window.renderDashboard(); window.saveDataToCloud()" class="w-full bg-indigo-50/50 text-indigo-600 py-3 rounded-xl font-bold border-2 border-dashed border-indigo-200 mt-2 hover:bg-indigo-100 transition">+ Yeni Tarih Ekle</button>`;
             } else {
                 if(calData.length === 0) { calHtml += '<p class="text-xs md:text-sm opacity-50 font-bold">Kayıt yok.</p>'; }
                 else {
@@ -950,7 +954,7 @@
             indicators.innerHTML = dotHtml;
             window.updateUINav();
 
-            // Chart Render (Sadece aktif sekmede istatistik varsa renderle)
+            // Chart Render
             setTimeout(() => { 
                 const statsMod = state.activeModules.find(m => m.type === 'stats');
                 if(statsMod && document.getElementById('radarChart')) window.initRadarChart(statsMod.data || []); 
@@ -1349,6 +1353,7 @@
             return html;
         }
 
+        // Tümüyle Kart Görünümüne (Mobil Optimize) Geçirilen Tablolar
         window.renderTasks = function(mod, isEdit) {
             let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full pb-8">';
             mod.data.forEach((d, i) => {
