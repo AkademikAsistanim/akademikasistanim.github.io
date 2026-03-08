@@ -131,7 +131,7 @@
         body.theme-crimson .custom-input { background: #f8fafc; border-color: #dc2626; }
 
         /* --- ORTAK UI BİLEŞENLERİ --- */
-        .glass-card { transition: box-shadow 0.4s ease; border-radius: 1.5rem; }
+        .glass-card { transition: box-shadow 0.4s ease; border-radius: 1.25rem; }
         .custom-input { width: 100%; padding: 10px 12px; border-radius: 10px; outline: none; border: 2px solid #e2e8f0; transition: 0.3s; background: #fff; color:#1e293b; font-size: 14px; }
         .custom-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
         .btn-primary { background: #6366f1; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
@@ -179,7 +179,7 @@
         .btn-google:hover { background: #f4f4f5; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-google img { width: 18px; height: 18px; }
 
-        /* --- YENİ: OK (BUTON) YÖNLENDİRMELİ EKRANLAR (MOBİL OPTİMİZE) --- */
+        /* --- YENİ: OK (BUTON) YÖNLENDİRMELİ EKRANLAR (MOBİL TAM EKRAN OPTİMİZE) --- */
         .dashboard-container {
             display: flex;
             overflow: hidden;
@@ -192,8 +192,8 @@
             flex: 0 0 100vw;
             width: 100vw;
             height: 100vh;
-            padding: 1rem;
-            padding-bottom: 5rem; /* Mobil dostu dar paddingler */
+            padding: 0.25rem;
+            padding-bottom: 4.5rem; /* Mobil dostu dar paddingler */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -203,7 +203,7 @@
         
         @media (min-width: 768px) {
             .dashboard-slide {
-                padding: 2rem;
+                padding: 1.5rem;
                 padding-bottom: 6rem;
             }
         }
@@ -216,55 +216,60 @@
             flex-direction: column;
         }
 
-        /* --- YÖNLENDİRME BUTONLARI (MOBİLDE DAHA KÜÇÜK VE KENARDA) --- */
-        .nav-btn {
+        /* --- YÖNLENDİRME BUTONLARI & ALT NAV BAR --- */
+        .bottom-nav-bar {
             position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.7);
+            bottom: 1rem;
+            left: 0;
+            width: 100vw;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 9000;
+            pointer-events: none; /* Arka plana tıklamayı engellememek için */
+        }
+        @media (min-width: 768px) {
+            .bottom-nav-bar { bottom: 1.5rem; padding: 0 2rem; }
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.8);
             border: 1px solid rgba(0,0,0,0.1);
             color: #4f46e5;
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            font-weight: black;
+            font-size: 20px;
+            font-weight: bold;
             cursor: pointer;
-            z-index: 150;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             transition: all 0.2s ease;
             backdrop-filter: blur(5px);
+            pointer-events: auto; /* Sadece butonlar tıklanabilir */
         }
         body.theme-dark .nav-btn, body.theme-engineering .nav-btn, body.theme-space .nav-btn, body.theme-gaming .nav-btn, body.theme-astrology .nav-btn, body.theme-harrypotter .nav-btn {
-            background: rgba(15,23,42,0.7); border-color: rgba(255,255,255,0.1); color: #818cf8;
+            background: rgba(15,23,42,0.8); border-color: rgba(255,255,255,0.2); color: #818cf8;
         }
-        .nav-btn:hover { background: #6366f1; color: white; transform: translateY(-50%) scale(1.1); border-color: transparent;}
-        .nav-btn.left { left: 0.25rem; }
-        .nav-btn.right { right: 0.25rem; }
-        .nav-btn:disabled { opacity: 0; pointer-events: none; }
+        .nav-btn:hover:not(:disabled) { background: #6366f1; color: white; transform: scale(1.1); border-color: transparent;}
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         
         @media (min-width: 768px) {
-            .nav-btn { width: 50px; height: 50px; font-size: 24px; }
-            .nav-btn.left { left: 1rem; }
-            .nav-btn.right { right: 1rem; }
+            .nav-btn { width: 56px; height: 56px; font-size: 24px; }
         }
 
         /* --- SAYFA GÖSTERGELERİ (DOTS) --- */
         .slide-dots {
-            position: fixed;
-            bottom: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
             display: flex;
             gap: 6px;
-            z-index: 100;
             background: rgba(0,0,0,0.1);
-            padding: 6px 10px;
+            padding: 8px 12px;
             border-radius: 20px;
             backdrop-filter: blur(5px);
+            pointer-events: auto;
         }
         body.theme-dark .slide-dots, body.theme-engineering .slide-dots, body.theme-space .slide-dots, body.theme-gaming .slide-dots, body.theme-astrology .slide-dots {
             background: rgba(255,255,255,0.1);
@@ -277,7 +282,7 @@
         .slide-dot.active { background: #6366f1; transform: scale(1.5); }
         
         @media (min-width: 768px) {
-            .slide-dots { bottom: 1.5rem; gap: 8px; padding: 8px 12px; }
+            .slide-dots { gap: 8px; padding: 10px 16px; }
             .slide-dot { width: 8px; height: 8px; }
         }
 
@@ -362,17 +367,17 @@
     <!-- ADIM 5: YATAY KAYDIRMALI ANA DASHBOARD -->
     <div id="screen-dashboard" class="screen relative h-full w-full">
         
-        <!-- Yönlendirme Okları -->
-        <button id="btn-prev" class="nav-btn left" onclick="slideBy(-1)" disabled>←</button>
-        <button id="btn-next" class="nav-btn right" onclick="slideBy(1)">→</button>
-
         <!-- Slide Container -->
         <div id="dashboard-container" class="dashboard-container" onscroll="handleScrollUpdate()">
-            <!-- JS ile doldurulacak (Slide 1, Slide 2, ..., Menu Slide) -->
+            <!-- JS ile doldurulacak -->
         </div>
 
-        <!-- Nokta Göstergeleri -->
-        <div id="slide-indicators" class="slide-dots"></div>
+        <!-- Alt Navigasyon Barı (Oklar ve Noktalar) -->
+        <div class="bottom-nav-bar">
+            <button id="btn-prev" class="nav-btn" onclick="slideBy(-1)" disabled title="Önceki Sayfa">←</button>
+            <div id="slide-indicators" class="slide-dots"></div>
+            <button id="btn-next" class="nav-btn" onclick="slideBy(1)" title="Sonraki Sayfa">→</button>
+        </div>
     </div>
 
     <!-- GENEL AYARLAR MODALI -->
@@ -502,8 +507,7 @@
             projectColor: '#4f46e5',
             editingModuleId: null,
             announcements: [
-                { id: 1, date: '04 Mart 2026', title: 'Yeni: Mobil Uyumlu Kart Tasarımı', content: 'Çalışma alanınızı genişlettik ve yatay kaydırma gerektiren tabloları iptal ettik! Artık dar telefon ekranlarında tüm modülleriniz ferah kartlar halinde listeleniyor.' },
-                { id: 2, date: '28 Şubat 2026', title: 'Sayfa Yönetimi', content: 'En sondaki menüden "Ayarlar & Düzenle" butonuna tıklayarak araçların sırasını belirleyebilirsiniz.' }
+                { id: 1, date: '04 Mart 2026', title: 'Tam Ekran & Gelişmiş Mobil Arayüz', content: 'Çalışma alanınızı genişlettik. Tablolar akıllı kartlara dönüştürüldü ve modüller ekranın tüm genişliğini kullanacak şekilde yenilendi. İyi çalışmalar dileriz.' }
             ],
             calendar: { id: 'header_calendar', type: 'calendar', title: 'TAKVİM', data: [ { label: 'Savunma Günü', targetDate: '2026-06-15', emoji: '🎓' }, { label: 'Tez Bitişi', targetDate: '2026-05-01', emoji: '📚' } ] },
             modules: [
@@ -789,29 +793,29 @@
             // Takvim HTML Üretimi
             let calData = state.calendar.data;
             const today = new Date(); today.setHours(0,0,0,0);
-            let calHtml = `<div class="flex justify-between items-center mb-6 border-b border-black/10 pb-4 w-full">
-                            <h3 class="text-lg md:text-xl font-black opacity-80 uppercase tracking-widest flex items-center gap-2">⏳ ${state.calendar.title}</h3>
-                            <button onclick="openUnifiedPanel('header_calendar')" class="text-xl md:text-2xl bg-indigo-100 text-indigo-700 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl hover:bg-indigo-200 transition shadow-sm">⚙️</button>
-                           </div><div class="space-y-4 w-full text-base md:text-lg">`;
-            if(calData.length === 0) { calHtml += '<p class="text-sm opacity-50 font-bold">Kayıt yok.</p>'; }
+            let calHtml = `<div class="flex justify-between items-center mb-4 md:mb-6 border-b border-black/10 pb-3 md:pb-4 w-full">
+                            <h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest flex items-center gap-2">⏳ ${state.calendar.title}</h3>
+                            <button onclick="openUnifiedPanel('header_calendar')" class="text-xl md:text-2xl bg-indigo-100 text-indigo-700 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl hover:bg-indigo-200 transition shadow-sm pointer-events-auto relative z-50">⚙️</button>
+                           </div><div class="space-y-3 md:space-y-4 w-full text-sm md:text-lg">`;
+            if(calData.length === 0) { calHtml += '<p class="text-xs md:text-sm opacity-50 font-bold">Kayıt yok.</p>'; }
             else {
                 calData.forEach(d => {
                     const tDate = new Date(d.targetDate); tDate.setHours(0,0,0,0);
                     const days = Math.ceil((tDate - today) / (1000 * 60 * 60 * 24));
                     const dayText = days > 0 ? days + ' gün' : (days === 0 ? 'BUGÜN' : 'Bitti');
-                    calHtml += `<div class="flex items-center justify-between"><span class="flex items-center gap-3">${d.emoji} <span class="font-bold opacity-80 text-sm md:text-base">${d.label}</span></span><span class="font-black text-xs md:text-sm text-indigo-600 bg-indigo-50 px-3 py-1.5 md:px-4 md:py-2 rounded-xl border border-indigo-100 shadow-sm">${dayText}</span></div>`;
+                    calHtml += `<div class="flex items-center justify-between"><span class="flex items-center gap-2 md:gap-3">${d.emoji} <span class="font-bold opacity-80 text-xs md:text-base">${d.label}</span></span><span class="font-black text-[10px] md:text-sm text-indigo-600 bg-indigo-50 px-2.5 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-indigo-100 shadow-sm">${dayText}</span></div>`;
                 });
             }
             calHtml += '</div>';
 
             html += `<div class="dashboard-slide" id="slide-home">
-                        <div class="module-full-content glass-card p-6 sm:p-10 md:p-16 shadow-2xl justify-center relative overflow-hidden group bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
+                        <div class="module-full-content glass-card p-5 sm:p-10 md:p-16 shadow-2xl justify-center relative overflow-hidden group bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
                             <div id="header-theme-icon" class="absolute right-[-20px] bottom-[-30px] text-[150px] md:text-[250px] opacity-5 transform rotate-15 pointer-events-none">${themeIcon}</div>
                             <h1 class="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter uppercase leading-tight drop-shadow-lg glow-animate mb-2 md:mb-4" style="color: ${state.projectColor}">
                                 <span id="dashboard-title-first">${firstPart}</span> <span id="dashboard-title-rest" class="italic opacity-80">${restPart}</span>
                             </h1>
-                            <p class="opacity-70 text-lg md:text-2xl font-semibold relative z-10 mb-8 md:mb-12">Stratejik İlerleme ve Veri Analizi</p>
-                            <div class="bg-white/50 dark:bg-black/20 p-6 md:p-8 rounded-3xl backdrop-blur-sm shadow-inner max-w-2xl w-full">
+                            <p class="opacity-70 text-base md:text-2xl font-semibold relative z-10 mb-6 md:mb-12">Stratejik İlerleme ve Veri Analizi</p>
+                            <div class="bg-white/50 dark:bg-black/20 p-5 md:p-8 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner max-w-2xl w-full relative z-10 pointer-events-auto">
                                 ${calHtml}
                             </div>
                         </div>
@@ -828,12 +832,12 @@
                 else if(mod.type === 'journal') contentHtml = window.renderJournal(mod);
 
                 html += `<div class="dashboard-slide" id="slide-${mod.id}">
-                            <div class="module-full-content glass-card p-4 sm:p-8 md:p-10 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
-                                <div class="flex justify-between items-center mb-4 md:mb-6 pb-2 md:pb-4 border-b border-black/10 shrink-0">
-                                    <h2 class="text-2xl md:text-4xl font-black uppercase tracking-tight opacity-80 flex items-center gap-2 md:gap-3">${mod.icon} ${mod.title}</h2>
-                                    <button onclick="openUnifiedPanel('${mod.id}')" class="text-xl md:text-2xl bg-indigo-100 text-indigo-700 w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-xl hover:bg-indigo-200 transition shadow-sm shrink-0">⚙️</button>
+                            <div class="module-full-content glass-card p-3 sm:p-6 md:p-10 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
+                                <div class="flex justify-between items-center mb-3 md:mb-6 pb-2 md:pb-4 border-b border-black/10 shrink-0">
+                                    <h2 class="text-xl md:text-4xl font-black uppercase tracking-tight opacity-80 flex items-center gap-2 md:gap-3">${mod.icon} ${mod.title}</h2>
+                                    <button onclick="openUnifiedPanel('${mod.id}')" class="text-xl md:text-2xl bg-indigo-100 text-indigo-700 w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-xl hover:bg-indigo-200 transition shadow-sm shrink-0 pointer-events-auto relative z-50">⚙️</button>
                                 </div>
-                                <div class="flex-1 overflow-hidden flex flex-col relative w-full">
+                                <div class="flex-1 overflow-hidden flex flex-col relative w-full pointer-events-auto">
                                     ${contentHtml}
                                 </div>
                             </div>
@@ -843,35 +847,35 @@
             // --- SLIDE N+1: PLATFORM MENÜSÜ ---
             html += `<div class="dashboard-slide" id="slide-menu">
                 <div class="module-full-content glass-card p-6 sm:p-10 md:p-16 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
-                    <h2 class="text-3xl md:text-5xl font-black text-indigo-600 dark:text-indigo-400 mb-8 md:mb-12 border-b border-black/10 pb-4 w-full text-center">Platform Menüsü</h2>
+                    <h2 class="text-2xl md:text-5xl font-black text-indigo-600 dark:text-indigo-400 mb-6 md:mb-12 border-b border-black/10 pb-4 w-full text-center">Platform Menüsü</h2>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 w-full max-w-3xl">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-8 w-full max-w-3xl relative z-10 pointer-events-auto">
                         <!-- Ayarlar ve Düzenle -->
-                        <button onclick="openGlobalSettings()" class="bg-indigo-50 dark:bg-slate-800 p-6 md:p-8 rounded-3xl shadow-md border border-indigo-100 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-3 md:gap-4 text-center group">
-                            <span class="text-4xl md:text-5xl group-hover:scale-110 transition">⚙️</span>
-                            <span class="font-black text-lg md:text-xl text-indigo-900 dark:text-indigo-100">Ayarlar & Düzenle</span>
-                            <span class="text-xs md:text-sm font-semibold opacity-70 text-indigo-700 dark:text-indigo-300">Tema, Modül Sırası ve Araç Ekleme</span>
+                        <button onclick="openGlobalSettings()" class="bg-indigo-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-indigo-100 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
+                            <span class="text-3xl md:text-5xl group-hover:scale-110 transition">⚙️</span>
+                            <span class="font-black text-base md:text-xl text-indigo-900 dark:text-indigo-100">Ayarlar & Düzenle</span>
+                            <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-indigo-700 dark:text-indigo-300">Tema, Modül Sırası ve Araç Ekleme</span>
                         </button>
                         
                         <!-- İletişim -->
-                        <button onclick="showDialog('İletişim', 'Sorularınız, önerileriniz veya iş birlikleri için bize ulaşın:<br><br><b>Destek E-Posta:</b> destek@akademikasistanim.com<br><b>Telefon:</b> +90 850 123 45 67')" class="bg-emerald-50 dark:bg-slate-800 p-6 md:p-8 rounded-3xl shadow-md border border-emerald-100 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-3 md:gap-4 text-center group">
-                            <span class="text-4xl md:text-5xl group-hover:scale-110 transition">📞</span>
-                            <span class="font-black text-lg md:text-xl text-emerald-900 dark:text-emerald-100">İletişim</span>
-                            <span class="text-xs md:text-sm font-semibold opacity-70 text-emerald-700 dark:text-emerald-300">Destek ve Sorularınız İçin</span>
+                        <button onclick="showDialog('İletişim', 'Sorularınız, önerileriniz veya iş birlikleri için bize ulaşın:<br><br><b>Destek E-Posta:</b> destek@akademikasistanim.com<br><b>Telefon:</b> +90 850 123 45 67')" class="bg-emerald-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-emerald-100 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
+                            <span class="text-3xl md:text-5xl group-hover:scale-110 transition">📞</span>
+                            <span class="font-black text-base md:text-xl text-emerald-900 dark:text-emerald-100">İletişim</span>
+                            <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-emerald-700 dark:text-emerald-300">Destek ve Sorularınız İçin</span>
                         </button>
                         
                         <!-- Şikayet -->
-                        <button onclick="showDialog('Şikayet & Geri Bildirim', 'Karşılaştığınız sorunları veya platformla ilgili şikayetlerinizi doğrudan ekibimize iletebilirsiniz.<br><br><b>Şikayet Hattı:</b> sikayet@akademikasistanim.com<br>Veya panel üzerinden formu kullanabilirsiniz.')" class="bg-amber-50 dark:bg-slate-800 p-6 md:p-8 rounded-3xl shadow-md border border-amber-100 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-3 md:gap-4 text-center group">
-                            <span class="text-4xl md:text-5xl group-hover:scale-110 transition">⚠️</span>
-                            <span class="font-black text-lg md:text-xl text-amber-900 dark:text-amber-100">Şikayet / Bildirim</span>
-                            <span class="text-xs md:text-sm font-semibold opacity-70 text-amber-700 dark:text-amber-300">Sorun Bildirin veya Öneri Sunun</span>
+                        <button onclick="showDialog('Şikayet & Geri Bildirim', 'Karşılaştığınız sorunları veya platformla ilgili şikayetlerinizi doğrudan ekibimize iletebilirsiniz.<br><br><b>Şikayet Hattı:</b> sikayet@akademikasistanim.com<br>Veya panel üzerinden formu kullanabilirsiniz.')" class="bg-amber-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-amber-100 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
+                            <span class="text-3xl md:text-5xl group-hover:scale-110 transition">⚠️</span>
+                            <span class="font-black text-base md:text-xl text-amber-900 dark:text-amber-100">Şikayet / Bildirim</span>
+                            <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-amber-700 dark:text-amber-300">Sorun Bildirin veya Öneri Sunun</span>
                         </button>
 
                         <!-- Çıkış Yap -->
-                        <button onclick="handleLogout()" class="bg-red-50 dark:bg-slate-800 p-6 md:p-8 rounded-3xl shadow-md border border-red-100 dark:border-slate-700 hover:border-red-400 dark:hover:border-red-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-3 md:gap-4 text-center group">
-                            <span class="text-4xl md:text-5xl group-hover:scale-110 transition">🚪</span>
-                            <span class="font-black text-lg md:text-xl text-red-700 dark:text-red-400">Çıkış Yap</span>
-                            <span class="text-xs md:text-sm font-semibold opacity-70 text-red-600 dark:text-red-300">Oturumu Güvenle Kapatın</span>
+                        <button onclick="handleLogout()" class="bg-red-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-red-100 dark:border-slate-700 hover:border-red-400 dark:hover:border-red-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
+                            <span class="text-3xl md:text-5xl group-hover:scale-110 transition">🚪</span>
+                            <span class="font-black text-base md:text-xl text-red-700 dark:text-red-400">Çıkış Yap</span>
+                            <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-red-600 dark:text-red-300">Oturumu Güvenle Kapatın</span>
                         </button>
                     </div>
                 </div>
@@ -1345,56 +1349,60 @@
 
         // --- VERİ DÜZENLEME PANELİ (Sağ Panel) ---
         window.openUnifiedPanel = function(moduleId) {
-            state.editingModuleId = moduleId;
-            const mod = moduleId === 'header_calendar' ? state.calendar : state.activeModules.find(m => m.id === moduleId);
-            if(!mod) return;
-            
-            tempEditTitle = mod.title;
-            tempEditData = JSON.parse(JSON.stringify(mod.data || []));
-            if(mod.columns) tempEditColumns = JSON.parse(JSON.stringify(mod.columns));
-            
-            const container = document.getElementById('panel-content');
-            let html = '<div class="mb-6 pb-6 border-b border-black/10">';
-            html += '<label class="text-[10px] font-black uppercase opacity-60 ml-1 text-indigo-600">ANA MODÜL BAŞLIĞI</label>';
-            html += '<input type="text" class="custom-input !py-3 mt-1 font-bold text-lg shadow-inner" value="' + tempEditTitle + '" onchange="tempEditTitle = this.value">';
-            html += '</div>';
+            try {
+                state.editingModuleId = moduleId;
+                const mod = moduleId === 'header_calendar' ? state.calendar : state.activeModules.find(m => m.id === moduleId);
+                if(!mod) return;
+                
+                tempEditTitle = mod.title || '';
+                tempEditData = mod.data ? JSON.parse(JSON.stringify(mod.data)) : [];
+                tempEditColumns = mod.columns ? JSON.parse(JSON.stringify(mod.columns)) : {};
+                
+                const container = document.getElementById('panel-content');
+                let html = '<div class="mb-6 pb-6 border-b border-black/10">';
+                html += '<label class="text-[10px] font-black uppercase opacity-60 ml-1 text-indigo-600">ANA MODÜL BAŞLIĞI</label>';
+                html += `<input type="text" class="custom-input !py-3 mt-1 font-bold text-lg shadow-inner" value="${tempEditTitle}" onchange="tempEditTitle = this.value">`;
+                html += '</div>';
 
-            if (mod.type === 'pomodoro') {
-                html += '<div class="mb-6 pb-6 border-b border-black/10">';
-                html += '<p class="text-sm opacity-70 mb-4 font-bold">⏱️ Süre Ayarları (Dakika):</p>';
-                html += '<div class="grid grid-cols-3 gap-3">';
-                html += '<div><label class="text-[10px] font-black uppercase opacity-60 ml-1">Odak</label><input type="number" class="custom-input !py-2 mt-1 text-center" value="' + tempEditColumns.work + '" onchange="tempEditColumns.work = parseInt(this.value)"></div>';
-                html += '<div><label class="text-[10px] font-black uppercase opacity-60 ml-1">Kısa Mola</label><input type="number" class="custom-input !py-2 mt-1 text-center" value="' + tempEditColumns.short + '" onchange="tempEditColumns.short = parseInt(this.value)"></div>';
-                html += '<div><label class="text-[10px] font-bold uppercase opacity-60 ml-1">Uzun Mola</label><input type="number" class="custom-input !py-2 mt-1 text-center" value="' + tempEditColumns.long + '" onchange="tempEditColumns.long = parseInt(this.value)"></div>';
-                html += '</div></div>';
+                if (mod.type === 'pomodoro') {
+                    html += '<div class="mb-6 pb-6 border-b border-black/10">';
+                    html += '<p class="text-sm opacity-70 mb-4 font-bold">⏱️ Süre Ayarları (Dakika):</p>';
+                    html += '<div class="grid grid-cols-3 gap-3">';
+                    html += `<div><label class="text-[10px] font-black uppercase opacity-60 ml-1">Odak</label><input type="number" class="custom-input !py-2 mt-1 text-center" value="${tempEditColumns.work || 25}" onchange="tempEditColumns.work = parseInt(this.value)"></div>`;
+                    html += `<div><label class="text-[10px] font-black uppercase opacity-60 ml-1">Kısa Mola</label><input type="number" class="custom-input !py-2 mt-1 text-center" value="${tempEditColumns.short || 5}" onchange="tempEditColumns.short = parseInt(this.value)"></div>`;
+                    html += `<div><label class="text-[10px] font-bold uppercase opacity-60 ml-1">Uzun Mola</label><input type="number" class="custom-input !py-2 mt-1 text-center" value="${tempEditColumns.long || 15}" onchange="tempEditColumns.long = parseInt(this.value)"></div>`;
+                    html += '</div></div>';
+                }
+                else if (Object.keys(tempEditColumns).length > 0) {
+                    html += '<div class="mb-6 pb-6 border-b border-black/10"><p class="text-sm opacity-70 mb-4 font-bold flex items-center gap-2">✏️ Şablon Sütun İsimleri:</p><div class="space-y-4">';
+                    const labels = { code:'1. Sütun (Kod)', name:'2. Sütun (İsim)', bool1:'3. Sütun (Onay 1)', bool2:'4. Sütun (Onay 2)', bool3:'5. Sütun (Onay 3)', task:'1. Sütun (Görev)', progress:'2. Sütun (İlerleme)', status:'3. Sütun (Durum)', note:'4. Sütun (Notlar)', role:'Rol Sütunu', contact:'İletişim Sütunu', ref:'Referans Sütunu', placeholder:'Günlük Soru Metni', btnText:'Günlük Buton Yazısı' };
+
+                    Object.keys(tempEditColumns).forEach(key => {
+                        html += `<div><label class="text-[10px] font-black uppercase opacity-60 ml-1 text-slate-500">${labels[key] || key}</label>
+                                 <input type="text" class="custom-input !py-2 mt-1" value="${tempEditColumns[key]}" onchange="tempEditColumns['${key}'] = this.value"></div>`;
+                    });
+                    html += '</div></div>';
+                }
+
+                if (['calendar', 'stats', 'tasks', 'contacts'].includes(mod.type)) {
+                    html += '<div id="panel-data-container"></div>';
+                } else if (mod.type === 'interviews') {
+                    html += '<div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-sm font-bold text-indigo-700 opacity-80 text-center">💡 Mülakat/Süreç verilerini doğrudan ana ekrandaki tablo üzerinden düzenleyebilirsiniz.</div>';
+                }
+
+                container.innerHTML = html;
+
+                if (['calendar', 'stats', 'tasks', 'contacts'].includes(mod.type)) window.renderPanelDataRows(mod.type);
+
+                document.getElementById('panel-footer-btn').style.display = 'block';
+                let footerHtml = '<button onclick="savePanel()" class="btn-primary shadow-lg !py-4 text-lg flex-1">Tüm Değişiklikleri Kaydet</button>';
+                document.getElementById('panel-footer-btn').innerHTML = '<div class="flex gap-3">' + footerHtml + '</div>';
+                document.getElementById('panel-backdrop').classList.replace('hidden', 'block');
+                setTimeout(() => { document.getElementById('panel-backdrop').classList.replace('opacity-0', 'opacity-100'); }, 10);
+                document.getElementById('right-panel').classList.add('open');
+            } catch (err) {
+                console.error('Ayarlar paneli açılırken hata:', err);
             }
-            else if (mod.columns && Object.keys(tempEditColumns).length > 0) {
-                html += '<div class="mb-6 pb-6 border-b border-black/10"><p class="text-sm opacity-70 mb-4 font-bold flex items-center gap-2">✏️ Şablon Sütun İsimleri:</p><div class="space-y-4">';
-                const labels = { code:'1. Sütun (Kod)', name:'2. Sütun (İsim)', bool1:'3. Sütun (Onay 1)', bool2:'4. Sütun (Onay 2)', bool3:'5. Sütun (Onay 3)', task:'1. Sütun (Görev)', progress:'2. Sütun (İlerleme)', status:'3. Sütun (Durum)', note:'4. Sütun (Notlar)', role:'Rol Sütunu', contact:'İletişim Sütunu', ref:'Referans Sütunu', placeholder:'Günlük Soru Metni', btnText:'Günlük Buton Yazısı' };
-
-                Object.keys(tempEditColumns).forEach(key => {
-                    html += `<div><label class="text-[10px] font-black uppercase opacity-60 ml-1 text-slate-500">${labels[key] || key}</label>
-                             <input type="text" class="custom-input !py-2 mt-1" value="${tempEditColumns[key]}" onchange="tempEditColumns['${key}'] = this.value"></div>`;
-                });
-                html += '</div></div>';
-            }
-
-            if (['calendar', 'stats', 'tasks', 'contacts'].includes(mod.type)) {
-                html += '<div id="panel-data-container"></div>';
-            } else if (mod.type === 'interviews') {
-                html += '<div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-sm font-bold text-indigo-700 opacity-80 text-center">💡 Mülakat/Süreç verilerini doğrudan ana ekrandaki tablo üzerinden düzenleyebilirsiniz.</div>';
-            }
-
-            container.innerHTML = html;
-
-            if (['calendar', 'stats', 'tasks', 'contacts'].includes(mod.type)) window.renderPanelDataRows(mod.type);
-
-            document.getElementById('panel-footer-btn').style.display = 'block';
-            let footerHtml = '<button onclick="savePanel()" class="btn-primary shadow-lg !py-4 text-lg flex-1">Tüm Değişiklikleri Kaydet</button>';
-            document.getElementById('panel-footer-btn').innerHTML = '<div class="flex gap-3">' + footerHtml + '</div>';
-            document.getElementById('panel-backdrop').classList.replace('hidden', 'block');
-            setTimeout(() => { document.getElementById('panel-backdrop').classList.replace('opacity-0', 'opacity-100'); }, 10);
-            document.getElementById('right-panel').classList.add('open');
         }
 
         window.renderPanelDataRows = function(type) {
