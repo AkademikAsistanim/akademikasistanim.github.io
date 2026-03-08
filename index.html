@@ -15,13 +15,13 @@
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            margin: 0; padding: 0; overflow: hidden; height: 100vh; width: 100vw;
+            margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden;
             transition: background 0.5s ease, color 0.5s ease;
         }
 
         .theme-container {
             filter: brightness(var(--theme-brightness));
-            height: 100vh; width: 100vw;
+            min-height: 100vh; width: 100%;
             transition: filter 0.3s ease;
             position: relative;
         }
@@ -179,31 +179,34 @@
         .btn-google:hover { background: #f4f4f5; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-google img { width: 18px; height: 18px; }
 
-        /* --- YENİ: OK (BUTON) YÖNLENDİRMELİ EKRANLAR (MOBİL TAM EKRAN OPTİMİZE) --- */
+        /* --- YENİ: OK (BUTON) YÖNLENDİRMELİ EKRANLAR (SERBEST KAYDIRMA OPTİMİZE) --- */
         .dashboard-container {
-            display: flex;
-            overflow: hidden;
-            height: 100vh;
             width: 100vw;
-            position: relative;
-            scroll-behavior: smooth;
         }
+        
         .dashboard-slide {
-            flex: 0 0 100vw;
+            display: none; /* Javascript ile değiştirilecek */
             width: 100vw;
-            height: 100vh;
-            padding: 0.25rem;
-            padding-bottom: 4.5rem; /* Mobil dostu dar paddingler */
+            min-height: 100vh;
+            padding: 1rem;
+            padding-bottom: 5rem; /* Alt nav-bar için boşluk */
+            box-sizing: border-box;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .dashboard-slide.active {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         @media (min-width: 768px) {
             .dashboard-slide {
-                padding: 1.5rem;
+                padding: 2rem;
                 padding-bottom: 6rem;
             }
         }
@@ -211,7 +214,7 @@
         .module-full-content {
             width: 100%;
             max-width: 1400px;
-            height: 100%;
+            flex-grow: 1; /* Sayfa yüksekliğine göre uzamasına izin verir */
             display: flex;
             flex-direction: column;
         }
@@ -228,9 +231,6 @@
             align-items: center;
             z-index: 9000;
             pointer-events: none; /* Arka plana tıklamayı engellememek için */
-        }
-        @media (min-width: 768px) {
-            .bottom-nav-bar { bottom: 1.5rem; padding: 0 2rem; }
         }
 
         .nav-btn {
@@ -255,10 +255,25 @@
             background: rgba(15,23,42,0.8); border-color: rgba(255,255,255,0.2); color: #818cf8;
         }
         .nav-btn:hover:not(:disabled) { background: #6366f1; color: white; transform: scale(1.1); border-color: transparent;}
-        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .nav-btn:disabled { opacity: 0; cursor: default; pointer-events: none; }
         
         @media (min-width: 768px) {
-            .nav-btn { width: 56px; height: 56px; font-size: 24px; }
+            .bottom-nav-bar { 
+                bottom: 2rem; 
+                justify-content: center; /* Desktop'ta noktaları ortala */
+            }
+            /* Masaüstünde okları dikeyde ortaya al */
+            .nav-btn { 
+                position: fixed; 
+                top: 50%; 
+                transform: translateY(-50%);
+                width: 60px; 
+                height: 60px; 
+                font-size: 28px; 
+            }
+            .nav-btn:hover:not(:disabled) { transform: translateY(-50%) scale(1.1); }
+            .nav-btn.left { left: 2rem; }
+            .nav-btn.right { right: 2rem; }
         }
 
         /* --- SAYFA GÖSTERGELERİ (DOTS) --- */
@@ -364,19 +379,19 @@
         </div>
     </div> <!-- /setup-container -->
 
-    <!-- ADIM 5: YATAY KAYDIRMALI ANA DASHBOARD -->
+    <!-- ADIM 5: SEKME/SLIDE TABANLI ANA DASHBOARD -->
     <div id="screen-dashboard" class="screen relative h-full w-full">
         
-        <!-- Slide Container -->
-        <div id="dashboard-container" class="dashboard-container" onscroll="handleScrollUpdate()">
-            <!-- JS ile doldurulacak -->
+        <!-- Ana İçerik Konteyneri -->
+        <div id="dashboard-container" class="dashboard-container">
+            <!-- JS ile tek bir slide "active" sınıfı alarak doldurulacak -->
         </div>
 
         <!-- Alt Navigasyon Barı (Oklar ve Noktalar) -->
         <div class="bottom-nav-bar">
-            <button id="btn-prev" class="nav-btn" onclick="slideBy(-1)" disabled title="Önceki Sayfa">←</button>
+            <button id="btn-prev" class="nav-btn left" onclick="slideBy(-1)" disabled title="Önceki Sayfa">←</button>
             <div id="slide-indicators" class="slide-dots"></div>
-            <button id="btn-next" class="nav-btn" onclick="slideBy(1)" title="Sonraki Sayfa">→</button>
+            <button id="btn-next" class="nav-btn right" onclick="slideBy(1)" title="Sonraki Sayfa">→</button>
         </div>
     </div>
 
@@ -735,30 +750,25 @@
             setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
         }
 
-        // OK (BUTON) İLE SAYFA DEĞİŞTİRME MANTIĞI
+        // YENİ: SEKME (TAB) GİBİ SAYFA DEĞİŞTİRME MANTIĞI (Kaydırmadan Bağımsız)
         window.goToSlide = function(index) {
             if(index < 0) index = 0;
             if(index > totalSlides - 1) index = totalSlides - 1;
             
-            const container = document.getElementById('dashboard-container');
-            if(container) {
-                container.scrollTo({ left: index * window.innerWidth, behavior: 'smooth' });
-            }
             currentSlideIndex = index;
+            
+            // Container yerine tüm slaytların görünürlüğünü CSS "display" sınıfıyla değiştiriyoruz.
+            document.querySelectorAll('.dashboard-slide').forEach((slide, i) => {
+                if(i === currentSlideIndex) slide.classList.add('active');
+                else slide.classList.remove('active');
+            });
+            
             window.updateUINav();
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Sayfa değişince en üste kaydır
         }
 
         window.slideBy = function(direction) {
             window.goToSlide(currentSlideIndex + direction);
-        }
-
-        // Ekran kaydırıldığında UI'ı (okların durumu ve noktaları) güncelle
-        window.handleScrollUpdate = function() {
-            const container = document.getElementById('dashboard-container');
-            if(!container) return;
-            
-            currentSlideIndex = Math.round(container.scrollLeft / window.innerWidth);
-            window.updateUINav();
         }
 
         window.updateUINav = function() {
@@ -775,7 +785,7 @@
             if(btnNext) btnNext.disabled = currentSlideIndex === totalSlides - 1;
         }
 
-        // --- DASHBOARD OLUŞTURMA (Slide Sistemi - Tam Ekran Genişliği) ---
+        // --- DASHBOARD OLUŞTURMA (Geniş & Sekmeli Sistem) ---
         window.renderDashboard = function() {
             const container = document.getElementById('dashboard-container');
             const indicators = document.getElementById('slide-indicators');
@@ -791,10 +801,10 @@
             let themeIcon = currentThemeObj ? currentThemeObj.icon : '✨';
 
             // Takvim HTML Üretimi
-            let calData = state.calendar.data;
+            let calData = state.calendar.data || [];
             const today = new Date(); today.setHours(0,0,0,0);
             let calHtml = `<div class="flex justify-between items-center mb-4 md:mb-6 border-b border-black/10 pb-3 md:pb-4 w-full">
-                            <h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest flex items-center gap-2">⏳ ${state.calendar.title}</h3>
+                            <h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest flex items-center gap-2">⏳ ${state.calendar.title || 'TAKVİM'}</h3>
                             <button onclick="openUnifiedPanel('header_calendar')" class="text-xl md:text-2xl bg-indigo-100 text-indigo-700 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl hover:bg-indigo-200 transition shadow-sm pointer-events-auto relative z-50">⚙️</button>
                            </div><div class="space-y-3 md:space-y-4 w-full text-sm md:text-lg">`;
             if(calData.length === 0) { calHtml += '<p class="text-xs md:text-sm opacity-50 font-bold">Kayıt yok.</p>'; }
@@ -808,7 +818,7 @@
             }
             calHtml += '</div>';
 
-            html += `<div class="dashboard-slide" id="slide-home">
+            html += `<div class="dashboard-slide ${currentSlideIndex === 0 ? 'active' : ''}" id="slide-home">
                         <div class="module-full-content glass-card p-5 sm:p-10 md:p-16 shadow-2xl justify-center relative overflow-hidden group bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
                             <div id="header-theme-icon" class="absolute right-[-20px] bottom-[-30px] text-[150px] md:text-[250px] opacity-5 transform rotate-15 pointer-events-none">${themeIcon}</div>
                             <h1 class="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter uppercase leading-tight drop-shadow-lg glow-animate mb-2 md:mb-4" style="color: ${state.projectColor}">
@@ -824,20 +834,20 @@
             // --- SLIDE 2..N: AKTİF MODÜLLER ---
             state.activeModules.forEach((mod, index) => {
                 let contentHtml = '';
-                if(mod.type === 'stats') contentHtml = window.renderStats(mod.data);
+                if(mod.type === 'stats') contentHtml = window.renderStats(mod.data || []);
                 else if(mod.type === 'pomodoro') contentHtml = window.renderPomodoro(mod);
                 else if(mod.type === 'interviews') contentHtml = window.renderInterviews(mod);
                 else if(mod.type === 'contacts') contentHtml = window.renderContacts(mod);
                 else if(mod.type === 'tasks') contentHtml = window.renderTasks(mod);
                 else if(mod.type === 'journal') contentHtml = window.renderJournal(mod);
 
-                html += `<div class="dashboard-slide" id="slide-${mod.id}">
+                html += `<div class="dashboard-slide ${currentSlideIndex === index + 1 ? 'active' : ''}" id="slide-${mod.id}">
                             <div class="module-full-content glass-card p-3 sm:p-6 md:p-10 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
                                 <div class="flex justify-between items-center mb-3 md:mb-6 pb-2 md:pb-4 border-b border-black/10 shrink-0">
                                     <h2 class="text-xl md:text-4xl font-black uppercase tracking-tight opacity-80 flex items-center gap-2 md:gap-3">${mod.icon} ${mod.title}</h2>
                                     <button onclick="openUnifiedPanel('${mod.id}')" class="text-xl md:text-2xl bg-indigo-100 text-indigo-700 w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-xl hover:bg-indigo-200 transition shadow-sm shrink-0 pointer-events-auto relative z-50">⚙️</button>
                                 </div>
-                                <div class="flex-1 overflow-hidden flex flex-col relative w-full pointer-events-auto">
+                                <div class="flex-1 flex flex-col w-full pointer-events-auto">
                                     ${contentHtml}
                                 </div>
                             </div>
@@ -845,7 +855,7 @@
             });
 
             // --- SLIDE N+1: PLATFORM MENÜSÜ ---
-            html += `<div class="dashboard-slide" id="slide-menu">
+            html += `<div class="dashboard-slide ${currentSlideIndex === totalSlides - 1 ? 'active' : ''}" id="slide-menu">
                 <div class="module-full-content glass-card p-6 sm:p-10 md:p-16 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
                     <h2 class="text-2xl md:text-5xl font-black text-indigo-600 dark:text-indigo-400 mb-6 md:mb-12 border-b border-black/10 pb-4 w-full text-center">Platform Menüsü</h2>
                     
@@ -891,10 +901,10 @@
             indicators.innerHTML = dotHtml;
             window.updateUINav(); // Butonların disabled durumunu kontrol et
 
-            // Chart Render
+            // Chart Render (Sadece aktif sekmede istatistik varsa renderle)
             setTimeout(() => { 
                 const statsMod = state.activeModules.find(m => m.type === 'stats');
-                if(statsMod) window.initRadarChart(statsMod.data); 
+                if(statsMod) window.initRadarChart(statsMod.data || []); 
             }, 100);
         }
 
@@ -1067,9 +1077,9 @@
             pomoState.isFinished = false;
             const mod = state.activeModules.find(m => m.type === 'pomodoro');
             if(mod) {
-                if(pomoState.mode === 'work') pomoState.timeLeft = mod.columns.work * 60;
-                else if(pomoState.mode === 'short') pomoState.timeLeft = mod.columns.short * 60;
-                else pomoState.timeLeft = mod.columns.long * 60;
+                if(pomoState.mode === 'work') pomoState.timeLeft = (mod.columns.work || 25) * 60;
+                else if(pomoState.mode === 'short') pomoState.timeLeft = (mod.columns.short || 5) * 60;
+                else pomoState.timeLeft = (mod.columns.long || 15) * 60;
             }
             window.renderDashboard();
             const pIdx = state.activeModules.findIndex(m => m.id === 'pomodoro');
@@ -1127,13 +1137,13 @@
             let mainContent = '';
 
             if (pomoState.isFinished) {
-                mainContent = '<div class="w-full max-w-2xl bg-indigo-50 dark:bg-indigo-900/30 p-6 md:p-10 rounded-3xl border-2 border-indigo-200 dark:border-indigo-700 text-center animate-pulse shadow-inner">';
+                mainContent = '<div class="w-full max-w-2xl bg-indigo-50 dark:bg-indigo-900/30 p-6 md:p-10 rounded-3xl border-2 border-indigo-200 dark:border-indigo-700 text-center animate-pulse shadow-inner mx-auto my-auto">';
                 mainContent += '<h4 class="text-2xl md:text-4xl font-black text-indigo-600 dark:text-indigo-400 mb-4">🎉 Süre Doldu!</h4>';
                 mainContent += '<p class="text-sm md:text-xl font-bold opacity-70 mb-6 md:mb-8">Bu oturumda ne üzerinde çalıştınız?</p>';
                 mainContent += '<input type="text" id="pomo-log-input" class="custom-input !py-3 md:!py-4 !text-base md:!text-xl mb-6 md:mb-8 font-bold" placeholder="Örn: Literatür taraması yapıldı..." autofocus>';
                 mainContent += '<div class="flex flex-wrap gap-3 md:gap-4 justify-center">';
                 mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-black text-base md:text-lg hover:bg-slate-300 transition">İptal Et</button>';
-                mainContent += '<button onclick="savePomoLog(\'' + mod.id + '\')" class="bg-indigo-600 text-white px-8 py-3 md:px-10 md:py-4 rounded-xl md:rounded-2xl font-black text-base md:text-lg shadow-xl hover:bg-indigo-700 transition">Kaydet</button>';
+                mainContent += `<button onclick="savePomoLog('${mod.id}')" class="bg-indigo-600 text-white px-8 py-3 md:px-10 md:py-4 rounded-xl md:rounded-2xl font-black text-base md:text-lg shadow-xl hover:bg-indigo-700 transition">Kaydet</button>`;
                 mainContent += '</div></div>';
             } else {
                 let wClass = pomoState.mode==='work' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-700';
@@ -1141,21 +1151,21 @@
                 let lClass = pomoState.mode==='long' ? 'bg-blue-500 text-white shadow-md' : 'text-slate-500 hover:text-slate-700';
                 
                 mainContent = '<div class="pomo-mode-btns flex flex-wrap justify-center gap-2 md:gap-3 mb-6 md:mb-8 bg-black/5 p-1.5 md:p-2 rounded-full shadow-inner mx-auto w-fit max-w-full">';
-                mainContent += '<button onclick="setPomoMode(\'work\', ' + workM + ')" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ' + wClass + '">Odaklan</button>';
-                mainContent += '<button onclick="setPomoMode(\'short\', ' + shortM + ')" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ' + sClass + '">Kısa Mola</button>';
-                mainContent += '<button onclick="setPomoMode(\'long\', ' + longM + ')" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ' + lClass + '">Uzun Mola</button>';
+                mainContent += `<button onclick="setPomoMode('work', ${workM})" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ${wClass}">Odaklan</button>`;
+                mainContent += `<button onclick="setPomoMode('short', ${shortM})" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ${sClass}">Kısa Mola</button>`;
+                mainContent += `<button onclick="setPomoMode('long', ${longM})" class="px-4 py-2 md:px-8 md:py-3 rounded-full text-xs md:text-base font-bold transition ${lClass}">Uzun Mola</button>`;
                 mainContent += '</div>';
-                mainContent += '<div class="text-[20vmin] md:text-[15rem] font-black font-pomodoro tracking-tighter mb-6 md:mb-10 text-current drop-shadow-xl transition-all duration-300 text-center leading-none" id="pomo-time-display">' + formatPomoTime(pomoState.timeLeft) + '</div>';
+                mainContent += `<div class="text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] font-black font-pomodoro tracking-tighter mb-6 md:mb-10 text-current drop-shadow-xl transition-all duration-300 text-center leading-none" id="pomo-time-display">${formatPomoTime(pomoState.timeLeft)}</div>`;
                 
                 mainContent += '<div class="pomo-btn-group flex flex-wrap gap-4 md:gap-6 w-full justify-center transition-all duration-300">';
-                mainContent += '<button onclick="togglePomo()" class="bg-indigo-600 text-white px-8 py-4 md:px-10 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-xl hover:bg-indigo-700 hover:-translate-y-1 transition transform flex items-center justify-center gap-3 min-w-[200px] md:w-[300px]">';
+                mainContent += `<button onclick="togglePomo()" class="bg-indigo-600 text-white px-8 py-4 md:px-10 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-xl hover:bg-indigo-700 hover:-translate-y-1 transition transform flex items-center justify-center gap-3 min-w-[200px] md:w-[300px]">`;
                 mainContent += pomoState.isRunning ? '⏸️ DURAKLAT' : '▶️ BAŞLAT';
                 mainContent += '</button>';
                 mainContent += '<button onclick="resetPomo()" class="bg-slate-200 text-slate-700 px-6 py-4 md:px-6 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-md hover:bg-slate-300 transition" title="Sıfırla">🔄</button>';
-                mainContent += '<button onclick="openPomoAnalytics(\'' + mod.id + '\')" class="bg-blue-100 text-blue-700 px-6 py-4 md:px-6 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-md hover:bg-blue-200 transition" title="Kayıtlar ve Analiz">📊</button>';
+                mainContent += `<button onclick="openPomoAnalytics('${mod.id}')" class="bg-blue-100 text-blue-700 px-6 py-4 md:px-6 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-md hover:bg-blue-200 transition" title="Kayıtlar ve Analiz">📊</button>`;
                 mainContent += '</div>';
             }
-            return '<div class="flex flex-col items-center justify-center py-4 w-full h-full">' + mainContent + '</div>';
+            return `<div class="flex flex-col items-center justify-center py-4 w-full h-full">${mainContent}</div>`;
         }
 
         window.openPomoAnalytics = function(modId) {
@@ -1177,9 +1187,9 @@
             let html = '<div class="space-y-6">';
             
             html += '<div class="grid grid-cols-2 gap-3">';
-            html += '<div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-center"><p class="text-[10px] font-black uppercase text-indigo-600 opacity-70">Toplam Odak</p><p class="text-2xl font-black text-indigo-800">' + totalWork + '<span class="text-xs ml-1">dk</span></p></div>';
-            html += '<div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-center"><p class="text-[10px] font-black uppercase text-emerald-600 opacity-70">Toplam Mola</p><p class="text-2xl font-black text-emerald-800">' + (totalShort + totalLong) + '<span class="text-xs ml-1">dk</span></p></div>';
-            html += '<div class="col-span-2 bg-slate-50 border border-slate-200 p-4 rounded-xl flex justify-between items-center"><span class="text-xs font-bold opacity-70">Tamamlanan Oturum Sayısı:</span><span class="font-black text-lg">' + totalSessions + '</span></div>';
+            html += `<div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-center"><p class="text-[10px] font-black uppercase text-indigo-600 opacity-70">Toplam Odak</p><p class="text-2xl font-black text-indigo-800">${totalWork}<span class="text-xs ml-1">dk</span></p></div>`;
+            html += `<div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-center"><p class="text-[10px] font-black uppercase text-emerald-600 opacity-70">Toplam Mola</p><p class="text-2xl font-black text-emerald-800">${totalShort + totalLong}<span class="text-xs ml-1">dk</span></p></div>`;
+            html += `<div class="col-span-2 bg-slate-50 border border-slate-200 p-4 rounded-xl flex justify-between items-center"><span class="text-xs font-bold opacity-70">Tamamlanan Oturum Sayısı:</span><span class="font-black text-lg">${totalSessions}</span></div>`;
             html += '</div>';
 
             html += '<div class="border-t border-black/10 pt-4">';
@@ -1196,10 +1206,10 @@
                     
                     html += '<div class="border border-black/5 p-3 rounded-xl flex justify-between items-start group hover:border-black/20 transition">';
                     html += '<div class="flex-1 pr-3">';
-                    html += '<div class="text-[10px] font-black ' + color + ' uppercase mb-1 flex items-center gap-1">' + icon + ' ' + log.duration + ' Dakika <span class="opacity-40 text-slate-500 ml-1 font-normal">• ' + log.date + '</span></div>';
-                    html += '<div class="text-xs font-bold opacity-80">' + log.text + '</div>';
+                    html += `<div class="text-[10px] font-black ${color} uppercase mb-1 flex items-center gap-1">${icon} ${log.duration} Dakika <span class="opacity-40 text-slate-500 ml-1 font-normal">• ${log.date}</span></div>`;
+                    html += `<div class="text-xs font-bold opacity-80">${log.text}</div>`;
                     html += '</div>';
-                    html += '<button onclick="deletePomoLogFromPanel(\'' + mod.id + '\', ' + index + ')" class="opacity-0 group-hover:opacity-100 text-[9px] font-bold text-red-500 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition shrink-0">SİL</button>';
+                    html += `<button onclick="deletePomoLogFromPanel('${mod.id}', ${index})" class="opacity-0 group-hover:opacity-100 text-[9px] font-bold text-red-500 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition shrink-0">SİL</button>`;
                     html += '</div>';
                 });
                 html += '</div>';
@@ -1235,9 +1245,9 @@
             html += `<div class="glass-card p-4 md:p-6 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-[10px] md:text-sm font-black uppercase opacity-60">Kategori</p><p class="text-3xl md:text-5xl font-black mt-2">${data.length}</p></div>`;
             html += '</div>';
             
-            html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center flex-1 h-0 min-h-[250px] md:min-h-[300px] w-full">';
-            html += '<div class="w-full h-full relative flex items-center justify-center p-2 md:p-4 bg-white/50 dark:bg-black/20 rounded-3xl border border-black/5 min-h-[150px]"><canvas id="radarChart"></canvas></div>';
-            html += '<div class="space-y-4 md:space-y-6 h-full overflow-y-auto pr-2 md:pr-4 custom-scroll py-2">';
+            html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-start w-full">';
+            html += '<div class="w-full h-auto relative flex items-center justify-center p-2 md:p-4 bg-white/50 dark:bg-black/20 rounded-3xl border border-black/5 min-h-[250px]"><canvas id="radarChart"></canvas></div>';
+            html += '<div class="space-y-4 md:space-y-6 w-full">';
             
             data.forEach(s => {
                 const perc = s.total > 0 ? Math.round((s.completed/s.total)*100) : 0;
@@ -1251,7 +1261,7 @@
 
         // Tümüyle Kart Görünümüne (Mobil Optimize) Geçirilen Tablolar
         window.renderTasks = function(mod) {
-            let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 flex-1 h-0 overflow-y-auto custom-scroll">';
+            let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full">';
             mod.data.forEach((d, i) => {
                 const progress = parseInt(d.progress || 0);
                 const style = getProgressStyle(progress);
@@ -1277,7 +1287,7 @@
         }
 
         window.renderContacts = function(mod) {
-            let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 flex-1 h-0 overflow-y-auto custom-scroll">';
+            let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full">';
             mod.data.forEach((d, i) => {
                 html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 relative group transition hover:bg-black/10 border border-transparent hover:border-black/5">`;
                 html += `<div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full">`;
@@ -1295,8 +1305,37 @@
             return html;
         }
 
+        window.inlineUpdateInterview = function(modId, index, field, value) {
+            const mod = state.activeModules.find(m => m.id === modId);
+            if(mod && mod.data[index]) {
+                mod.data[index][field] = value;
+                window.saveDataToCloud();
+            }
+        }
+        
+        window.inlineAddInterview = function(modId) {
+            const mod = state.activeModules.find(m => m.id === modId);
+            if(mod) {
+                if(!mod.data) mod.data = [];
+                mod.data.push({code:'YENİ', name:'', interviewed:false, consent:false, transcribed:false});
+                window.renderDashboard();
+                window.saveDataToCloud();
+            }
+        }
+        
+        window.inlineDeleteInterview = function(modId, index) {
+            if(confirm('Bu kaydı silmek istediğinize emin misiniz?')) {
+                const mod = state.activeModules.find(m => m.id === modId);
+                if(mod && mod.data[index]) {
+                    mod.data.splice(index, 1);
+                    window.renderDashboard();
+                    window.saveDataToCloud();
+                }
+            }
+        }
+
         window.renderInterviews = function(mod) {
-            let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 flex-1 h-0 overflow-y-auto custom-scroll pb-4">';
+            let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full pb-4">';
             mod.data.forEach((d, i) => {
                 html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-3 md:p-5 flex flex-col xl:flex-row xl:items-center gap-3 md:gap-5 relative group transition hover:bg-black/10 border border-transparent hover:border-black/10">`;
                 html += `<div class="flex w-full xl:w-1/3 gap-2">`;
@@ -1329,20 +1368,20 @@
                     listHtml += '<div class="flex justify-between items-start mb-2 md:mb-4">';
                     listHtml += '<div class="text-[10px] md:text-xs font-black text-indigo-500 uppercase tracking-widest">' + d.date + '</div>';
                     listHtml += '<div class="opacity-0 group-hover:opacity-100 transition flex gap-2">';
-                    listHtml += '<button onclick="editJournalEntry(\'' + mod.id + '\', ' + i + ')" class="text-[9px] md:text-[10px] font-bold text-indigo-600 bg-indigo-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-indigo-200">DÜZENLE</button>';
-                    listHtml += '<button onclick="deleteJournalEntry(\'' + mod.id + '\', ' + i + ')" class="text-[9px] md:text-[10px] font-bold text-red-600 bg-red-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-red-200">SİL</button>';
+                    listHtml += `<button onclick="editJournalEntry('${mod.id}', ${i})" class="text-[9px] md:text-[10px] font-bold text-indigo-600 bg-indigo-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-indigo-200">DÜZENLE</button>`;
+                    listHtml += `<button onclick="deleteJournalEntry('${mod.id}', ${i})" class="text-[9px] md:text-[10px] font-bold text-red-600 bg-red-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-red-200">SİL</button>`;
                     listHtml += '</div></div>';
                     listHtml += '<p class="text-sm md:text-lg font-medium opacity-90 leading-relaxed">' + d.text + '</p>';
                     listHtml += '</div>';
                 });
             }
 
-            let html = '<div class="flex flex-col h-full mt-4 md:mt-6">';
+            let html = '<div class="flex flex-col h-full mt-4 md:mt-6 w-full">';
             html += '<div class="flex flex-col md:flex-row gap-3 md:gap-4 mb-6 md:mb-10 border-b border-black/10 pb-4 md:pb-8 shrink-0">';
-            html += '<input type="text" id="journal-input-' + mod.id + '" class="custom-input flex-1 !py-3 md:!py-4 text-sm md:!text-lg !px-4 md:!px-6 rounded-xl md:rounded-2xl shadow-inner" placeholder="' + (mod.columns.placeholder || 'Bugün neler yaptın?') + '">';
-            html += '<button onclick="addJournalEntry(\'' + mod.id + '\')" class="btn-primary !w-full md:!w-auto !py-3 md:!py-4 md:!px-10 text-sm md:text-lg shadow-xl rounded-xl md:rounded-2xl hover:-translate-y-1 transform transition">' + (mod.columns.btnText || 'Kaydet') + '</button>';
+            html += `<input type="text" id="journal-input-${mod.id}" class="custom-input flex-1 !py-3 md:!py-4 text-sm md:!text-lg !px-4 md:!px-6 rounded-xl md:rounded-2xl shadow-inner" placeholder="${mod.columns.placeholder || 'Bugün neler yaptın?'}">`;
+            html += `<button onclick="addJournalEntry('${mod.id}')" class="btn-primary !w-full md:!w-auto !py-3 md:!py-4 md:!px-10 text-sm md:text-lg shadow-xl rounded-xl md:rounded-2xl hover:-translate-y-1 transform transition">${mod.columns.btnText || 'Kaydet'}</button>`;
             html += '</div>';
-            html += '<div class="flex-1 overflow-y-auto custom-scroll pr-2 md:pr-4 mb-2 pl-3 md:pl-4 border-l-2 border-black/10">' + listHtml + '</div>';
+            html += '<div class="flex-1 w-full pl-3 md:pl-4 border-l-2 border-black/10">' + listHtml + '</div>';
             html += '</div>';
             return html;
         }
@@ -1396,7 +1435,8 @@
 
                 document.getElementById('panel-footer-btn').style.display = 'block';
                 let footerHtml = '<button onclick="savePanel()" class="btn-primary shadow-lg !py-4 text-lg flex-1">Tüm Değişiklikleri Kaydet</button>';
-                document.getElementById('panel-footer-btn').innerHTML = '<div class="flex gap-3">' + footerHtml + '</div>';
+                document.getElementById('panel-footer-btn').innerHTML = `<div class="flex gap-3">${footerHtml}</div>`;
+                
                 document.getElementById('panel-backdrop').classList.replace('hidden', 'block');
                 setTimeout(() => { document.getElementById('panel-backdrop').classList.replace('opacity-0', 'opacity-100'); }, 10);
                 document.getElementById('right-panel').classList.add('open');
@@ -1476,7 +1516,7 @@
                 mod.title = tempEditTitle;
                 if(mod.columns) mod.columns = JSON.parse(JSON.stringify(tempEditColumns));
                 if(['calendar', 'stats', 'tasks', 'contacts'].includes(mod.type)) mod.data = JSON.parse(JSON.stringify(tempEditData));
-                if (mod.type === 'pomodoro' && !pomoState.isRunning) pomoState.timeLeft = mod.columns.work * 60;
+                if (mod.type === 'pomodoro' && !pomoState.isRunning) pomoState.timeLeft = (mod.columns.work || 25) * 60;
 
                 window.renderDashboard();
                 window.closePanel();
