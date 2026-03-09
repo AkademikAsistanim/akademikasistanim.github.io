@@ -202,8 +202,6 @@
         /* FLEX VE TAŞMA HATASI DÜZELTİLDİ (Display: block yapılarak arka planın sarmalaması sağlandı) */
         .dashboard-slide.active { display: block; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         /* h-fit kullanılarak ne kadar öğe eklenirse eklensin kutunun da o kadar aşağı uzaması garantilendi */
         .module-full-content { width: 100%; max-width: 1200px; margin: 2vh auto 0 auto; display: flex; flex-direction: column; height: fit-content; }
 
@@ -516,6 +514,7 @@
         // --- MOTİVASYON SÖZÜ ÜRETİCİ ---
         window.getRandomMotivation = function() {
             if (!state.motivation) state.motivation = { excluded: [] };
+            if (!state.motivation.excluded) state.motivation.excluded = [];
             const availableGroups = Object.keys(MOTIVATION_DATA).filter(g => !state.motivation.excluded.includes(g));
             if (availableGroups.length === 0) {
                 currentMotivationQuote = "Tüm kategorileri gizledin, ancak sen yine de harika işler başarıyorsun! ✨";
@@ -528,6 +527,7 @@
 
         window.toggleMotivationGroup = function(group, isChecked) {
             if (!state.motivation) state.motivation = { excluded: [] };
+            if (!state.motivation.excluded) state.motivation.excluded = [];
             if (!isChecked) {
                 if (!state.motivation.excluded.includes(group)) state.motivation.excluded.push(group);
             } else {
@@ -644,6 +644,7 @@
         }
 
         window.toggleInlineEdit = function(modId) {
+            if(!state.inlineEdit) state.inlineEdit = {};
             state.inlineEdit[modId] = !state.inlineEdit[modId];
             window.renderDashboard();
             window.saveDataToCloud();
@@ -880,24 +881,34 @@
 
         window.toggleModuleSelection = function(index) { state.modules[index].selected = !state.modules[index].selected; window.saveProjectName(); }
 
-        /* HANG BUG'I ÇÖZÜLDÜ: Firebase kaydını beklemek yerine fire-and-forget yapıldı */
+        /* HANG BUG'I ÇÖZÜLDÜ: Firebase kaydını asenkron yürütüp ekranı zorla geçiriyoruz */
         window.finishSetup = function() {
             showLoading(true, "Çalışma alanınız kuruluyor...");
-            state.activeModules = state.modules.filter(m => m.selected);
-            document.body.className = state.theme;
-            
-            window.getRandomMotivation(); // Yeni kullanıcılara sözü atayalım
-            
-            // Firebase kaydını asenkron başlatıyoruz AMA bitmesini beklemeden UI'ı açıyoruz
-            window.saveDataToCloud(); 
+            try {
+                state.activeModules = state.modules.filter(m => m.selected);
+                document.body.className = state.theme;
+                
+                window.getRandomMotivation(); // Yeni kullanıcılara sözü atayalım
+                
+                // Firebase kaydını asenkron başlatıyoruz AMA bitmesini beklemeden UI'ı açıyoruz
+                window.saveDataToCloud(); 
 
-            // Çok minik bir gecikme ekleyerek arayüzün yumuşak geçiş yapmasını sağlıyoruz
-            setTimeout(() => {
-                document.getElementById('setup-container').style.display = 'none';
-                window.renderDashboard(); 
+                // Çok minik bir gecikme ekleyerek arayüzün yumuşak geçiş yapmasını sağlıyoruz
+                setTimeout(() => {
+                    try {
+                        document.getElementById('setup-container').style.display = 'none';
+                        window.renderDashboard(); 
+                        window.nextScreen('screen-dashboard'); 
+                    } catch(err) {
+                        console.error("Dashboard render error:", err);
+                    } finally {
+                        showLoading(false);
+                    }
+                }, 300);
+            } catch(err) {
+                console.error("Setup error:", err);
                 showLoading(false);
-                window.nextScreen('screen-dashboard'); 
-            }, 300);
+            }
         }
 
         window.showDialog = function(title, content) {
@@ -953,6 +964,7 @@
         // --- DASHBOARD OLUŞTURMA ---
         window.renderDashboard = function() {
             if(!state.motivation) state.motivation = { excluded: [] };
+            if(!state.inlineEdit) state.inlineEdit = {};
 
             const container = document.getElementById('dashboard-container');
             const indicators = document.getElementById('slide-indicators');
@@ -1500,6 +1512,7 @@
         }
 
         window.renderTasks = function(mod) {
+            if (!mod.data) mod.data = [];
             let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full pb-8">';
             mod.data.forEach((d, i) => {
                 const progress = parseInt(d.progress || 0);
@@ -1535,6 +1548,7 @@
         }
 
         window.renderContacts = function(mod) {
+            if (!mod.data) mod.data = [];
             let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full pb-8">';
             mod.data.forEach((d, i) => {
                 html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-4 md:p-5 flex flex-col lg:flex-row lg:items-center gap-3 md:gap-6 relative group transition border border-transparent hover:border-black/10">`;
@@ -1559,6 +1573,8 @@
         }
 
         window.renderInterviews = function(mod) {
+            if (!mod.data) mod.data = [];
+            if (!mod.columns) mod.columns = {};
             let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full pb-4">';
             
             let boolKeys = Object.keys(mod.columns || {}).filter(k => k.startsWith('bool'));
@@ -1624,6 +1640,7 @@
         }
 
         window.renderJournal = function(mod) {
+            if (!mod.data) mod.data = [];
             let listHtml = '';
             if(mod.data.length === 0) {
                 listHtml = '<p class="opacity-50 text-center py-10 text-sm md:text-lg font-bold">Henüz kayıt yok.</p>';
