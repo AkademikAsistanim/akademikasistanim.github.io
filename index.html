@@ -476,7 +476,7 @@
             projectName: 'Benim İzlencem',
             projectColor: '#4f46e5',
             inlineEdit: {}, 
-            motivation: { excluded: [] }, // Hangi söz gruplarının gizleneceği burada tutulacak
+            motivation: { excluded: [] }, 
             calendar: { id: 'header_calendar', type: 'calendar', title: 'TAKVİM', data: [ { label: 'Savunma Günü', targetDate: '2026-06-15', emoji: '🎓' }, { label: 'Tez Bitişi', targetDate: '2026-05-01', emoji: '📚' } ] },
             modules: [
                 { id: 'gorevler', type: 'tasks', selected: true, title: 'Akademik Görevler', icon: '✅', data: [ { task: 'Literatür Taraması (Bölüm 2)', progress: 20, status: 'Yapılmadı', note: 'Kaynaklar toplanıyor' }, { task: 'Anket Formu Tasarımı', progress: 100, status: 'Yapıldı', note: 'Hocaya iletildi' } ] },
@@ -524,7 +524,6 @@
                 const quotes = MOTIVATION_DATA[randomGroup];
                 currentMotivationQuote = quotes[Math.floor(Math.random() * quotes.length)];
             }
-            window.renderDashboard();
         }
 
         window.toggleMotivationGroup = function(group, isChecked) {
@@ -881,16 +880,24 @@
 
         window.toggleModuleSelection = function(index) { state.modules[index].selected = !state.modules[index].selected; window.saveProjectName(); }
 
+        /* HANG BUG'I ÇÖZÜLDÜ: Firebase kaydını beklemek yerine fire-and-forget yapıldı */
         window.finishSetup = function() {
             showLoading(true, "Çalışma alanınız kuruluyor...");
             state.activeModules = state.modules.filter(m => m.selected);
             document.body.className = state.theme;
-            document.getElementById('setup-container').style.display = 'none';
-            window.saveDataToCloud().then(() => {
+            
+            window.getRandomMotivation(); // Yeni kullanıcılara sözü atayalım
+            
+            // Firebase kaydını asenkron başlatıyoruz AMA bitmesini beklemeden UI'ı açıyoruz
+            window.saveDataToCloud(); 
+
+            // Çok minik bir gecikme ekleyerek arayüzün yumuşak geçiş yapmasını sağlıyoruz
+            setTimeout(() => {
+                document.getElementById('setup-container').style.display = 'none';
                 window.renderDashboard(); 
                 showLoading(false);
                 window.nextScreen('screen-dashboard'); 
-            });
+            }, 300);
         }
 
         window.showDialog = function(title, content) {
@@ -1031,7 +1038,7 @@
                     <button onclick="toggleInlineEdit('motivation')" class="absolute top-4 right-4 text-lg opacity-30 group-hover:opacity-100 transition hover:scale-110 z-10">⚙️</button>
                     <div class="text-center relative z-10 w-full px-2 md:px-6">
                         <p class="text-sm md:text-lg font-bold text-slate-700 dark:text-slate-300 italic mb-4 leading-relaxed">"${currentMotivationQuote}"</p>
-                        <button onclick="window.getRandomMotivation()" class="text-[10px] md:text-xs font-black text-indigo-500 uppercase tracking-widest bg-white/60 dark:bg-black/30 px-4 py-2 rounded-xl hover:bg-indigo-100 hover:text-indigo-700 transition shadow-sm inline-flex items-center gap-2">🎲 Yeni Söz Getir</button>
+                        <button onclick="window.getRandomMotivation(); window.renderDashboard();" class="text-[10px] md:text-xs font-black text-indigo-500 uppercase tracking-widest bg-white/60 dark:bg-black/30 px-4 py-2 rounded-xl hover:bg-indigo-100 hover:text-indigo-700 transition shadow-sm inline-flex items-center gap-2">🎲 Yeni Söz Getir</button>
                     </div>
                 </div>`;
             }
