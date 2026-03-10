@@ -173,7 +173,7 @@
         .btn-google:hover { background: #f4f4f5; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-google img { width: 18px; height: 18px; }
 
-        /* --- YENİ: OK (BUTON) YÖNLENDİRMELİ EKRANLAR (KAYDIRMA SERBEST) --- */
+        /* --- OK (BUTON) YÖNLENDİRMELİ EKRANLAR (KAYDIRMA DÜZELTİLDİ) --- */
         .dashboard-container { width: 100%; }
         
         .dashboard-slide {
@@ -188,11 +188,27 @@
         
         @media (min-width: 768px) { .dashboard-slide { padding: 2rem 5rem 6rem 5rem; } }
 
-        .dashboard-slide.active { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+        /* Flex bug'ını önlemek ve taşmayı engellemek için display: block yapıldı */
+        .dashboard-slide.active { display: block; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .module-full-content { width: 100%; max-width: 1200px; margin-top: 2vh; display: flex; flex-direction: column; height: fit-content; min-height: fit-content; /* Düzenlendi: Taşma sorunu çözümü */ }
+        /* Aşağı doğru genişleyebilmesi için esnek yapısı düzenlendi */
+        .module-full-content { width: 100%; max-width: 1200px; margin: 2vh auto 6rem auto; display: flex; flex-direction: column; min-height: 80vh; }
+
+        /* --- POMODORO TAM EKRAN (YENİ) --- */
+        .pomo-fullscreen {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            z-index: 9999999 !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            background-color: rgba(255,255,255,0.95) !important;
+            backdrop-filter: blur(20px) !important;
+        }
+        body.theme-dark .pomo-fullscreen { background-color: rgba(15, 23, 42, 0.95) !important; }
 
         /* --- YÖNLENDİRME BUTONLARI (SABİT) --- */
         .nav-btn {
@@ -400,7 +416,19 @@
             <p class="text-sm font-medium opacity-80 mb-6" id="confirm-modal-message">Bu işlemi gerçekleştirmek istediğinize emin misiniz?</p>
             <div class="flex gap-3 justify-center">
                 <button onclick="closeCustomConfirm(false)" class="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold hover:bg-slate-300 transition w-full">İptal</button>
-                <button onclick="closeCustomConfirm(true)" class="bg-red-500 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-red-600 shadow-md transition w-full">Evet, Sil</button>
+                <button onclick="closeCustomConfirm(true)" class="bg-red-500 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-red-600 shadow-md transition w-full">Evet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ÖZEL GİRİŞ (PROMPT) MODALI -->
+    <div id="custom-prompt-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[99999] opacity-0 transition-opacity duration-300 p-4">
+        <div class="glass-card w-full max-w-sm p-6 md:p-8 shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800 border-t-4 border-indigo-500 text-center">
+            <h3 class="text-lg md:text-xl font-black text-slate-800 dark:text-slate-100 mb-4" id="prompt-modal-title">Değer Girin</h3>
+            <input type="text" id="prompt-modal-input" class="custom-input mb-6" placeholder="...">
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeCustomPrompt(null)" class="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold hover:bg-slate-300 transition w-full">İptal</button>
+                <button onclick="closeCustomPrompt(document.getElementById('prompt-modal-input').value)" class="bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-indigo-600 shadow-md transition w-full">Tamam</button>
             </div>
         </div>
     </div>
@@ -441,7 +469,8 @@
         let totalSlides = 0; 
         let currentSlideIndex = 0; 
         let radarInstances = {}; 
-        let confirmCallback = null; // Özel Onay Penceresi için callback
+        let confirmCallback = null; 
+        let promptCallback = null;  
         
         const EMOJI_LIST = ['📌', '⏳', '🎓', '📚', '📊', '🔍', '✍️', '💡', '🚀', '🎯', '🔥', '🏆', '📝', '📅', '🧠', '⚙️', '📈', '🗣️', '💻', '☕', '👨‍🍳', '👩‍🍳', '⚕️', '🏛️'];
         const ALL_THEMES = [
@@ -462,7 +491,7 @@
         for(let i=1; i<=10; i++) {
             DEFAULT_QUOTES['cat'+i] = {
                 name: 'Söz Grubu ' + i,
-                active: i <= 3, // İlk 3 kategori varsayılan açık
+                active: i <= 3, 
                 list: i === 1 ? ["Başlamak için mükemmel olmayı beklemeyin.", "Her küçük adım, büyük bir hedefe yaklaştırır."] : 
                       i === 2 ? ["Çalışmak, en iyi yetenektir.", "Bugün yapacağın bir şey, yarınki seni şekillendirir."] :
                       i === 3 ? ["Zorluklar, başarıya giden yoldaki basamaklardır.", "Asla vazgeçme!"] : []
@@ -474,9 +503,9 @@
             themeBrightness: 1,
             projectName: 'Benim İzlencem',
             projectColor: '#4f46e5',
-            inlineEdit: {}, // Tüm modülün düzenleme modunu tutar (başlık vb.)
-            itemEdit: {},   // Sadece tıklanan satırın düzenleme modunu tutar
-            quotes: DEFAULT_QUOTES, // Yeni eklendi
+            inlineEdit: {}, 
+            itemEdit: {},   
+            quotes: DEFAULT_QUOTES,
             calendar: { id: 'header_calendar', type: 'calendar', title: 'TAKVİM', data: [ { label: 'Savunma Günü', targetDate: '2026-06-15', emoji: '🎓' }, { label: 'Tez Bitişi', targetDate: '2026-05-01', emoji: '📚' } ] },
             modules: [
                 { id: 'gorevler', type: 'tasks', selected: true, title: 'Akademik Görevler', icon: '✅', columns: { task: 'GÖREV', progress: 'İLERLEME', note: 'NOTLAR' }, data: [ { task: 'Literatür Taraması (Bölüm 2)', progress: 20, status: 'Yapılmadı', note: 'Kaynaklar toplanıyor' }, { task: 'Anket Formu Tasarımı', progress: 100, status: 'Yapıldı', note: 'Hocaya iletildi' } ] },
@@ -529,7 +558,7 @@
                         state.calendar = savedData.calendar || state.calendar;
                         state.modules = savedData.modules || state.modules; 
                         state.activeModules = savedData.activeModules || [];
-                        state.quotes = savedData.quotes || state.quotes; // Sözleri yükle
+                        state.quotes = savedData.quotes || state.quotes; 
 
                         document.body.className = state.theme;
                         window.changeThemeBrightness(state.themeBrightness);
@@ -566,7 +595,7 @@
             try { await setDoc(userDocRef, dataToSave, { merge: true }); } catch(e) {}
         }
 
-        // ÖZEL ONAY PENCERESİ FONKSİYONLARI
+        // MODAL FONKSIYONLARI
         window.customConfirm = function(message, onConfirmCallback) {
             document.getElementById('confirm-modal-message').innerText = message;
             confirmCallback = onConfirmCallback;
@@ -585,7 +614,41 @@
             confirmCallback = null;
         }
 
-        // GÜVENLİ VE MERKEZİ ÖĞE SİLME FONKSİYONU
+        window.customPrompt = function(title, defaultVal, callback) {
+            document.getElementById('prompt-modal-title').innerText = title;
+            const input = document.getElementById('prompt-modal-input');
+            input.value = defaultVal || '';
+            promptCallback = callback;
+            const modal = document.getElementById('custom-prompt-modal');
+            modal.classList.replace('hidden', 'flex');
+            setTimeout(() => { modal.classList.replace('opacity-0', 'opacity-100'); input.focus(); }, 10);
+        }
+
+        window.closeCustomPrompt = function(result) {
+            const modal = document.getElementById('custom-prompt-modal');
+            modal.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
+            if(promptCallback) promptCallback(result);
+            promptCallback = null;
+        }
+
+        // KÜRESEL GÜVENLİ TAKVİM FONKSİYONLARI (1. İSTEK)
+        window.deleteCalendarItem = function(index) {
+            if (state.calendar && state.calendar.data) {
+                state.calendar.data.splice(index, 1);
+                window.renderDashboard();
+                window.saveDataToCloud();
+            }
+        };
+
+        window.addCalendarItem = function() {
+            if(!state.calendar.data) state.calendar.data = [];
+            state.calendar.data.push({emoji:'📌', label:'Yeni Tarih', targetDate:''});
+            state.inlineEdit['header_calendar'] = true;
+            window.renderDashboard();
+            window.saveDataToCloud();
+        };
+
         window.deleteModuleItem = function(modId, index, itemType) {
             let msg = 'Bu kaydı silmek istediğinize emin misiniz?';
             if (itemType === 'task') msg = 'Görevi silmek istediğinize emin misiniz?';
@@ -603,7 +666,6 @@
             });
         };
 
-        // GLOBAL: YENİ MODÜL OLUŞTURMA
         window.createNewModule = function() {
             const type = document.getElementById('new-mod-type').value;
             const titleInput = document.getElementById('new-mod-title').value.trim();
@@ -629,21 +691,18 @@
             }
 
             state.modules.push(newMod);
-            // Oluşturulan modülü otomatik olarak aktife ekle
             state.activeModules.push(newMod); 
             window.renderModuleManagement();
             window.renderDashboard();
             window.saveDataToCloud();
         }
 
-        // İÇERİDEN DÜZENLEME (INLINE EDIT) FONKSİYONU
         window.toggleInlineEdit = function(modId) {
             state.inlineEdit[modId] = !state.inlineEdit[modId];
             window.renderDashboard();
             window.saveDataToCloud();
         }
 
-        // YENİ: SATIR BAZINDA DÜZENLEME (ITEM EDIT) FONKSİYONU
         window.toggleItemEdit = function(modId, index) {
             let key = modId + '_' + index;
             state.itemEdit = state.itemEdit || {};
@@ -657,8 +716,6 @@
             if(mod && mod.data[index]) {
                 mod.data[index][field] = value;
                 window.saveDataToCloud();
-                
-                // Görevler için bar rengini anında güncellemek için dashboard'u renderlayalım (isteğe bağlı)
                 if (mod.type === 'tasks' && field === 'progress') {
                     window.renderDashboard();
                 }
@@ -677,14 +734,13 @@
             if(!mod) return;
             if(!mod.data) mod.data = [];
 
-            let newIdx = mod.data.length; // Sona eklenecek, indeksi boyutu olacak
+            let newIdx = mod.data.length; 
 
             if(type === 'task') mod.data.push({task:'Yeni Görev', progress:0, status:'Yapılmadı', note:''});
             if(type === 'contact') mod.data.push({name:'Yeni Kişi', role:'', contact:'', ref:'', note:''});
             if(type === 'interview') mod.data.push({code:'YENİ', name:'', interviewed:false, consent:false, transcribed:false});
             if(type === 'stat') mod.data.push({title:'Yeni Kategori', completed:0, total:10, emoji:'📊'});
 
-            // Yeni eklenen öğeyi direkt düzenleme moduna al
             if (type === 'task' || type === 'contact' || type === 'interview') {
                 state.itemEdit = state.itemEdit || {};
                 state.itemEdit[modId + '_' + newIdx] = true;
@@ -696,20 +752,17 @@
             window.saveDataToCloud();
         }
 
-        // Süreç Takibi İçin Dinamik Sütun Ekleme/Silme
         window.addColumnToInterview = function(modId) {
             const mod = state.activeModules.find(m => m.id === modId);
             if(!mod) return;
             if(!mod.columns) mod.columns = { code: 'KOD', name: 'İSİM', bool1: 'GÖRÜŞME', bool2: 'ONAM', bool3: 'METİN' };
             
-            // Kaç tane bool var bul
             let count = Object.keys(mod.columns).filter(k => k.startsWith('bool')).length;
-            if(count >= 6) { alert("Maksimum sütun sayısına ulaştınız."); return; } // Maks 6 ekstra sütun
+            if(count >= 6) { window.showDialog("Bilgi", "Maksimum sütun sayısına ulaştınız."); return; }
             
             let newKey = 'bool' + (count + 1);
             mod.columns[newKey] = 'YENİ SÜTUN';
             
-            // Mevcut datalara yeni alanı ekle (false olarak)
             if(mod.data) {
                 mod.data.forEach(d => { d[newKey] = false; });
             }
@@ -723,7 +776,6 @@
                 const mod = state.activeModules.find(m => m.id === modId);
                 if(mod && mod.columns[colKey]) {
                     delete mod.columns[colKey];
-                    // Datalardan da sil
                     if(mod.data) {
                         mod.data.forEach(d => { delete d[colKey]; });
                     }
@@ -885,9 +937,8 @@
             window.updateUINav();
             window.scrollTo({ top: 0, behavior: 'smooth' }); 
             
-            // Eğer açılan slide'da ağ grafiği varsa renderla
             setTimeout(() => {
-                let activeMod = state.activeModules[currentSlideIndex - 1]; // 0: Home, 1: Mod1...
+                let activeMod = state.activeModules[currentSlideIndex - 1]; 
                 if(activeMod && activeMod.type === 'stats' && !state.inlineEdit[activeMod.id]) {
                     window.initRadarChart(activeMod.data || [], 'radarChart-' + activeMod.id);
                 }
@@ -909,7 +960,7 @@
             if(btnNext) btnNext.disabled = currentSlideIndex === totalSlides - 1;
         }
 
-        // --- DASHBOARD OLUŞTURMA (Serbest Kaydırma ve Inline Edit Uyumlu) ---
+        // --- DASHBOARD OLUŞTURMA ---
         window.renderDashboard = function() {
             const container = document.getElementById('dashboard-container');
             const indicators = document.getElementById('slide-indicators');
@@ -929,7 +980,6 @@
             let calData = state.calendar.data || [];
             const today = new Date(); today.setHours(0,0,0,0);
             
-            // 1) SÖZLER KUTUSU İÇİN HTML
             let quotesHtml = `<div class="bg-white/50 dark:bg-black/20 p-5 md:p-8 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-center">`;
             quotesHtml += `<div class="flex justify-between items-center mb-4 md:mb-6 border-b border-black/10 pb-3 md:pb-4 w-full relative">`;
             quotesHtml += `<h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest flex items-center gap-2">💡 MOTİVASYON</h3>`;
@@ -938,7 +988,6 @@
                 </button></div>`;
 
             if (isQuoteEdit) {
-                // SÖZ DÜZENLEME MODU
                 quotesHtml += `<div class="space-y-2 max-h-64 overflow-y-auto custom-scroll pr-2 pointer-events-auto relative z-40">`;
                 for(let i=1; i<=10; i++) {
                     let cat = state.quotes['cat'+i];
@@ -948,7 +997,7 @@
                                 <input type="checkbox" class="w-4 h-4 accent-amber-500" ${cat.active ? 'checked' : ''} onchange="state.quotes.cat${i}.active = this.checked; window.saveDataToCloud()">
                                 Söz Grubu ${i}
                             </label>
-                            <button onclick="let q = prompt('Yeni söz ekle:'); if(q){ state.quotes.cat${i}.list.push(q); window.renderDashboard(); window.saveDataToCloud(); }" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-md font-black hover:bg-amber-200">+ EKLE</button>
+                            <button onclick="window.customPrompt('Yeni söz ekle:', '', (q) => { if(q){ state.quotes.cat${i}.list.push(q); window.renderDashboard(); window.saveDataToCloud(); } })" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-md font-black hover:bg-amber-200">+ EKLE</button>
                         </div>
                         <div class="pl-6 space-y-1">`;
                     if(cat.list.length === 0) quotesHtml += `<p class="text-[10px] opacity-50 italic">Bu grupta söz yok.</p>`;
@@ -962,7 +1011,6 @@
                 }
                 quotesHtml += `</div>`;
             } else {
-                // RASTGELE SÖZ GÖSTERİMİ
                 let activeQuotes = [];
                 Object.values(state.quotes).forEach(cat => {
                     if(cat.active) activeQuotes.push(...cat.list);
@@ -983,7 +1031,6 @@
             }
             quotesHtml += `</div>`;
 
-            // 2) TAKVİM KUTUSU İÇİN HTML
             let calHtml = `<div class="bg-white/50 dark:bg-black/20 p-5 md:p-8 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-start">`;
             calHtml += `<div class="flex justify-between items-center mb-4 md:mb-6 border-b border-black/10 pb-3 md:pb-4 w-full relative">`;
             if (isCalEdit) {
@@ -992,7 +1039,6 @@
                 calHtml += `<h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest flex items-center gap-2">⏳ ${state.calendar.title || 'TAKVİM'}</h3>`;
             }
             
-            // TAKVİM ÜZERİNDE DÜZENLE İKONU (KALEM)
             calHtml += `<button onclick="toggleInlineEdit('header_calendar')" class="absolute right-0 top-0 text-lg md:text-xl bg-indigo-50 text-indigo-700 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl hover:bg-indigo-100 transition shadow-sm pointer-events-auto z-50">
                 ${isCalEdit ? '✅' : '✏️'}
             </button></div>`;
@@ -1004,10 +1050,10 @@
                         <input type="text" class="custom-input w-16 text-center !p-2" value="${d.emoji}" onchange="window.inlineUpdateCalendar(${i}, 'emoji', this.value)">
                         <input type="text" class="custom-input flex-1 !p-2 min-w-[150px]" value="${d.label}" onchange="window.inlineUpdateCalendar(${i}, 'label', this.value)">
                         <input type="date" class="custom-input w-full sm:w-36 !p-2 text-xs" value="${d.targetDate}" onchange="window.inlineUpdateCalendar(${i}, 'targetDate', this.value)">
-                        <button onclick="state.calendar.data.splice(${i},1); window.renderDashboard(); window.saveDataToCloud()" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg font-bold w-full sm:w-auto mt-2 sm:mt-0">Sil</button>
+                        <button onclick="window.deleteCalendarItem(${i})" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg font-bold w-full sm:w-auto mt-2 sm:mt-0">Sil</button>
                     </div>`;
                 });
-                calHtml += `<button onclick="if(!state.calendar.data) state.calendar.data=[]; state.calendar.data.push({emoji:'📌', label:'Yeni', targetDate:''}); state.inlineEdit['header_calendar']=true; window.renderDashboard(); window.saveDataToCloud()" class="w-full bg-indigo-50/50 text-indigo-600 py-3 rounded-xl font-bold border-2 border-dashed border-indigo-200 mt-2 hover:bg-indigo-100 transition">+ Yeni Tarih Ekle</button>`;
+                calHtml += `<button onclick="window.addCalendarItem()" class="w-full bg-indigo-50/50 text-indigo-600 py-3 rounded-xl font-bold border-2 border-dashed border-indigo-200 mt-2 hover:bg-indigo-100 transition">+ Yeni Tarih Ekle</button>`;
             } else {
                 if(calData.length === 0) { calHtml += '<p class="text-xs md:text-sm opacity-50 font-bold">Kayıt yok.</p>'; }
                 else {
@@ -1022,7 +1068,7 @@
             calHtml += '</div></div>';
 
             html += `<div class="dashboard-slide ${currentSlideIndex === 0 ? 'active' : ''}" id="slide-home">
-                        <div class="module-full-content glass-card p-5 sm:p-10 md:p-16 shadow-2xl justify-center relative overflow-hidden group bg-white/90 dark:bg-slate-900/90 backdrop-blur-md min-h-[80vh]">
+                        <div class="module-full-content glass-card p-5 sm:p-10 md:p-16 shadow-2xl justify-center relative overflow-hidden group bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
                             <div id="header-theme-icon" class="absolute right-[-20px] bottom-[-30px] text-[150px] md:text-[250px] opacity-5 transform rotate-15 pointer-events-none">${themeIcon}</div>
                             <h1 class="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter uppercase leading-tight drop-shadow-lg glow-animate mb-2 md:mb-4" style="color: ${state.projectColor}">
                                 <span id="dashboard-title-first">${firstPart}</span> <span id="dashboard-title-rest" class="italic opacity-80">${restPart}</span>
@@ -1048,15 +1094,13 @@
                 else if(mod.type === 'tasks') contentHtml = window.renderTasks(mod, isEdit);
                 else if(mod.type === 'journal') contentHtml = window.renderJournal(mod, isEdit);
 
-                // Modül Başlığı
                 let titleHtml = '';
-                if(isEdit && mod.type !== 'stats') { // Stats için başlık editleme inline olacak
+                if(isEdit && mod.type !== 'stats') { 
                     titleHtml = `<div class="flex items-center gap-2 w-2/3"><span class="text-2xl md:text-4xl">${mod.icon}</span> <input type="text" class="custom-input text-lg md:text-2xl font-black uppercase !py-2" value="${mod.title}" onchange="state.activeModules.find(m=>m.id==='${mod.id}').title=this.value; window.saveDataToCloud()"></div>`;
                 } else {
                     titleHtml = `<h2 class="text-xl md:text-4xl font-black uppercase tracking-tight opacity-80 flex items-center gap-2 md:gap-3">${mod.icon} ${mod.title}</h2>`;
                 }
 
-                // Ayarlar İkonu Mantığı
                 let settingsBtnHtml = '';
                 if (mod.type !== 'pomodoro') {
                     settingsBtnHtml = `<button onclick="toggleInlineEdit('${mod.id}')" class="text-xl md:text-2xl ${isEdit ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'} w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-xl hover:opacity-80 transition shadow-sm shrink-0 pointer-events-auto relative z-50">
@@ -1065,7 +1109,7 @@
                 }
 
                 html += `<div class="dashboard-slide ${currentSlideIndex === index + 1 ? 'active' : ''}" id="slide-${mod.id}">
-                            <div class="module-full-content glass-card p-4 sm:p-6 md:p-10 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl min-h-[80vh]">
+                            <div class="module-full-content glass-card p-4 sm:p-6 md:p-10 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
                                 <div class="flex justify-between items-center mb-3 md:mb-6 pb-2 md:pb-4 border-b border-black/10 shrink-0">
                                     ${titleHtml}
                                     ${settingsBtnHtml}
@@ -1079,32 +1123,28 @@
 
             // --- SLIDE N+1: PLATFORM MENÜSÜ ---
             html += `<div class="dashboard-slide ${currentSlideIndex === totalSlides - 1 ? 'active' : ''}" id="slide-menu">
-                <div class="module-full-content glass-card p-6 sm:p-10 md:p-16 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl min-h-[80vh]">
+                <div class="module-full-content glass-card p-6 sm:p-10 md:p-16 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
                     <h2 class="text-2xl md:text-5xl font-black text-indigo-600 dark:text-indigo-400 mb-6 md:mb-12 border-b border-black/10 pb-4 w-full text-center">Platform Menüsü</h2>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 w-full max-w-3xl relative z-10 pointer-events-auto">
-                        <!-- Ayarlar ve Düzenle -->
                         <button onclick="openGlobalSettings()" class="bg-indigo-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-indigo-100 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
                             <span class="text-3xl md:text-5xl group-hover:scale-110 transition">⚙️</span>
                             <span class="font-black text-base md:text-xl text-indigo-900 dark:text-indigo-100">Ayarlar & Düzenle</span>
                             <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-indigo-700 dark:text-indigo-300">Tema, Modül Sırası ve Yeni Araç</span>
                         </button>
                         
-                        <!-- İletişim -->
                         <button onclick="window.showDialog('İletişim', 'Sorularınız, önerileriniz veya iş birlikleri için bize ulaşın:<br><br><b>Destek E-Posta:</b> destek@kisiselasistanim.com<br><b>Telefon:</b> +90 850 123 45 67')" class="bg-emerald-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-emerald-100 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
                             <span class="text-3xl md:text-5xl group-hover:scale-110 transition">📞</span>
                             <span class="font-black text-base md:text-xl text-emerald-900 dark:text-emerald-100">İletişim</span>
                             <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-emerald-700 dark:text-emerald-300">Destek ve Sorularınız İçin</span>
                         </button>
                         
-                        <!-- Şikayet -->
                         <button onclick="window.showDialog('Şikayet & Geri Bildirim', 'Karşılaştığınız sorunları veya platformla ilgili şikayetlerinizi doğrudan ekibimize iletebilirsiniz.<br><br><b>Şikayet Hattı:</b> sikayet@kisiselasistanim.com<br>Veya panel üzerinden formu kullanabilirsiniz.')" class="bg-amber-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-amber-100 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
                             <span class="text-3xl md:text-5xl group-hover:scale-110 transition">⚠️</span>
                             <span class="font-black text-base md:text-xl text-amber-900 dark:text-amber-100">Şikayet / Bildirim</span>
                             <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-amber-700 dark:text-amber-300">Sorun Bildirin veya Öneri Sunun</span>
                         </button>
 
-                        <!-- Çıkış Yap -->
                         <button onclick="handleLogout()" class="bg-red-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-red-100 dark:border-slate-700 hover:border-red-400 dark:hover:border-red-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
                             <span class="text-3xl md:text-5xl group-hover:scale-110 transition">🚪</span>
                             <span class="font-black text-base md:text-xl text-red-700 dark:text-red-400">Çıkış Yap</span>
@@ -1116,7 +1156,6 @@
 
             container.innerHTML = html;
 
-            // Nokta Göstergelerini Oluştur
             let dotHtml = '';
             for(let i=0; i<totalSlides; i++) {
                 dotHtml += `<div class="slide-dot ${i===currentSlideIndex ? 'active':''}" onclick="window.goToSlide(${i})"></div>`;
@@ -1124,7 +1163,6 @@
             indicators.innerHTML = dotHtml;
             window.updateUINav();
 
-            // Slayttayken Chart varsa renderla
             setTimeout(() => { 
                 let activeMod = state.activeModules[currentSlideIndex - 1];
                 if(activeMod && activeMod.type === 'stats' && !state.inlineEdit[activeMod.id]) {
@@ -1149,7 +1187,6 @@
             });
         }
 
-        // --- GLOBAL AYARLAR (MODAL İÇİ) ---
         window.openGlobalSettings = function() {
             document.getElementById('settings-project-name').value = state.projectName;
             document.getElementById('settings-project-color').value = state.projectColor;
@@ -1268,7 +1305,6 @@
         window.removeActiveModule = function(modId) {
             window.customConfirm("Bu modülü çalışma alanından (sayfalardan) kaldırmak istediğinize emin misiniz?", () => {
                 state.activeModules = state.activeModules.filter(m => m.id !== modId);
-                // Yeni oluşturulan modülleri pasif listesine atma, tamamen sil.
                 if(modId.includes('_')) {
                     state.modules = state.modules.filter(m => m.id !== modId);
                 } else {
@@ -1284,7 +1320,7 @@
             });
         }
 
-        // Pomodoro Fonksiyonları
+        // Pomodoro Fonksiyonları & TAM EKRAN İŞLEMİ
         function formatPomoTime(seconds) {
             const m = Math.floor(seconds / 60).toString().padStart(2, '0');
             const s = (seconds % 60).toString().padStart(2, '0');
@@ -1347,7 +1383,7 @@
         window.savePomoLog = function(modId) {
             const input = document.getElementById('pomo-log-input');
             const text = input ? input.value.trim() : '';
-            if (!text) { alert("Lütfen çalışmalarınızı kaydetmek için bir not girin!"); return; }
+            if (!text) { window.showDialog("Uyarı", "Lütfen çalışmalarınızı kaydetmek için bir not girin!"); return; }
 
             const mod = state.activeModules.find(m => m.id === modId);
             let duration = mod.columns?.work || 25;
@@ -1376,6 +1412,11 @@
                 window.saveDataToCloud();
             });
         }
+
+        window.togglePomoFullscreen = function(modId) {
+            const el = document.getElementById(`pomo-card-${modId}`);
+            if(el) el.classList.toggle('pomo-fullscreen');
+        };
 
         window.renderPomodoro = function(mod, isEdit) {
             const workM = mod.columns?.work || 25; const shortM = mod.columns?.short || 5; const longM = mod.columns?.long || 15;
@@ -1412,7 +1453,11 @@
                 mainContent += `<button onclick="window.openPomoAnalytics('${mod.id}')" class="bg-blue-100 text-blue-700 px-6 py-4 md:px-6 md:py-5 rounded-2xl md:rounded-3xl font-black text-lg md:text-2xl shadow-md hover:bg-blue-200 transition" title="Kayıtlar ve Analiz">📊</button>`;
                 mainContent += '</div>';
             }
-            return `<div class="flex flex-col items-center justify-center py-4 w-full h-full">${mainContent}</div>`;
+            
+            return `<div id="pomo-card-${mod.id}" class="flex flex-col items-center justify-center py-4 w-full h-full transition-all duration-300 relative">
+                        <button onclick="window.togglePomoFullscreen('${mod.id}')" class="absolute -top-12 md:-top-4 right-0 md:right-4 text-xl md:text-2xl hover:scale-110 transition bg-black/5 dark:bg-white/10 w-10 h-10 flex items-center justify-center rounded-xl" title="Tam Ekran Modu">🔲</button>
+                        ${mainContent}
+                    </div>`;
         }
 
         window.openPomoAnalytics = function(modId) {
@@ -1472,7 +1517,6 @@
         window.renderStats = function(mod, isEdit) {
             let data = mod.data || [];
             
-            // Inline Düzenleme Paneli
             let editPanelHtml = '';
             if(isEdit) {
                 editPanelHtml = `<div class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-3xl w-full mx-auto shadow-inner border border-indigo-200 mt-2 mb-6 transition-all duration-300">
@@ -1504,7 +1548,7 @@
             data.forEach(d => { tDone += d.completed; tTarget += d.total; });
             const overall = tTarget > 0 ? Math.round((tDone/tTarget)*100) : 0;
             
-            let html = editPanelHtml; // Edit paneli varsa üste ekle
+            let html = editPanelHtml; 
             
             html += '<div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10 w-full shrink-0">';
             html += `<div class="glass-card p-4 md:p-6 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-[10px] md:text-sm font-black uppercase opacity-60">Başarı</p><p class="text-3xl md:text-5xl font-black flame-gold mt-2">%${overall}</p></div>`;
@@ -1598,7 +1642,7 @@
                 } else {
                     html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 relative group transition border border-transparent hover:border-black/5">`;
                     html += `<div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full">`;
-                    html += `<div><div class="font-bold text-sm md:text-base flex items-center flex-wrap gap-2">${d.name} ${d.role ? `<span class="bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-md text-[9px] font-black uppercase">${d.role}</span>` : ''}</div></div>`;
+                    html += `<div><div class="font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 text-base md:text-lg flex items-center flex-wrap gap-2">${d.name} ${d.role ? `<span class="bg-gradient-to-r from-amber-200 to-orange-300 text-amber-900 px-2 py-0.5 rounded-md text-[9px] font-black uppercase shadow-sm">${d.role}</span>` : ''}</div></div>`;
                     html += `<div class="text-xs md:text-sm font-medium opacity-80 flex items-center gap-1">${d.contact ? '📞 '+d.contact : ''}</div>`;
                     html += `<div class="text-xs md:text-sm opacity-80 flex items-center gap-1">${d.ref ? '👤 '+d.ref : ''}</div>`;
                     html += `</div>`;
@@ -1620,7 +1664,6 @@
             
             let boolKeys = Object.keys(mod.columns).filter(k => k.startsWith('bool'));
 
-            // ÇEKBOX SÜTUNLARI İÇİN YÜZDE ORANLARI BAR KISMI (YENİ EKLENDİ)
             if (mod.data && mod.data.length > 0 && boolKeys.length > 0) {
                 let statsHtml = '<div class="flex flex-wrap items-center justify-start md:justify-end gap-2 md:gap-4 mb-2 bg-indigo-50/50 dark:bg-indigo-900/20 px-4 py-2 rounded-xl border border-indigo-100/50 shadow-sm w-fit ml-auto">';
                 boolKeys.forEach(key => {
@@ -1666,8 +1709,8 @@
                     html += `</div>`;
                 } else {
                     html += `<div class="flex w-full xl:w-1/3 gap-2">`;
-                    html += `<div class="bg-white/60 dark:bg-black/30 p-2 md:p-3 rounded-lg md:rounded-xl font-black text-indigo-600 text-xs md:text-sm w-16 md:w-20 text-center">${d.code}</div>`;
-                    html += `<div class="bg-white/60 dark:bg-black/30 p-2 md:p-3 rounded-lg md:rounded-xl font-bold text-xs md:text-sm flex-1 truncate">${d.name}</div>`;
+                    html += `<div class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md p-2 md:p-3 rounded-lg md:rounded-xl font-black text-xs md:text-sm w-16 md:w-20 text-center">${d.code}</div>`;
+                    html += `<div class="bg-white/60 dark:bg-black/30 p-2 md:p-3 rounded-lg md:rounded-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300 text-sm md:text-base flex-1 truncate">${d.name}</div>`;
                     html += `</div>`;
                 }
                 
@@ -1681,7 +1724,6 @@
                 
                 html += `</div>`;
                 
-                // Sağ taraf butonları
                 html += `<div class="flex items-center justify-end gap-2 mt-2 xl:mt-0 ${isItemEdit ? 'opacity-100' : 'opacity-100 md:opacity-0 group-hover:opacity-100'} transition w-full xl:w-auto">`;
                 if(isItemEdit) {
                     html += `<button onclick="window.deleteModuleItem('${mod.id}', ${i}, 'interview')" class="text-red-500 font-bold text-[10px] md:text-xs bg-red-100/80 px-4 py-2.5 rounded-xl hover:bg-red-200 transition shadow-sm w-full xl:w-auto">SİL</button>`;
@@ -1698,9 +1740,7 @@
             return html;
         }
 
-        // GÜNLÜK İŞLEMLERİ
         window.addJournalEntry = function(modId) {
-            // Document'taki id, modül id'si ile uyumlu olmalı
             const inputId = 'journal-input-' + modId;
             const input = document.getElementById(inputId);
             
@@ -1718,12 +1758,13 @@
         
         window.editJournalEntry = function(modId, index) {
             const mod = state.activeModules.find(m => m.id === modId);
-            const newText = prompt('Notunuzu düzenleyin:', mod.data[index].text);
-            if (newText !== null && newText.trim() !== '') { 
-                mod.data[index].text = newText; 
-                window.renderDashboard(); 
-                window.saveDataToCloud();
-            }
+            window.customPrompt('Notunuzu düzenleyin:', mod.data[index].text, (newText) => {
+                if (newText !== null && newText.trim() !== '') { 
+                    mod.data[index].text = newText; 
+                    window.renderDashboard(); 
+                    window.saveDataToCloud();
+                }
+            });
         }
         
         window.deleteJournalEntry = function(modId, index) { 
@@ -1774,18 +1815,17 @@
             return html;
         }
 
-        // KLAVYE OK TUŞLARI İLE GEZİNME (KAYMAYI ENGELLEYEN YAPI)
+        // KLAVYE OK TUŞLARI İLE GEZİNME
         document.addEventListener('keydown', (e) => {
             if(document.getElementById('screen-dashboard').classList.contains('active')) {
-                // Eğer focus input veya textarea ise gezinmeyi iptal et
                 if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
                 
                 if (e.key === 'ArrowRight') {
-                    e.preventDefault(); // Sayfa kaymasını engelle
+                    e.preventDefault(); 
                     window.slideBy(1);
                 }
                 if (e.key === 'ArrowLeft') {
-                    e.preventDefault(); // Sayfa kaymasını engelle
+                    e.preventDefault(); 
                     window.slideBy(-1);
                 }
             }
