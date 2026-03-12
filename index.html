@@ -37,8 +37,8 @@
         /* --- SİNEMATİK ARKA PLANLAR --- */
         .cinematic-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; overflow: hidden; background: linear-gradient(90deg, #bef264 0%, #a7f3d0 35%, #64748b 65%, #0f172a 100%); }
         body.theme-nature .cinematic-bg { display: block; }
-        .hills { position: absolute; bottom: -80px; left: 0; width: 55%; height: 250px; background: #84cc16; border-radius: 100% 100% 0 0; opacity: 0.5; }
-        .sun { position: absolute; top: 5%; left: 10%; width: 100px; height: 100px; background: radial-gradient(circle, rgba(253,224,71,0.8) 0%, rgba(253,224,71,0) 70%); animation: sun-glow 6s infinite alternate; }
+        .hills { position: absolute; bottom: -80px; left: 0; width: 55%; height: 250px; background: #84cc16; border-radius: 100% 100% 0 0; opacity: 0.5; z-index: 1;}
+        .sun { position: absolute; top: 5%; left: 10%; width: 100px; height: 100px; background: radial-gradient(circle, rgba(253,224,71,0.8) 0%, rgba(253,224,71,0) 70%); animation: sun-glow 6s infinite alternate; z-index: 0;}
         @keyframes sun-glow { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.15); opacity: 0.85; } }
 
         .hp-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; overflow: hidden; background: linear-gradient(to bottom, #0f172a, #1e1b4b); }
@@ -51,6 +51,35 @@
         @keyframes hp-train-move { 0% { transform: translateX(-100px); } 100% { transform: translateX(120vw); } }
         @keyframes hp-smoke { 0% { transform: translateY(0) scale(1); opacity: 0.8; } 100% { transform: translateY(-20px) scale(2); opacity: 0; } }
 
+        /* --- ENERJİ TEMASI (YENİ EKLENDİ) --- */
+        .energy-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; overflow: hidden; background: linear-gradient(90deg, #bef264 0%, #a7f3d0 35%, #64748b 65%, #0f172a 100%); }
+        body.theme-energy .energy-bg { display: block; }
+        .energy-bg .hills { position: absolute; bottom: -80px; left: 0; width: 55%; height: 250px; background: #84cc16; border-radius: 100% 100% 0 0; opacity: 0.5; z-index: 1; }
+        .energy-bg .hills::after { content: ''; position: absolute; bottom: 30px; left: -20%; width: 140%; height: 280px; background: #65a30d; border-radius: 80% 100% 0 0; opacity: 0.4; }
+        .energy-bg .sun { position: absolute; top: 5%; left: 10%; width: 100px; height: 100px; background: radial-gradient(circle, rgba(253,224,71,0.8) 0%, rgba(253,224,71,0) 70%); animation: sun-glow 6s infinite alternate; opacity: 0.7; z-index: 0; }
+        .energy-bg .solar-panel-group { position: absolute; bottom: 100px; left: 8%; z-index: 2; transform: perspective(600px) rotateX(30deg) rotateY(10deg) scale(0.9); opacity: 0.8; }
+        .energy-bg .panel { width: 50px; height: 35px; background: linear-gradient(135deg, #1e40af 0%, #60a5fa 100%); margin: 4px; display: inline-block; border: 1px solid #bfdbfe; position: relative; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .energy-bg .panel::after { content: ''; position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.5) 50%, transparent 55%); animation: panel-shimmer 7s infinite linear; }
+        .energy-bg .turbine { position: absolute; bottom: 120px; width: 3px; height: 90px; background: #e2e8f0; z-index: 2; }
+        .energy-bg .turbine::before { content: ''; position: absolute; top: 0; left: -2px; width: 7px; height: 7px; background: #cbd5e1; border-radius: 50%; z-index: 3; }
+        .energy-bg .blades { position: absolute; top: 3px; left: 1.5px; width: 0; height: 0; animation: spin 6s linear infinite; }
+        .energy-bg .blade { position: absolute; top: 0; left: -1.5px; width: 3px; height: 55px; background: #f1f5f9; border-radius: 50% 50% 0 0; transform-origin: bottom center; }
+        .energy-bg .b1 { transform: rotate(0deg) translateY(-55px); } .energy-bg .b2 { transform: rotate(120deg) translateY(-55px); } .energy-bg .b3 { transform: rotate(240deg) translateY(-55px); }
+        .energy-bg .t1 { left: 20%; transform: scale(0.9); } .energy-bg .t2 { left: 35%; bottom: 160px; animation-duration: 8s; transform: scale(0.7); }
+        .energy-bg .power-line { position: absolute; top: 55%; left: 0; width: 100%; height: 3px; z-index: 3; background: linear-gradient(90deg, rgba(132,204,22,0.3) 0%, rgba(59,130,246,0.3) 50%, rgba(239,68,68,0.3) 100%); transform: rotate(-4deg); transform-origin: left; box-shadow: 0 0 10px rgba(59,130,246,0.2); }
+        .energy-bg .current-pulse { position: absolute; top: -3px; left: 0; width: 80px; height: 9px; background: linear-gradient(90deg, transparent, #fff, transparent); filter: blur(3px); opacity: 0.9; animation: electricity 3.5s linear infinite; }
+        .energy-bg .factory-silhouette { position: absolute; bottom: 15%; right: 5%; width: 220px; height: 140px; z-index: 1; background: #1e293b; opacity: 0.7; clip-path: polygon(10% 100%, 90% 100%, 90% 60%, 85% 60%, 85% 10%, 70% 10%, 70% 60%, 55% 60%, 55% 25%, 40% 25%, 40% 60%, 10% 60%); }
+        .energy-bg .chimney-smoke { position: absolute; bottom: 60%; right: 17%; width: 40px; height: 20px; z-index: 0; }
+        .energy-bg .puff { position: absolute; width: 35px; height: 35px; background: #334155; border-radius: 40% 60% 50% 50% / 50% 40% 60% 50%; filter: blur(12px); opacity: 0; animation: billow 9s infinite linear; }
+        .energy-bg .p1 { animation-delay: 0s; } .energy-bg .p2 { animation-delay: 1.5s; right: -15px; } .energy-bg .p3 { animation-delay: 3s; left: -10px; } .energy-bg .p4 { animation-delay: 4.5s; } .energy-bg .p5 { animation-delay: 6s; right: -20px; } .energy-bg .p6 { animation-delay: 7.5s; left: -15px; }
+        .energy-bg .bad-spark { position: absolute; top: 25%; right: 12%; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); opacity: 0; animation: harsh-spark 7s infinite; z-index: 0; }
+        
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes panel-shimmer { 0% { transform: translate(-150%, -150%); } 30%, 100% { transform: translate(150%, 150%); } }
+        @keyframes electricity { 0% { left: -10%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 110%; opacity: 0; } }
+        @keyframes billow { 0% { transform: translateY(0) scale(0.8) rotate(0deg); opacity: 0.8; background: #334155; } 30% { opacity: 0.7; } 100% { transform: translateY(-300px) translateX(80px) scale(5) rotate(120deg); opacity: 0; background: #94a3b8; } }
+        @keyframes harsh-spark { 0%, 90%, 100% { opacity: 0; } 93%, 97% { opacity: 0.5; filter: brightness(2); } 95% { opacity: 0; } }
+
         /* ==========================================
            30 TEMA SİSTEMİ 
            ========================================== */
@@ -61,6 +90,8 @@
         body.theme-dark .custom-input { background: rgba(15, 23, 42, 0.8); color: #fff; border-color: #334155; }
         body.theme-nature { color: #1e293b; }
         body.theme-nature .glass-card { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        body.theme-energy { color: #1e293b; }
+        body.theme-energy .glass-card { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         body.theme-gastronomy { background-color: #fff7ed; background-image: linear-gradient(#fed7aa 1px, transparent 1px), linear-gradient(90deg, #fed7aa 1px, transparent 1px); background-size: 30px 30px; color: #7c2d12; }
         body.theme-gastronomy .glass-card { background: rgba(255, 237, 213, 0.95); border: 2px solid #fdba74; box-shadow: 0 8px 25px rgba(234,88,12,0.15); backdrop-filter: blur(5px); }
         body.theme-politics { background: radial-gradient(circle at top right, #1e3a8a, #0f172a); color: #f8fafc; }
@@ -274,6 +305,17 @@
     <!-- ARKA PLANLAR -->
     <div class="cinematic-bg"><div class="hills"></div><div class="sun"></div></div>
     <div class="hp-bg"><div class="hp-lightning"></div><div class="hp-castle"></div><div class="hp-train"></div></div>
+    
+    <!-- ENERJİ TEMASI ÖZEL ARKA PLANI -->
+    <div class="energy-bg">
+        <div class="hills"></div><div class="sun"></div>
+        <div class="solar-panel-group"><div class="panel"></div><div class="panel"></div><div class="panel"></div><div class="panel"></div><div class="panel"></div><div class="panel"></div></div>
+        <div class="turbine t1"><div class="blades"><div class="blade b1"></div><div class="blade b2"></div><div class="blade b3"></div></div></div>
+        <div class="turbine t2"><div class="blades"><div class="blade b1"></div><div class="blade b2"></div><div class="blade b3"></div></div></div>
+        <div class="power-line"><div class="current-pulse"></div></div>
+        <div class="bad-spark"></div><div class="factory-silhouette"></div>
+        <div class="chimney-smoke"><div class="puff p1"></div><div class="puff p2"></div><div class="puff p3"></div><div class="puff p4"></div><div class="puff p5"></div><div class="puff p6"></div></div>
+    </div>
 
     <!-- ADIM 1-4: Kurulum Ekranları -->
     <div class="p-6 fixed inset-0 z-50 pointer-events-none" id="setup-container">
@@ -512,7 +554,7 @@
         
         const EMOJI_LIST = ['📌', '⏳', '🎓', '📚', '📊', '🔍', '✍️', '💡', '🚀', '🎯', '🔥', '🏆', '📝', '📅', '🧠', '⚙️', '📈', '🗣️', '💻', '☕', '👨‍🍳', '👩‍🍳', '⚕️', '🏛️'];
         const ALL_THEMES = [
-            { id: 'theme-light', name: 'Aydınlık', icon: '✨' }, { id: 'theme-dark', name: 'Gece Modu', icon: '🌙' }, { id: 'theme-nature', name: 'Doğa', icon: '🍃' },
+            { id: 'theme-light', name: 'Aydınlık', icon: '✨' }, { id: 'theme-dark', name: 'Gece Modu', icon: '🌙' }, { id: 'theme-energy', name: 'Enerji', icon: '⚡' }, { id: 'theme-nature', name: 'Doğa', icon: '🍃' },
             { id: 'theme-gastronomy', name: 'Gastronomi', icon: '👨‍🍳👩‍🍳' }, { id: 'theme-politics', name: 'Siyaset', icon: '🏛️' }, { id: 'theme-engineering', name: 'Mühendislik', icon: '⚙️' },
             { id: 'theme-history', name: 'Tarih', icon: '📜' }, { id: 'theme-math', name: 'Matematik', icon: '📐' }, { id: 'theme-health', name: 'Sağlık', icon: '⚕️' },
             { id: 'theme-communication', name: 'İletişim', icon: '📡' }, { id: 'theme-cat', name: 'Kedicik', icon: '🐾' }, { id: 'theme-space', name: 'Uzay', icon: '🚀' },
@@ -536,7 +578,7 @@
                 { id: 'gorevler', type: 'tasks', selected: true, title: 'Akademik Görevler', icon: '✅', columns: { task: 'GÖREV', progress: 'İLERLEME', note: 'NOTLAR' }, data: [ { task: 'Literatür Taraması (Bölüm 2)', progress: 20, status: 'Yapılmadı', note: 'Kaynaklar toplanıyor' }, { task: 'Anket Formu Tasarımı', progress: 100, status: 'Yapıldı', note: 'Hocaya iletildi' } ] },
                 { id: 'genel_durum', type: 'stats', selected: true, title: 'Genel Durum & Ağ Dengesi', icon: '🕸️', data: [ { title: 'Akademisyenler', completed: 11, total: 11, emoji: '🎓' }, { title: 'Sivil Toplum', completed: 5, total: 6, emoji: '🌳' }, { title: 'Bürokratlar', completed: 4, total: 4, emoji: '🕴️' }, { title: 'Milletvekilleri', completed: 2, total: 6, emoji: '🏛️' } ] },
                 { id: 'pomodoro', type: 'pomodoro', selected: true, title: 'Pomodoro Tekniği', icon: '🍅', columns: { work: 25, short: 5, long: 15 }, data: [] },
-                { id: 'mulakatlar', type: 'interviews', selected: true, title: 'Süreç Takibi', icon: '🎙️', columns: { code: 'KOD', name: 'İSİM', bool1: 'GÖRÜŞME', bool2: 'ONAM', bool3: 'METİN' }, data: [ { code: 'AKA 1', name: 'Prof. Dr. Ahmet Yılmaz', interviewed: true, consent: true, transcribed: false }, { code: 'SİV 1', name: 'Dernek Başkanı V.', interviewed: true, consent: false, transcribed: false } ] },
+                { id: 'mulakatlar', type: 'interviews', selected: true, title: 'Süreç Takibi', icon: '🎙️', columns: { code: 'KOD', name: 'İSİM', bool1: 'GÖRÜŞME', bool2: 'ONAY', bool3: 'SONUÇ' }, data: [ { code: 'AKA 1', name: 'Prof. Dr. Ahmet Yılmaz', interviewed: true, consent: true, transcribed: false }, { code: 'SİV 1', name: 'Dernek Başkanı V.', interviewed: true, consent: false, transcribed: false } ] },
                 { id: 'iletisim', type: 'contacts', selected: true, title: 'İletişim Rehberi', icon: '📞', columns: { name: 'AD SOYAD', role: 'ROL', contact: 'İLETİŞİM', ref: 'REFERANS', note: 'NOTLAR' }, data: [ { name: 'Ayşe Demir', role: 'Akademisyen', contact: 'ayse@uni.edu.tr', ref: 'Prof. Dr. X', note: 'Salı günleri müsaittir.' } ] },
                 { id: 'gunluk', type: 'journal', selected: true, title: 'Günlük', icon: '📓', columns: { placeholder: 'Bugün neler yaptın?', btnText: 'Kaydet' }, data: [ { date: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'}), text: 'Sistemi kurdum ve yeni arayüz ile çalışmalarıma başladım!' } ] }
             ],
@@ -573,6 +615,15 @@
         function listenPublicData() {
             onSnapshot(collection(db, 'artifacts', myAppId, 'public', 'data', 'quoteCategories'), (snap) => {
                 globalQuoteCategories = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                
+                // Adminse ve hiç söz yoksa default'ları yükle
+                if (globalQuoteCategories.length === 0 && isAdmin) {
+                    if(!window._autoLoadedDefaults) {
+                        window._autoLoadedDefaults = true;
+                        window.adminLoadDefaultCategories();
+                    }
+                }
+                
                 window.renderDashboard();
             }, (e) => console.error(e));
 
@@ -1024,7 +1075,14 @@
             const defaultCats = [
                 { name: "Başlangıç Motivasyonu", active: true, list: ["Başlamak için mükemmel olmayı beklemeyin.", "Her küçük adım, büyük bir hedefe yaklaştırır."] },
                 { name: "Sıkı Çalışma", active: true, list: ["Çalışmak, en iyi yetenektir.", "Bugün yapacağın bir şey, yarınki seni şekillendirir."] },
-                { name: "Zorlukları Aşma", active: true, list: ["Zorluklar, başarıya giden yoldaki basamaklardır.", "Asla vazgeçme!"] }
+                { name: "Zorlukları Aşma", active: true, list: ["Zorluklar, başarıya giden yoldaki basamaklardır.", "Asla vazgeçme!"] },
+                { name: "Atatürk'ün Sözleri", active: true, list: [
+                    "Vatanını en çok seven, görevini en iyi yapandır.", 
+                    "Hiçbir şeye ihtiyacımız yok, yalnız bir şeye ihtiyacımız var; çalışkan olmak!", 
+                    "Yerinde duran, geriye gidiyor demektir… İleri, daima ileri!",
+                    "Zafer, 'zafer benimdir' diyebilenindir. Başarı ise 'başaracağım' diye başlayarak sonunda 'başardım' diyebilenindir.",
+                    "Eğitimdir ki, bir milleti ya özgür, bağımsız, şanlı, yüksek bir topluluk halinde yaşatır; ya da esaret ve sefalete terk eder."
+                ]}
             ];
             
             for (let cat of defaultCats) {
@@ -1169,7 +1227,7 @@
             let calData = state.calendar.data || [];
             const today = new Date(); today.setHours(0,0,0,0);
             
-            // Sözler (Artık Kategori Havuzundan Rastgele Çekiliyor)
+            // Sözler (Kategori Havuzundan Rastgele Çekiliyor)
             let activeQuotesList = [];
             globalQuoteCategories.filter(c => c.active).forEach(c => {
                 if(c.list) activeQuotesList.push(...c.list);
