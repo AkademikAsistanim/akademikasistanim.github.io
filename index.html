@@ -149,6 +149,19 @@
         .glow-animate { animation: textGlow 2s infinite alternate; }
         @keyframes textGlow { from { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; opacity: 0.8;} to { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor; opacity: 1;} }
 
+        /* YENİ: ALEV EFEKTLİ YAZI SİTİLİ */
+        .flame-text {
+            background: linear-gradient(0deg, #ff0000 0%, #ff5e00 40%, #ffb300 80%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: flicker 1.5s infinite alternate;
+            text-shadow: 0 0 10px rgba(255, 69, 0, 0.3), 0 0 20px rgba(255, 0, 0, 0.1);
+        }
+        @keyframes flicker {
+            0% { filter: drop-shadow(0 0 3px rgba(255, 69, 0, 0.4)); transform: scale(1); }
+            100% { filter: drop-shadow(0 0 8px rgba(255, 69, 0, 0.6)); transform: scale(1.01); }
+        }
+
         /* STATUS BADGES */
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
         .badge-done { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; } 
@@ -450,7 +463,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyDoh8mOTAK7o61a5O0Q_2wg83OXWrqVYDo",
@@ -465,12 +478,18 @@
 
         let db, auth;
         let currentUser = null;
+        let isAdmin = false;
         let unsubscribeUserDoc = null;
         let totalSlides = 0; 
         let currentSlideIndex = 0; 
         let radarInstances = {}; 
         let confirmCallback = null; 
         let promptCallback = null;  
+
+        // Global Değişkenler (Admin Yetkisi İle Yönetilecek Olanlar)
+        let globalQuotes = [];
+        let publicAnnouncements = [];
+        let allUsers = [];
         
         const EMOJI_LIST = ['📌', '⏳', '🎓', '📚', '📊', '🔍', '✍️', '💡', '🚀', '🎯', '🔥', '🏆', '📝', '📅', '🧠', '⚙️', '📈', '🗣️', '💻', '☕', '👨‍🍳', '👩‍🍳', '⚕️', '🏛️'];
         const ALL_THEMES = [
@@ -486,18 +505,6 @@
             { id: 'theme-cyan', name: 'Turkuaz', icon: '🧿' }, { id: 'theme-emerald', name: 'Zümrüt', icon: '❇️' }, { id: 'theme-crimson', name: 'Kızıl', icon: '🌹' }
         ];
 
-        // Başlangıç Söz Grupları
-        const DEFAULT_QUOTES = {};
-        for(let i=1; i<=10; i++) {
-            DEFAULT_QUOTES['cat'+i] = {
-                name: 'Söz Grubu ' + i,
-                active: i <= 3, 
-                list: i === 1 ? ["Başlamak için mükemmel olmayı beklemeyin.", "Her küçük adım, büyük bir hedefe yaklaştırır."] : 
-                      i === 2 ? ["Çalışmak, en iyi yetenektir.", "Bugün yapacağın bir şey, yarınki seni şekillendirir."] :
-                      i === 3 ? ["Zorluklar, başarıya giden yoldaki basamaklardır.", "Asla vazgeçme!"] : []
-            };
-        }
-
         let state = {
             theme: 'theme-light',
             themeBrightness: 1,
@@ -505,7 +512,6 @@
             projectColor: '#4f46e5',
             inlineEdit: {}, 
             itemEdit: {},   
-            quotes: DEFAULT_QUOTES,
             calendar: { id: 'header_calendar', type: 'calendar', title: 'TAKVİM', data: [ { label: 'Savunma Günü', targetDate: '2026-06-15', emoji: '🎓' }, { label: 'Tez Bitişi', targetDate: '2026-05-01', emoji: '📚' } ] },
             modules: [
                 { id: 'gorevler', type: 'tasks', selected: true, title: 'Akademik Görevler', icon: '✅', columns: { task: 'GÖREV', progress: 'İLERLEME', note: 'NOTLAR' }, data: [ { task: 'Literatür Taraması (Bölüm 2)', progress: 20, status: 'Yapılmadı', note: 'Kaynaklar toplanıyor' }, { task: 'Anket Formu Tasarımı', progress: 100, status: 'Yapıldı', note: 'Hocaya iletildi' } ] },
@@ -529,9 +535,13 @@
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         currentUser = user;
+                        isAdmin = (user.email === 'buraksancak@msn.com'); // Admin Kontrolü
+                        listenPublicData();
+                        if (isAdmin) listenAdminData();
                         loadUserData(); 
                     } else {
                         currentUser = null;
+                        isAdmin = false;
                         if(unsubscribeUserDoc) unsubscribeUserDoc();
                         document.getElementById('setup-container').style.display = 'block';
                         window.nextScreen('screen-auth');
@@ -539,6 +549,27 @@
                 });
             } catch(e) { console.error("Firebase başlatılamadı:", e); }
         });
+
+        // Ortak Dinleyiciler
+        function listenPublicData() {
+            onSnapshot(collection(db, 'artifacts', myAppId, 'public', 'data', 'quotes'), (snap) => {
+                globalQuotes = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                window.renderDashboard();
+            }, (e) => console.error(e));
+
+            onSnapshot(collection(db, 'artifacts', myAppId, 'public', 'data', 'announcements'), (snap) => {
+                publicAnnouncements = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a,b) => b.timestamp - a.timestamp);
+                window.renderDashboard();
+            }, (e) => console.error(e));
+        }
+
+        // Admin Özel Dinleyiciler
+        function listenAdminData() {
+            onSnapshot(collection(db, 'artifacts', myAppId, 'public', 'data', 'users'), (snap) => {
+                allUsers = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                window.renderDashboard();
+            }, (e) => console.error(e));
+        }
 
         async function loadUserData() {
             showLoading(true, "Profiliniz Hazırlanıyor...");
@@ -558,7 +589,6 @@
                         state.calendar = savedData.calendar || state.calendar;
                         state.modules = savedData.modules || state.modules; 
                         state.activeModules = savedData.activeModules || [];
-                        state.quotes = savedData.quotes || state.quotes; 
 
                         document.body.className = state.theme;
                         window.changeThemeBrightness(state.themeBrightness);
@@ -578,6 +608,12 @@
                     document.getElementById('setup-container').style.display = 'block';
                     window.nextScreen('screen-theme');
                 }
+                
+                // Admin'in görebilmesi için kullanıcı kaydını public havuza bırakalım
+                try {
+                    const publicUserRef = doc(db, 'artifacts', myAppId, 'public', 'data', 'users', currentUser.uid);
+                    await setDoc(publicUserRef, { email: currentUser.email, projectName: state.projectName, lastActive: new Date().toISOString() }, { merge: true });
+                } catch(e) {}
             } else {
                 showLoading(false);
                 document.getElementById('setup-container').style.display = 'block';
@@ -590,9 +626,14 @@
             const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'data', 'profile');
             const dataToSave = {
                 theme: state.theme, themeBrightness: state.themeBrightness, projectName: state.projectName,
-                projectColor: state.projectColor, calendar: state.calendar, activeModules: state.activeModules, modules: state.modules, quotes: state.quotes, updatedAt: new Date().toISOString()
+                projectColor: state.projectColor, calendar: state.calendar, activeModules: state.activeModules, modules: state.modules, updatedAt: new Date().toISOString()
             };
-            try { await setDoc(userDocRef, dataToSave, { merge: true }); } catch(e) {}
+            try { 
+                await setDoc(userDocRef, dataToSave, { merge: true }); 
+                // Public listeyi de güncelle
+                const publicUserRef = doc(db, 'artifacts', myAppId, 'public', 'data', 'users', currentUser.uid);
+                await setDoc(publicUserRef, { email: currentUser.email, projectName: state.projectName, lastActive: new Date().toISOString() }, { merge: true });
+            } catch(e) {}
         }
 
         // MODAL FONKSIYONLARI
@@ -960,6 +1001,32 @@
             if(btnNext) btnNext.disabled = currentSlideIndex === totalSlides - 1;
         }
 
+        // ADMİN AKSİYONLARI (GLOBAL SÖZ VE DUYURU)
+        window.adminAddQuote = function() {
+            window.customPrompt("Yeni Motivasyon Sözü", "", async (text) => {
+                if(text && text.trim() !== '') {
+                    try { await addDoc(collection(db, 'artifacts', myAppId, 'public', 'data', 'quotes'), { text: text, timestamp: Date.now() }); } catch(e){}
+                }
+            });
+        }
+        window.adminDeleteQuote = async function(id) {
+            window.customConfirm("Bu sözü kalıcı olarak silmek istediğinize emin misiniz?", async () => {
+                try { await deleteDoc(doc(db, 'artifacts', myAppId, 'public', 'data', 'quotes', id)); } catch(e){}
+            });
+        }
+        window.adminAddAnnouncement = function() {
+            window.customPrompt("Yeni Duyuru Mesajı", "", async (text) => {
+                if(text && text.trim() !== '') {
+                    try { await addDoc(collection(db, 'artifacts', myAppId, 'public', 'data', 'announcements'), { text: text, timestamp: Date.now() }); } catch(e){}
+                }
+            });
+        }
+        window.adminDeleteAnnouncement = async function(id) {
+            window.customConfirm("Bu duyuruyu silmek istediğinize emin misiniz?", async () => {
+                try { await deleteDoc(doc(db, 'artifacts', myAppId, 'public', 'data', 'announcements', id)); } catch(e){}
+            });
+        }
+
         // --- DASHBOARD OLUŞTURMA ---
         window.renderDashboard = function() {
             const container = document.getElementById('dashboard-container');
@@ -967,88 +1034,70 @@
             if(!container || !indicators) return;
 
             let html = '';
-            totalSlides = state.activeModules.length + 2; 
+            totalSlides = state.activeModules.length + 2 + (isAdmin ? 1 : 0); 
             
-            // --- SLIDE 1: ANA EKRAN & TAKVİM & SÖZLER ---
+            // --- SLIDE 1: ANA EKRAN & TAKVİM & SÖZLER & DUYURULAR ---
             let parts = state.projectName.split(' ');
             let firstPart = parts[0] || 'BENİM'; let restPart = parts.slice(1).join(' ') || '';
             let currentThemeObj = ALL_THEMES.find(t => t.id === state.theme);
             let themeIcon = currentThemeObj ? currentThemeObj.icon : '✨';
             
             let isCalEdit = state.inlineEdit['header_calendar'];
-            let isQuoteEdit = state.inlineEdit['header_quotes'];
             let calData = state.calendar.data || [];
             const today = new Date(); today.setHours(0,0,0,0);
             
-            let quotesHtml = `<div class="bg-white/50 dark:bg-black/20 p-5 md:p-8 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-center">`;
-            quotesHtml += `<div class="flex justify-between items-center mb-4 md:mb-6 border-b border-black/10 pb-3 md:pb-4 w-full relative">`;
-            quotesHtml += `<h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest flex items-center gap-2">💡 MOTİVASYON</h3>`;
-            quotesHtml += `<button onclick="toggleInlineEdit('header_quotes')" class="absolute right-0 top-0 text-lg md:text-xl bg-amber-50 text-amber-700 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl hover:bg-amber-100 transition shadow-sm pointer-events-auto z-50">
-                    ${isQuoteEdit ? '✅' : '✏️'}
-                </button></div>`;
-
-            if (isQuoteEdit) {
-                quotesHtml += `<div class="space-y-2 max-h-64 overflow-y-auto custom-scroll pr-2 pointer-events-auto relative z-40">`;
-                for(let i=1; i<=10; i++) {
-                    let cat = state.quotes['cat'+i];
-                    quotesHtml += `<div class="bg-white/60 dark:bg-black/30 p-3 rounded-xl border border-black/5">
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="flex items-center gap-2 font-bold text-sm cursor-pointer">
-                                <input type="checkbox" class="w-4 h-4 accent-amber-500" ${cat.active ? 'checked' : ''} onchange="state.quotes.cat${i}.active = this.checked; window.saveDataToCloud()">
-                                Söz Grubu ${i}
-                            </label>
-                            <button onclick="window.customPrompt('Yeni söz ekle:', '', (q) => { if(q){ state.quotes.cat${i}.list.push(q); window.renderDashboard(); window.saveDataToCloud(); } })" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-md font-black hover:bg-amber-200">+ EKLE</button>
-                        </div>
-                        <div class="pl-6 space-y-1">`;
-                    if(cat.list.length === 0) quotesHtml += `<p class="text-[10px] opacity-50 italic">Bu grupta söz yok.</p>`;
-                    cat.list.forEach((quote, qIndex) => {
-                        quotesHtml += `<div class="flex justify-between items-start gap-2 group border-b border-black/5 pb-1 mb-1 last:border-0 last:mb-0">
-                            <p class="text-[11px] opacity-80 italic leading-tight flex-1">- "${quote}"</p>
-                            <button onclick="state.quotes.cat${i}.list.splice(${qIndex}, 1); window.renderDashboard(); window.saveDataToCloud();" class="text-[9px] font-bold text-red-500 opacity-0 group-hover:opacity-100 transition bg-red-50 px-1.5 py-0.5 rounded">SİL</button>
-                        </div>`;
-                    });
-                    quotesHtml += `</div></div>`;
-                }
-                quotesHtml += `</div>`;
+            // Sözler (Artık Global Havuzdan)
+            let quotesHtml = `<div class="bg-white/50 dark:bg-black/20 p-5 md:p-8 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-center border border-black/5">`;
+            quotesHtml += `<h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest mb-4 border-b border-black/10 pb-3">💡 MOTİVASYON</h3>`;
+            if (globalQuotes.length > 0) {
+                let randomQuote = globalQuotes[Math.floor(Math.random() * globalQuotes.length)].text;
+                quotesHtml += `<div class="quote-card flex-1 flex items-center justify-center py-4 px-2">
+                    <p class="text-sm md:text-2xl font-black italic text-center relative px-6 leading-relaxed flame-text">
+                        <span class="text-5xl absolute -top-4 left-0 opacity-40 text-amber-600">"</span>
+                        ${randomQuote}
+                        <span class="text-5xl absolute -bottom-6 right-0 opacity-40 text-amber-600">"</span>
+                    </p>
+                </div>`;
             } else {
-                let activeQuotes = [];
-                Object.values(state.quotes).forEach(cat => {
-                    if(cat.active) activeQuotes.push(...cat.list);
-                });
-                
-                if (activeQuotes.length > 0) {
-                    let randomQuote = activeQuotes[Math.floor(Math.random() * activeQuotes.length)];
-                    quotesHtml += `<div class="quote-card flex-1 flex items-center justify-center py-4 px-2">
-                        <p class="text-sm md:text-xl font-medium italic opacity-90 text-center relative px-6 leading-relaxed">
-                            <span class="text-5xl absolute -top-4 left-0 opacity-20 text-amber-500">"</span>
-                            ${randomQuote}
-                            <span class="text-5xl absolute -bottom-6 right-0 opacity-20 text-amber-500">"</span>
-                        </p>
-                    </div>`;
-                } else {
-                    quotesHtml += `<div class="flex-1 flex items-center justify-center py-4"><p class="text-xs opacity-50 font-bold">Aktif söz bulunmuyor.</p></div>`;
-                }
+                quotesHtml += `<div class="flex-1 flex items-center justify-center py-4"><p class="text-xs opacity-50 font-bold">Aktif söz bulunmuyor.</p></div>`;
             }
             quotesHtml += `</div>`;
 
-            let calHtml = `<div class="bg-white/50 dark:bg-black/20 p-5 md:p-8 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-start">`;
+            // Duyurular (Global Havuzdan)
+            let annHtml = `<div class="bg-white/50 dark:bg-black/20 p-5 md:p-8 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-start border border-black/5">`;
+            annHtml += `<h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest mb-4 border-b border-black/10 pb-3 text-indigo-600 dark:text-indigo-400">📢 DUYURULAR</h3>`;
+            annHtml += `<div class="space-y-3 overflow-y-auto custom-scroll pr-2 flex-1 max-h-[250px]">`;
+            if(publicAnnouncements.length === 0) {
+                annHtml += `<p class="text-xs opacity-50 font-bold text-center">Henüz duyuru yok.</p>`;
+            } else {
+                publicAnnouncements.forEach(a => {
+                    let dateStr = new Date(a.timestamp).toLocaleDateString('tr-TR', {day:'numeric', month:'short'});
+                    annHtml += `<div class="bg-white/80 dark:bg-black/40 p-3 rounded-xl border border-indigo-100 shadow-sm transition hover:shadow-md">
+                        <div class="text-[10px] font-black text-indigo-500 mb-1">${dateStr}</div>
+                        <div class="text-sm font-bold opacity-90 leading-tight">${a.text}</div>
+                    </div>`;
+                });
+            }
+            annHtml += `</div></div>`;
+
+            // Takvim
+            let calHtml = `<div class="bg-white/50 dark:bg-black/20 p-5 md:p-8 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-start border border-black/5">`;
             calHtml += `<div class="flex justify-between items-center mb-4 md:mb-6 border-b border-black/10 pb-3 md:pb-4 w-full relative">`;
             if (isCalEdit) {
                 calHtml += `<input type="text" class="custom-input font-black uppercase text-base md:text-xl w-1/2" value="${state.calendar.title || 'TAKVİM'}" onchange="state.calendar.title=this.value; window.saveDataToCloud()">`;
             } else {
                 calHtml += `<h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest flex items-center gap-2">⏳ ${state.calendar.title || 'TAKVİM'}</h3>`;
             }
-            
             calHtml += `<button onclick="toggleInlineEdit('header_calendar')" class="absolute right-0 top-0 text-lg md:text-xl bg-indigo-50 text-indigo-700 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl hover:bg-indigo-100 transition shadow-sm pointer-events-auto z-50">
                 ${isCalEdit ? '✅' : '✏️'}
             </button></div>`;
             
-            calHtml += `<div class="space-y-3 md:space-y-4 w-full text-sm md:text-lg mt-2 pointer-events-auto relative z-40">`;
+            calHtml += `<div class="space-y-3 md:space-y-4 w-full text-sm md:text-lg mt-2 pointer-events-auto relative z-40 max-h-[250px] overflow-y-auto custom-scroll pr-2">`;
             if (isCalEdit) {
                 calData.forEach((d, i) => {
-                    calHtml += `<div class="flex flex-wrap sm:flex-nowrap items-center gap-2 mb-2 bg-white/50 p-2 rounded-xl border border-black/5">
+                    calHtml += `<div class="flex flex-wrap sm:flex-nowrap items-center gap-2 mb-2 bg-white/80 p-2 rounded-xl border border-black/5">
                         <input type="text" class="custom-input w-16 text-center !p-2" value="${d.emoji}" onchange="window.inlineUpdateCalendar(${i}, 'emoji', this.value)">
-                        <input type="text" class="custom-input flex-1 !p-2 min-w-[150px]" value="${d.label}" onchange="window.inlineUpdateCalendar(${i}, 'label', this.value)">
+                        <input type="text" class="custom-input flex-1 !p-2 min-w-[100px]" value="${d.label}" onchange="window.inlineUpdateCalendar(${i}, 'label', this.value)">
                         <input type="date" class="custom-input w-full sm:w-36 !p-2 text-xs" value="${d.targetDate}" onchange="window.inlineUpdateCalendar(${i}, 'targetDate', this.value)">
                         <button onclick="window.deleteCalendarItem(${i})" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg font-bold w-full sm:w-auto mt-2 sm:mt-0">Sil</button>
                     </div>`;
@@ -1061,7 +1110,7 @@
                         const tDate = new Date(d.targetDate); tDate.setHours(0,0,0,0);
                         const days = Math.ceil((tDate - today) / (1000 * 60 * 60 * 24));
                         const dayText = days > 0 ? days + ' gün' : (days === 0 ? 'BUGÜN' : 'Bitti');
-                        calHtml += `<div class="flex items-center justify-between"><span class="flex items-center gap-2 md:gap-3">${d.emoji} <span class="font-bold opacity-80 text-xs md:text-base">${d.label}</span></span><span class="font-black text-[10px] md:text-sm text-indigo-600 bg-indigo-50 px-2.5 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-indigo-100 shadow-sm">${dayText}</span></div>`;
+                        calHtml += `<div class="flex items-center justify-between bg-white/40 dark:bg-black/10 p-2 rounded-xl"><span class="flex items-center gap-2 md:gap-3">${d.emoji} <span class="font-bold opacity-80 text-xs md:text-base">${d.label}</span></span><span class="font-black text-[10px] md:text-sm text-indigo-600 bg-indigo-50 px-2.5 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-indigo-100 shadow-sm">${dayText}</span></div>`;
                     });
                 }
             }
@@ -1075,9 +1124,10 @@
                             </h1>
                             <p class="opacity-70 text-base md:text-2xl font-semibold relative z-10 mb-6 md:mb-12">Stratejik İlerleme ve Veri Analizi</p>
                             
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 w-full max-w-5xl mx-auto relative z-10 pointer-events-auto transition-all items-stretch mt-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 w-full max-w-6xl mx-auto relative z-10 pointer-events-auto transition-all items-stretch mt-4">
                                 ${calHtml}
                                 ${quotesHtml}
+                                ${annHtml}
                             </div>
                         </div>
                      </div>`;
@@ -1122,7 +1172,7 @@
             });
 
             // --- SLIDE N+1: PLATFORM MENÜSÜ ---
-            html += `<div class="dashboard-slide ${currentSlideIndex === totalSlides - 1 ? 'active' : ''}" id="slide-menu">
+            html += `<div class="dashboard-slide ${currentSlideIndex === state.activeModules.length + 1 ? 'active' : ''}" id="slide-menu">
                 <div class="module-full-content glass-card p-6 sm:p-10 md:p-16 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
                     <h2 class="text-2xl md:text-5xl font-black text-indigo-600 dark:text-indigo-400 mb-6 md:mb-12 border-b border-black/10 pb-4 w-full text-center">Platform Menüsü</h2>
                     
@@ -1153,6 +1203,67 @@
                     </div>
                 </div>
             </div>`;
+
+            // --- SLIDE N+2 (ADMİN PANELİ) ---
+            if(isAdmin) {
+                let adminHtml = `<div class="dashboard-slide ${currentSlideIndex === totalSlides - 1 ? 'active' : ''}" id="slide-admin">
+                    <div class="module-full-content glass-card p-6 sm:p-10 md:p-16 shadow-2xl flex flex-col bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
+                        <h2 class="text-3xl md:text-4xl font-black text-red-600 mb-6 border-b border-red-200 pb-4 flex items-center gap-3">👑 Admin Paneli</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full relative z-10 pointer-events-auto">
+                            
+                            <!-- Global Quotes Management -->
+                            <div class="bg-amber-50 dark:bg-slate-800 p-5 rounded-2xl shadow-inner border border-amber-200">
+                                <div class="flex justify-between items-center mb-4 border-b border-amber-200 pb-2">
+                                    <h3 class="font-black text-amber-800 dark:text-amber-400 text-sm md:text-base">Motivasyon Sözleri</h3>
+                                    <button onclick="window.adminAddQuote()" class="bg-amber-500 text-white px-4 py-1.5 rounded shadow hover:bg-amber-600 text-xs font-bold">+ Ekle</button>
+                                </div>
+                                <div class="space-y-2 max-h-60 overflow-y-auto custom-scroll pr-2">
+                                    ${globalQuotes.length === 0 ? '<p class="text-xs opacity-50">Söz yok.</p>' : ''}
+                                    ${globalQuotes.map(q => `
+                                        <div class="flex justify-between items-center bg-white/80 dark:bg-black/30 p-2.5 rounded-lg border border-black/5">
+                                            <p class="text-xs font-bold opacity-80 truncate flex-1 mr-2">${q.text}</p>
+                                            <button onclick="window.adminDeleteQuote('${q.id}')" class="text-red-500 font-bold text-[10px] bg-red-100 hover:bg-red-200 px-3 py-1.5 rounded">SİL</button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Global Announcements Management -->
+                            <div class="bg-indigo-50 dark:bg-slate-800 p-5 rounded-2xl shadow-inner border border-indigo-200">
+                                <div class="flex justify-between items-center mb-4 border-b border-indigo-200 pb-2">
+                                    <h3 class="font-black text-indigo-800 dark:text-indigo-400 text-sm md:text-base">Genel Duyurular</h3>
+                                    <button onclick="window.adminAddAnnouncement()" class="bg-indigo-500 text-white px-4 py-1.5 rounded shadow hover:bg-indigo-600 text-xs font-bold">+ Ekle</button>
+                                </div>
+                                <div class="space-y-2 max-h-60 overflow-y-auto custom-scroll pr-2">
+                                    ${publicAnnouncements.length === 0 ? '<p class="text-xs opacity-50">Duyuru yok.</p>' : ''}
+                                    ${publicAnnouncements.map(a => `
+                                        <div class="flex justify-between items-center bg-white/80 dark:bg-black/30 p-2.5 rounded-lg border border-black/5">
+                                            <p class="text-xs font-bold opacity-80 truncate flex-1 mr-2">${a.text}</p>
+                                            <button onclick="window.adminDeleteAnnouncement('${a.id}')" class="text-red-500 font-bold text-[10px] bg-red-100 hover:bg-red-200 px-3 py-1.5 rounded">SİL</button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Users Tracker -->
+                            <div class="bg-emerald-50 dark:bg-slate-800 p-5 rounded-2xl shadow-inner border border-emerald-200 md:col-span-2 mt-4">
+                                <h3 class="font-black text-emerald-800 dark:text-emerald-400 mb-4 border-b border-emerald-200 pb-2 text-sm md:text-base">Kayıtlı Kullanıcılar (${allUsers.length})</h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-60 overflow-y-auto custom-scroll pr-2">
+                                    ${allUsers.length === 0 ? '<p class="text-xs opacity-50">Kullanıcı bulunamadı.</p>' : ''}
+                                    ${allUsers.map(u => `
+                                        <div class="bg-white/80 dark:bg-black/30 p-4 rounded-xl border border-black/5 flex flex-col hover:border-emerald-300 transition">
+                                            <span class="font-black text-sm truncate text-emerald-900 dark:text-emerald-300">${u.email}</span>
+                                            <span class="text-xs opacity-80 font-bold mt-1.5">Proje: ${u.projectName || 'Belirtilmedi'}</span>
+                                            <span class="text-[10px] opacity-60 mt-1">Son G.: ${new Date(u.lastActive).toLocaleString('tr-TR')}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+                html += adminHtml;
+            }
 
             container.innerHTML = html;
 
