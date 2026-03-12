@@ -37,10 +37,9 @@
         /* --- SİNEMATİK ARKA PLANLAR --- */
         .cinematic-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; overflow: hidden; background: linear-gradient(90deg, #bef264 0%, #a7f3d0 35%, #64748b 65%, #0f172a 100%); }
         body.theme-nature .cinematic-bg { display: block; }
-        .hills { position: absolute; bottom: -80px; left: 0; width: 55%; height: 250px; background: #84cc16; border-radius: 100% 100% 0 0; opacity: 0.5; z-index: 1;}
-        .sun { position: absolute; top: 5%; left: 10%; width: 100px; height: 100px; background: radial-gradient(circle, rgba(253,224,71,0.8) 0%, rgba(253,224,71,0) 70%); animation: sun-glow 6s infinite alternate; z-index: 0;}
-        @keyframes sun-glow { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.15); opacity: 0.85; } }
-
+        .cinematic-bg .hills { position: absolute; bottom: -80px; left: 0; width: 55%; height: 250px; background: #84cc16; border-radius: 100% 100% 0 0; opacity: 0.5; z-index: 1;}
+        .cinematic-bg .sun { position: absolute; top: 5%; left: 10%; width: 100px; height: 100px; background: radial-gradient(circle, rgba(253,224,71,0.8) 0%, rgba(253,224,71,0) 70%); animation: sun-glow 6s infinite alternate; z-index: 0;}
+        
         .hp-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; overflow: hidden; background: linear-gradient(to bottom, #0f172a, #1e1b4b); }
         body.theme-harrypotter .hp-bg { display: block; }
         .hp-lightning { position: absolute; top: 0; left: 40%; width: 2px; height: 100vh; background: #fff; box-shadow: 0 0 20px #fff, 0 0 40px #fff; opacity: 0; transform: rotate(15deg); animation: lightning 8s infinite; }
@@ -51,7 +50,7 @@
         @keyframes hp-train-move { 0% { transform: translateX(-100px); } 100% { transform: translateX(120vw); } }
         @keyframes hp-smoke { 0% { transform: translateY(0) scale(1); opacity: 0.8; } 100% { transform: translateY(-20px) scale(2); opacity: 0; } }
 
-        /* --- ENERJİ TEMASI (YENİ EKLENDİ) --- */
+        /* --- ENERJİ TEMASI ÖZEL ARKA PLANI --- */
         .energy-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; overflow: hidden; background: linear-gradient(90deg, #bef264 0%, #a7f3d0 35%, #64748b 65%, #0f172a 100%); }
         body.theme-energy .energy-bg { display: block; }
         .energy-bg .hills { position: absolute; bottom: -80px; left: 0; width: 55%; height: 250px; background: #84cc16; border-radius: 100% 100% 0 0; opacity: 0.5; z-index: 1; }
@@ -75,6 +74,7 @@
         .energy-bg .bad-spark { position: absolute; top: 25%; right: 12%; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); opacity: 0; animation: harsh-spark 7s infinite; z-index: 0; }
         
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes sun-glow { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.15); opacity: 0.85; } }
         @keyframes panel-shimmer { 0% { transform: translate(-150%, -150%); } 30%, 100% { transform: translate(150%, 150%); } }
         @keyframes electricity { 0% { left: -10%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 110%; opacity: 0; } }
         @keyframes billow { 0% { transform: translateY(0) scale(0.8) rotate(0deg); opacity: 0.8; background: #334155; } 30% { opacity: 0.7; } 100% { transform: translateY(-300px) translateX(80px) scale(5) rotate(120deg); opacity: 0; background: #94a3b8; } }
@@ -88,10 +88,10 @@
         body.theme-dark { background: #0f172a; color: #f8fafc; }
         body.theme-dark .glass-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(51, 65, 85, 0.8); backdrop-filter: blur(12px); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
         body.theme-dark .custom-input { background: rgba(15, 23, 42, 0.8); color: #fff; border-color: #334155; }
-        body.theme-nature { color: #1e293b; }
-        body.theme-nature .glass-card { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         body.theme-energy { color: #1e293b; }
         body.theme-energy .glass-card { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        body.theme-nature { color: #1e293b; }
+        body.theme-nature .glass-card { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         body.theme-gastronomy { background-color: #fff7ed; background-image: linear-gradient(#fed7aa 1px, transparent 1px), linear-gradient(90deg, #fed7aa 1px, transparent 1px); background-size: 30px 30px; color: #7c2d12; }
         body.theme-gastronomy .glass-card { background: rgba(255, 237, 213, 0.95); border: 2px solid #fdba74; box-shadow: 0 8px 25px rgba(234,88,12,0.15); backdrop-filter: blur(5px); }
         body.theme-politics { background: radial-gradient(circle at top right, #1e3a8a, #0f172a); color: #f8fafc; }
@@ -180,7 +180,7 @@
         .glow-animate { animation: textGlow 2s infinite alternate; }
         @keyframes textGlow { from { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; opacity: 0.8;} to { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor; opacity: 1;} }
 
-        /* YENİ: ALEV EFEKTLİ YAZI SİTİLİ */
+        /* ALEV EFEKTLİ YAZI SİTİLİ */
         .flame-text {
             background: linear-gradient(0deg, #ff0000 0%, #ff5e00 40%, #ffb300 80%, #ffffff 100%);
             -webkit-background-clip: text;
@@ -217,7 +217,7 @@
         .btn-google:hover { background: #f4f4f5; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-google img { width: 18px; height: 18px; }
 
-        /* --- OK (BUTON) YÖNLENDİRMELİ EKRANLAR (KAYDIRMA DÜZELTİLDİ) --- */
+        /* --- OK (BUTON) YÖNLENDİRMELİ EKRANLAR --- */
         .dashboard-container { width: 100%; }
         
         .dashboard-slide {
@@ -227,20 +227,18 @@
             padding: 1rem 1rem 6rem 1rem;
             box-sizing: border-box;
             animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-y: auto; /* Dikey kaydırma sadece slayt içinde */
+            overflow-y: auto; 
         }
         
         @media (min-width: 768px) { .dashboard-slide { padding: 2rem 5rem 6rem 5rem; } }
 
-        /* Flex bug'ını önlemek ve taşmayı engellemek için display: block yapıldı */
         .dashboard-slide.active { display: block; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Aşağı doğru genişleyebilmesi için esnek yapısı düzenlendi */
         .module-full-content { width: 100%; max-width: 1200px; margin: 2vh auto 6rem auto; display: flex; flex-direction: column; min-height: 80vh; }
 
-        /* --- POMODORO TAM EKRAN (YENİ) --- */
+        /* --- POMODORO TAM EKRAN --- */
         .pomo-fullscreen {
             position: fixed !important;
             top: 0 !important; left: 0 !important;
@@ -279,17 +277,6 @@
         .slide-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.3s; }
         body.theme-light .slide-dot, body.theme-nature .slide-dot, body.theme-health .slide-dot { background: rgba(0,0,0,0.3); }
         .slide-dot.active { background: #6366f1; transform: scale(1.6); }
-
-        /* İÇ DÜZENLEME INPUT GÖRÜNÜMÜ */
-        .inline-edit-input {
-            background: rgba(255,255,255,0.8); border: 2px dashed #6366f1; color: #1e293b; padding: 6px 12px; border-radius: 8px; font-weight: bold; width: 100%; outline: none; transition: 0.3s;
-        }
-        .inline-edit-input:focus { border-style: solid; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
-        body.theme-dark .inline-edit-input { background: rgba(0,0,0,0.5); color: #fff; border-color: #818cf8; }
-
-        /* Motivasyon Sözleri Kartı */
-        .quote-card { transition: all 0.3s ease; }
-        .quote-card:hover { transform: translateY(-2px); }
 
     </style>
 </head>
@@ -573,6 +560,7 @@
             projectColor: '#4f46e5',
             inlineEdit: {}, 
             itemEdit: {},   
+            activeQuoteCategories: null, // Kullanıcının seçtiği kategoriler
             calendar: { id: 'header_calendar', type: 'calendar', title: 'TAKVİM', data: [ { label: 'Savunma Günü', targetDate: '2026-06-15', emoji: '🎓' }, { label: 'Tez Bitişi', targetDate: '2026-05-01', emoji: '📚' } ] },
             modules: [
                 { id: 'gorevler', type: 'tasks', selected: true, title: 'Akademik Görevler', icon: '✅', columns: { task: 'GÖREV', progress: 'İLERLEME', note: 'NOTLAR' }, data: [ { task: 'Literatür Taraması (Bölüm 2)', progress: 20, status: 'Yapılmadı', note: 'Kaynaklar toplanıyor' }, { task: 'Anket Formu Tasarımı', progress: 100, status: 'Yapıldı', note: 'Hocaya iletildi' } ] },
@@ -659,6 +647,7 @@
                         state.calendar = savedData.calendar || state.calendar;
                         state.modules = savedData.modules || state.modules; 
                         state.activeModules = savedData.activeModules || [];
+                        state.activeQuoteCategories = savedData.activeQuoteCategories || null;
 
                         document.body.className = state.theme;
                         window.changeThemeBrightness(state.themeBrightness);
@@ -695,7 +684,9 @@
             const userDocRef = doc(db, 'artifacts', myAppId, 'users', currentUser.uid, 'data', 'profile');
             const dataToSave = {
                 theme: state.theme, themeBrightness: state.themeBrightness, projectName: state.projectName,
-                projectColor: state.projectColor, calendar: state.calendar, activeModules: state.activeModules, modules: state.modules, updatedAt: new Date().toISOString()
+                projectColor: state.projectColor, calendar: state.calendar, activeModules: state.activeModules, modules: state.modules, 
+                activeQuoteCategories: state.activeQuoteCategories,
+                updatedAt: new Date().toISOString()
             };
             try { 
                 await setDoc(userDocRef, dataToSave, { merge: true }); 
@@ -891,6 +882,24 @@
                     window.saveDataToCloud();
                 }
             });
+        }
+
+        // KULLANICI KATEGORİ GÖSTERİM AYARI
+        window.toggleUserQuoteCategory = function(catId, isChecked) {
+            if (!state.activeQuoteCategories) {
+                state.activeQuoteCategories = globalQuoteCategories.map(c => c.id);
+            }
+            
+            if (isChecked) {
+                if (!state.activeQuoteCategories.includes(catId)) {
+                    state.activeQuoteCategories.push(catId);
+                }
+            } else {
+                state.activeQuoteCategories = state.activeQuoteCategories.filter(id => id !== catId);
+            }
+            
+            window.saveDataToCloud();
+            window.renderDashboard();
         }
 
         window.toggleAuthTab = function(mode) {
@@ -1224,28 +1233,65 @@
             let themeIcon = currentThemeObj ? currentThemeObj.icon : '✨';
             
             let isCalEdit = state.inlineEdit['header_calendar'];
+            let isQuoteEdit = state.inlineEdit['header_quotes']; // <-- SÖZLERİ DÜZENLEME DURUMU
             let calData = state.calendar.data || [];
             const today = new Date(); today.setHours(0,0,0,0);
             
-            // Sözler (Kategori Havuzundan Rastgele Çekiliyor)
-            let activeQuotesList = [];
-            globalQuoteCategories.filter(c => c.active).forEach(c => {
-                if(c.list) activeQuotesList.push(...c.list);
-            });
-
             let quotesHtml = `<div class="bg-white/50 dark:bg-black/20 p-5 md:p-8 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-center border border-black/5">`;
-            quotesHtml += `<h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest mb-4 border-b border-black/10 pb-3">💡 MOTİVASYON</h3>`;
-            if (activeQuotesList.length > 0) {
-                let randomQuote = activeQuotesList[Math.floor(Math.random() * activeQuotesList.length)];
-                quotesHtml += `<div class="quote-card flex-1 flex items-center justify-center py-4 px-2">
-                    <p class="text-sm md:text-2xl font-black italic text-center relative px-6 leading-relaxed flame-text">
-                        <span class="text-5xl absolute -top-4 left-0 opacity-40 text-amber-600">"</span>
-                        ${randomQuote}
-                        <span class="text-5xl absolute -bottom-6 right-0 opacity-40 text-amber-600">"</span>
-                    </p>
-                </div>`;
+            quotesHtml += `<div class="flex justify-between items-center mb-4 md:mb-6 border-b border-black/10 pb-3 md:pb-4 w-full relative">`;
+            quotesHtml += `<h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest flex items-center gap-2">💡 MOTİVASYON</h3>`;
+            quotesHtml += `<button onclick="toggleInlineEdit('header_quotes')" class="absolute right-0 top-0 text-lg md:text-xl bg-amber-50 text-amber-700 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl hover:bg-amber-100 transition shadow-sm pointer-events-auto z-50">
+                    ${isQuoteEdit ? '✅' : '✏️'}
+                </button></div>`;
+
+            if (isQuoteEdit) {
+                // KULLANICI İÇİN KATEGORİ SEÇİM PANELİ
+                quotesHtml += `<div class="space-y-2 max-h-64 overflow-y-auto custom-scroll pr-2 pointer-events-auto relative z-40">`;
+                quotesHtml += `<p class="text-[10px] font-bold opacity-60 mb-2 uppercase">Görmek İstediğiniz Kategorileri Seçin</p>`;
+                
+                if (globalQuoteCategories.length === 0) {
+                     quotesHtml += `<p class="text-xs opacity-50">Sistemde henüz söz kategorisi yok.</p>`;
+                }
+                
+                // Varsayılan olarak tüm kategorileri aktif et (ilk girişte)
+                if (!state.activeQuoteCategories) {
+                    state.activeQuoteCategories = globalQuoteCategories.map(c => c.id);
+                }
+
+                globalQuoteCategories.forEach(cat => {
+                    let isChecked = state.activeQuoteCategories.includes(cat.id);
+                    quotesHtml += `<div class="bg-white/60 dark:bg-black/30 p-3 rounded-xl border border-black/5 transition hover:bg-white/80">
+                        <label class="flex items-center gap-3 font-bold text-sm cursor-pointer w-full">
+                            <input type="checkbox" class="w-5 h-5 accent-amber-500" ${isChecked ? 'checked' : ''} onchange="window.toggleUserQuoteCategory('${cat.id}', this.checked)">
+                            <span class="flex-1">${cat.name}</span>
+                            <span class="text-[10px] bg-black/5 px-2 py-1 rounded font-black opacity-70">${cat.list ? cat.list.length : 0} söz</span>
+                        </label>
+                    </div>`;
+                });
+                quotesHtml += `</div>`;
             } else {
-                quotesHtml += `<div class="flex-1 flex items-center justify-center py-4"><p class="text-xs opacity-50 font-bold">Aktif söz bulunmuyor.</p></div>`;
+                // RASTGELE SÖZ GÖSTERİMİ
+                let activeQuotesList = [];
+                if (!state.activeQuoteCategories) {
+                    state.activeQuoteCategories = globalQuoteCategories.map(c => c.id);
+                }
+                
+                globalQuoteCategories.filter(c => state.activeQuoteCategories.includes(c.id)).forEach(c => {
+                    if(c.list) activeQuotesList.push(...c.list);
+                });
+                
+                if (activeQuotesList.length > 0) {
+                    let randomQuote = activeQuotesList[Math.floor(Math.random() * activeQuotesList.length)];
+                    quotesHtml += `<div class="quote-card flex-1 flex items-center justify-center py-4 px-2">
+                        <p class="text-sm md:text-2xl font-black italic text-center relative px-6 leading-relaxed flame-text">
+                            <span class="text-5xl absolute -top-4 left-0 opacity-40 text-amber-600">"</span>
+                            ${randomQuote}
+                            <span class="text-5xl absolute -bottom-6 right-0 opacity-40 text-amber-600">"</span>
+                        </p>
+                    </div>`;
+                } else {
+                    quotesHtml += `<div class="flex-1 flex items-center justify-center py-4"><p class="text-xs opacity-50 font-bold">Aktif söz bulunmuyor.</p></div>`;
+                }
             }
             quotesHtml += `</div>`;
 
