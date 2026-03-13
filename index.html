@@ -165,11 +165,11 @@
 
         /* --- ORTAK UI BİLEŞENLERİ --- */
         .glass-card { transition: box-shadow 0.4s ease; border-radius: 1.25rem; }
-        .custom-input { width: 100%; padding: 10px 12px; border-radius: 10px; outline: none; border: 2px solid #e2e8f0; transition: 0.3s; background: #fff; color:#1e293b; font-size: 15px; }
+        .custom-input { width: 100%; padding: 8px 10px; border-radius: 10px; outline: none; border: 2px solid #e2e8f0; transition: 0.3s; background: #fff; color:#1e293b; font-size: 14px; }
         .custom-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
-        .btn-primary { background: #6366f1; color: white; padding: 14px 24px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
+        .btn-primary { background: #6366f1; color: white; padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
         .btn-primary:hover { background: #4f46e5; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); transform: translateY(-2px); }
-        .btn-danger { background: #ef4444; color: white; padding: 14px 24px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
+        .btn-danger { background: #ef4444; color: white; padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; border: none;}
         .btn-danger:hover { background: #dc2626; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); transform: translateY(-2px); }
         
         .screen { display: none; opacity: 0; transition: opacity 0.5s ease-in-out; }
@@ -217,26 +217,26 @@
         .btn-google:hover { background: #f4f4f5; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .btn-google img { width: 18px; height: 18px; }
 
-        /* --- OK (BUTON) YÖNLENDİRMELİ EKRANLAR --- */
+        /* --- OK (BUTON) YÖNLENDİRMELİ EKRANLAR (SIKILAŞTIRILMIŞ) --- */
         .dashboard-container { width: 100%; }
         
         .dashboard-slide {
             display: none; 
             width: 100%;
             height: 100vh;
-            padding: 1rem 1rem 6rem 1rem;
+            padding: 1rem 1rem 4rem 1rem;
             box-sizing: border-box;
             animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto; 
         }
         
-        @media (min-width: 768px) { .dashboard-slide { padding: 2rem 5rem 6rem 5rem; } }
+        @media (min-width: 768px) { .dashboard-slide { padding: 1rem 2rem 4rem 2rem; } }
 
         .dashboard-slide.active { display: block; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .module-full-content { width: 100%; max-width: 1200px; margin: 2vh auto 6rem auto; display: flex; flex-direction: column; min-height: 80vh; }
+        .module-full-content { width: 100%; max-width: 1200px; margin: 1vh auto 4rem auto; display: flex; flex-direction: column; min-height: 80vh; }
 
         /* --- POMODORO TAM EKRAN --- */
         .pomo-fullscreen {
@@ -383,72 +383,72 @@
     <!-- GENEL AYARLAR MODALI (PLATFORM MENÜSÜ İÇİN) -->
     <div id="global-settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[9999] opacity-0 transition-opacity duration-300 p-4">
         <div class="glass-card w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800">
-            <div class="p-4 md:p-6 border-b border-black/10 flex justify-between items-center bg-indigo-600 text-white">
-                <h3 class="text-lg md:text-xl font-black uppercase tracking-wider">⚙️ Panel Ayarları</h3>
-                <button onclick="closeGlobalSettings()" class="text-2xl md:text-3xl hover:scale-110 transition">&times;</button>
+            <div class="p-4 md:p-5 border-b border-black/10 flex justify-between items-center bg-indigo-600 text-white">
+                <h3 class="text-lg font-black uppercase tracking-wider">⚙️ Panel Ayarları</h3>
+                <button onclick="closeGlobalSettings()" class="text-2xl hover:scale-110 transition">&times;</button>
             </div>
             
-            <div class="flex border-b border-black/10 px-2 md:px-6 pt-2 bg-black/5 overflow-x-auto custom-scroll shrink-0">
+            <div class="flex border-b border-black/10 px-2 md:px-5 pt-2 bg-black/5 overflow-x-auto custom-scroll shrink-0">
                 <button onclick="switchSettingsTab('tab-general')" id="btn-tab-general" class="settings-tab-btn active whitespace-nowrap p-3 font-bold opacity-60 hover:opacity-100 border-b-2 border-transparent">Genel Görünüm & Tema</button>
                 <button onclick="switchSettingsTab('tab-modules')" id="btn-tab-modules" class="settings-tab-btn whitespace-nowrap p-3 font-bold opacity-60 hover:opacity-100 border-b-2 border-transparent">Modül Yönetimi</button>
             </div>
 
-            <div class="p-4 md:p-6 overflow-y-auto flex-1 custom-scroll">
-                <div id="tab-general" class="settings-tab-content active space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="p-4 md:p-5 overflow-y-auto flex-1 custom-scroll">
+                <div id="tab-general" class="settings-tab-content active space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
                             <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 ml-1">Proje Adı</label>
-                            <input type="text" id="settings-project-name" class="custom-input mt-1 font-bold text-lg" value="" onchange="updateGlobalSettings()">
+                            <input type="text" id="settings-project-name" class="custom-input mt-1 font-bold text-base" value="" onchange="updateGlobalSettings()">
                         </div>
                         <div>
                             <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 ml-1">Başlık Rengi</label>
                             <div class="mt-1 flex items-center gap-4">
-                                <input type="color" id="settings-project-color" class="w-12 h-12 rounded-xl cursor-pointer border-0 p-0 shadow-sm" value="" onchange="updateGlobalSettings()">
+                                <input type="color" id="settings-project-color" class="w-10 h-10 rounded-xl cursor-pointer border-0 p-0 shadow-sm" value="" onchange="updateGlobalSettings()">
                                 <span class="text-xs font-bold opacity-70">İzlence isminizin parlayan rengi</span>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="border-t border-black/10 pt-6">
-                        <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 block mb-3 ml-1">Tema Parlaklığı</label>
+                    <div class="border-t border-black/10 pt-5">
+                        <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 block mb-2 ml-1">Tema Parlaklığı</label>
                         <div class="flex items-center gap-4">
                             <span class="text-xl">🌘</span>
                             <input type="range" id="settings-theme-brightness" min="0.5" max="1.5" step="0.1" value="1" oninput="changeThemeBrightness(this.value)" class="w-full cursor-pointer accent-indigo-600">
                             <span class="text-xl">☀️</span>
                         </div>
-                        <p class="text-[10px] md:text-xs opacity-60 mt-2 ml-1">Seçtiğiniz temanın genel tonunu daha açık veya daha koyu yapın.</p>
+                        <p class="text-[10px] opacity-60 mt-1 ml-1">Seçtiğiniz temanın genel tonunu daha açık veya daha koyu yapın.</p>
                     </div>
 
-                    <div class="border-t border-black/10 pt-6">
-                        <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 block mb-3 ml-1">Tema Değiştir</label>
+                    <div class="border-t border-black/10 pt-5">
+                        <label class="text-[10px] font-black uppercase opacity-60 text-indigo-600 block mb-2 ml-1">Tema Değiştir</label>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 text-[10px] h-48 overflow-y-auto custom-scroll p-1" id="settings-theme-grid"></div>
                     </div>
                 </div>
 
                 <div id="tab-modules" class="settings-tab-content hidden">
-                    <p class="text-xs md:text-sm font-bold opacity-70 mb-4 bg-indigo-50 text-indigo-800 p-3 md:p-4 rounded-xl border border-indigo-100">Sayfalarınızdaki araçları buradan yönetebilir, sıralarını değiştirebilir veya <b>yeni araçlar oluşturabilirsiniz.</b></p>
+                    <p class="text-xs font-bold opacity-70 mb-4 bg-indigo-50 text-indigo-800 p-3 rounded-xl border border-indigo-100">Sayfalarınızdaki araçları buradan yönetebilir, sıralarını değiştirebilir veya <b>yeni araçlar oluşturabilirsiniz.</b></p>
                     
                     <!-- YENİ MODÜL OLUŞTURMA ALANI -->
-                    <div class="bg-indigo-50/50 p-4 rounded-xl border-2 border-indigo-200 border-dashed mb-6">
+                    <div class="bg-indigo-50/50 p-4 rounded-xl border-2 border-indigo-200 border-dashed mb-5">
                         <h4 class="text-xs font-black text-indigo-600 mb-3 uppercase">✨ Yeni Boş Araç Oluştur</h4>
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <select id="new-mod-type" class="custom-input !py-2 !text-xs sm:w-1/3 font-bold">
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <select id="new-mod-type" class="custom-input !py-1.5 !text-xs sm:w-1/3 font-bold">
                                 <option value="tasks">✅ Akademik Görevler</option>
                                 <option value="stats">🕸️ Genel Durum (Ağ)</option>
                                 <option value="interviews">🎙️ Süreç Takibi</option>
                                 <option value="contacts">📞 İletişim Rehberi</option>
                             </select>
-                            <input type="text" id="new-mod-title" class="custom-input !py-2 flex-1" placeholder="Aracın Başlığı (Örn: Makale Görevleri)">
-                            <button onclick="createNewModule()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm shrink-0">Oluştur</button>
+                            <input type="text" id="new-mod-title" class="custom-input !py-1.5 flex-1 text-xs" placeholder="Aracın Başlığı (Örn: Makale Görevleri)">
+                            <button onclick="createNewModule()" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm shrink-0">Oluştur</button>
                         </div>
                     </div>
 
-                    <div id="settings-module-management" class="space-y-6"></div>
+                    <div id="settings-module-management" class="space-y-5"></div>
                 </div>
             </div>
             
-            <div class="p-4 border-t border-black/10 bg-black/5 flex justify-end">
-                <button onclick="closeGlobalSettings()" class="btn-primary !w-auto">Kapat</button>
+            <div class="p-3 border-t border-black/10 bg-black/5 flex justify-end">
+                <button onclick="closeGlobalSettings()" class="btn-primary !w-auto !py-2 !px-6 text-sm">Kapat</button>
             </div>
         </div>
     </div>
@@ -456,55 +456,55 @@
     <!-- KULLANICI PROFİLİ GÖRÜNTÜLEME MODALI (ADMİN İÇİN) -->
     <div id="user-profile-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[99999] opacity-0 transition-opacity duration-300 p-4">
         <div class="glass-card w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800 border-t-4 border-emerald-500">
-            <div class="p-4 md:p-6 border-b border-black/10 flex justify-between items-center bg-emerald-50 dark:bg-slate-700">
+            <div class="p-4 border-b border-black/10 flex justify-between items-center bg-emerald-50 dark:bg-slate-700">
                 <div>
-                    <h3 class="text-lg md:text-xl font-black text-emerald-800 dark:text-emerald-400" id="up-modal-email">Kullanıcı Profili</h3>
+                    <h3 class="text-lg font-black text-emerald-800 dark:text-emerald-400" id="up-modal-email">Kullanıcı Profili</h3>
                     <p class="text-xs font-bold opacity-60" id="up-modal-project">Proje: ...</p>
                 </div>
-                <button onclick="closeUserProfileModal()" class="text-2xl md:text-3xl hover:scale-110 transition">&times;</button>
+                <button onclick="closeUserProfileModal()" class="text-2xl hover:scale-110 transition">&times;</button>
             </div>
-            <div class="p-4 md:p-6 overflow-y-auto flex-1 custom-scroll space-y-4" id="up-modal-content">
+            <div class="p-4 overflow-y-auto flex-1 custom-scroll space-y-4" id="up-modal-content">
                 <!-- İçerik JS ile yüklenecek -->
             </div>
             <div class="p-4 border-t border-black/10 bg-black/5 flex justify-end">
-                <button onclick="closeUserProfileModal()" class="bg-slate-200 text-slate-800 font-bold px-6 py-2 rounded-xl hover:bg-slate-300">Kapat</button>
+                <button onclick="closeUserProfileModal()" class="bg-slate-200 text-slate-800 font-bold px-6 py-2 rounded-xl hover:bg-slate-300 text-sm">Kapat</button>
             </div>
         </div>
     </div>
 
     <!-- ÖZEL ONAY (CONFIRM) MODALI -->
     <div id="custom-confirm-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[99999] opacity-0 transition-opacity duration-300 p-4">
-        <div class="glass-card w-full max-w-sm p-6 md:p-8 shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800 border-t-4 border-red-500 text-center">
-            <div class="text-4xl mb-4">⚠️</div>
-            <h3 class="text-lg md:text-xl font-black text-slate-800 dark:text-slate-100 mb-2">Emin misiniz?</h3>
-            <p class="text-sm font-medium opacity-80 mb-6" id="confirm-modal-message">Bu işlemi gerçekleştirmek istediğinize emin misiniz?</p>
+        <div class="glass-card w-full max-w-sm p-6 shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800 border-t-4 border-red-500 text-center">
+            <div class="text-4xl mb-3">⚠️</div>
+            <h3 class="text-lg font-black text-slate-800 dark:text-slate-100 mb-2">Emin misiniz?</h3>
+            <p class="text-sm font-medium opacity-80 mb-5" id="confirm-modal-message">Bu işlemi gerçekleştirmek istediğinize emin misiniz?</p>
             <div class="flex gap-3 justify-center">
-                <button onclick="closeCustomConfirm(false)" class="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold hover:bg-slate-300 transition w-full">İptal</button>
-                <button onclick="closeCustomConfirm(true)" class="bg-red-500 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-red-600 shadow-md transition w-full">Evet</button>
+                <button onclick="closeCustomConfirm(false)" class="bg-slate-200 text-slate-700 px-5 py-2 rounded-xl font-bold hover:bg-slate-300 transition w-full text-sm">İptal</button>
+                <button onclick="closeCustomConfirm(true)" class="bg-red-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-red-600 shadow-md transition w-full text-sm">Evet</button>
             </div>
         </div>
     </div>
 
     <!-- ÖZEL GİRİŞ (PROMPT) MODALI -->
     <div id="custom-prompt-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[99999] opacity-0 transition-opacity duration-300 p-4">
-        <div class="glass-card w-full max-w-sm p-6 md:p-8 shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800 border-t-4 border-indigo-500 text-center">
-            <h3 class="text-lg md:text-xl font-black text-slate-800 dark:text-slate-100 mb-4" id="prompt-modal-title">Değer Girin</h3>
-            <input type="text" id="prompt-modal-input" class="custom-input mb-6" placeholder="...">
+        <div class="glass-card w-full max-w-sm p-6 shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800 border-t-4 border-indigo-500 text-center">
+            <h3 class="text-lg font-black text-slate-800 dark:text-slate-100 mb-3" id="prompt-modal-title">Değer Girin</h3>
+            <input type="text" id="prompt-modal-input" class="custom-input mb-5" placeholder="...">
             <div class="flex gap-3 justify-center">
-                <button onclick="closeCustomPrompt(null)" class="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold hover:bg-slate-300 transition w-full">İptal</button>
-                <button onclick="closeCustomPrompt(document.getElementById('prompt-modal-input').value)" class="bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-indigo-600 shadow-md transition w-full">Tamam</button>
+                <button onclick="closeCustomPrompt(null)" class="bg-slate-200 text-slate-700 px-5 py-2 rounded-xl font-bold hover:bg-slate-300 transition w-full text-sm">İptal</button>
+                <button onclick="closeCustomPrompt(document.getElementById('prompt-modal-input').value)" class="bg-indigo-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-indigo-600 shadow-md transition w-full text-sm">Tamam</button>
             </div>
         </div>
     </div>
 
     <!-- DUYURU / BİLGİLENDİRME MODALI -->
     <div id="announcement-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[9999] opacity-0 transition-opacity duration-300 p-4">
-        <div class="glass-card w-full max-w-md p-6 md:p-8 shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800 border-t-4 border-indigo-500">
-            <button onclick="closeAnnouncement()" class="absolute top-4 right-4 text-3xl opacity-50 hover:opacity-100 transition">&times;</button>
+        <div class="glass-card w-full max-w-md p-6 shadow-2xl relative overflow-hidden bg-white dark:bg-slate-800 border-t-4 border-indigo-500">
+            <button onclick="closeAnnouncement()" class="absolute top-3 right-3 text-2xl opacity-50 hover:opacity-100 transition">&times;</button>
             <div class="text-[10px] font-black text-indigo-500 uppercase mb-2 flex items-center gap-2"><span class="text-lg">📢</span> <span id="ann-modal-date"></span></div>
-            <h3 class="text-xl md:text-2xl font-black text-slate-800 dark:text-slate-100 mb-4 leading-tight" id="ann-modal-title"></h3>
-            <div class="text-sm font-medium opacity-80 space-y-3 leading-relaxed" id="ann-modal-content"></div>
-            <button onclick="closeAnnouncement()" class="btn-primary mt-8">Anladım, Kapat</button>
+            <h3 class="text-lg md:text-xl font-black text-slate-800 dark:text-slate-100 mb-3 leading-tight" id="ann-modal-title"></h3>
+            <div class="text-sm font-medium opacity-80 space-y-2 leading-relaxed" id="ann-modal-content"></div>
+            <button onclick="closeAnnouncement()" class="btn-primary mt-6 !py-2 text-sm">Anladım, Kapat</button>
         </div>
     </div>
 
@@ -1181,7 +1181,7 @@
                 content = '<p class="text-sm opacity-50 font-bold text-center py-8">Kullanıcının panelinde aktif modülü bulunmuyor.</p>';
             } else {
                 data.activeModules.forEach(mod => {
-                    content += `<div class="border border-black/10 p-4 rounded-xl bg-white/50 dark:bg-black/20 flex flex-col gap-2">`;
+                    content += `<div class="border border-black/10 p-3 rounded-xl bg-white/50 dark:bg-black/20 flex flex-col gap-2">`;
                     content += `<h4 class="font-black text-sm mb-1 text-emerald-700 dark:text-emerald-400 border-b border-black/5 pb-2">${mod.icon} ${mod.title}</h4>`;
                     
                     if (mod.type === 'tasks') {
@@ -1236,19 +1236,24 @@
             let themeIcon = currentThemeObj ? currentThemeObj.icon : '✨';
             
             let isCalEdit = state.inlineEdit['header_calendar'];
-            let isQuoteEdit = state.inlineEdit['header_quotes']; // <-- SÖZLERİ DÜZENLEME DURUMU
+            let isQuoteEdit = state.inlineEdit['header_quotes']; 
             let calData = state.calendar.data || [];
             const today = new Date(); today.setHours(0,0,0,0);
             
-            let quotesHtml = `<div class="bg-white/50 dark:bg-black/20 p-5 md:p-8 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-center border border-black/5">`;
-            quotesHtml += `<div class="flex justify-between items-center mb-4 md:mb-6 border-b border-black/10 pb-3 md:pb-4 w-full relative">`;
-            quotesHtml += `<h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest flex items-center gap-2">💡 MOTİVASYON</h3>`;
-            quotesHtml += `<button onclick="toggleInlineEdit('header_quotes')" class="absolute right-0 top-0 text-lg md:text-xl bg-amber-50 text-amber-700 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl hover:bg-amber-100 transition shadow-sm pointer-events-auto z-50">
+            // Sözler
+            let activeQuotesList = [];
+            globalQuoteCategories.filter(c => c.active).forEach(c => {
+                if(c.list) activeQuotesList.push(...c.list);
+            });
+
+            let quotesHtml = `<div class="bg-white/50 dark:bg-black/20 p-4 md:p-5 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-center border border-black/5">`;
+            quotesHtml += `<div class="flex justify-between items-center mb-3 border-b border-black/10 pb-2 w-full relative">`;
+            quotesHtml += `<h3 class="text-sm md:text-lg font-black opacity-80 uppercase tracking-widest flex items-center gap-2">💡 MOTİVASYON</h3>`;
+            quotesHtml += `<button onclick="toggleInlineEdit('header_quotes')" class="absolute right-0 top-0 text-base md:text-lg bg-amber-50 text-amber-700 w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-xl hover:bg-amber-100 transition shadow-sm pointer-events-auto z-50">
                     ${isQuoteEdit ? '✅' : '✏️'}
                 </button></div>`;
 
             if (isQuoteEdit) {
-                // KULLANICI İÇİN KATEGORİ SEÇİM PANELİ
                 quotesHtml += `<div class="space-y-2 max-h-64 overflow-y-auto custom-scroll pr-2 pointer-events-auto relative z-40">`;
                 quotesHtml += `<p class="text-[10px] font-bold opacity-60 mb-2 uppercase">Görmek İstediğiniz Kategorileri Seçin</p>`;
                 
@@ -1256,24 +1261,22 @@
                      quotesHtml += `<p class="text-xs opacity-50">Sistemde henüz söz kategorisi yok.</p>`;
                 }
                 
-                // Varsayılan olarak tüm kategorileri aktif et (ilk girişte)
                 if (!state.activeQuoteCategories) {
                     state.activeQuoteCategories = globalQuoteCategories.map(c => c.id);
                 }
 
                 globalQuoteCategories.forEach(cat => {
                     let isChecked = state.activeQuoteCategories.includes(cat.id);
-                    quotesHtml += `<div class="bg-white/60 dark:bg-black/30 p-3 rounded-xl border border-black/5 transition hover:bg-white/80">
-                        <label class="flex items-center gap-3 font-bold text-sm cursor-pointer w-full">
-                            <input type="checkbox" class="w-5 h-5 accent-amber-500" ${isChecked ? 'checked' : ''} onchange="window.toggleUserQuoteCategory('${cat.id}', this.checked)">
+                    quotesHtml += `<div class="bg-white/60 dark:bg-black/30 p-2 md:p-3 rounded-xl border border-black/5 transition hover:bg-white/80">
+                        <label class="flex items-center gap-3 font-bold text-xs md:text-sm cursor-pointer w-full">
+                            <input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-amber-500" ${isChecked ? 'checked' : ''} onchange="window.toggleUserQuoteCategory('${cat.id}', this.checked)">
                             <span class="flex-1">${cat.name}</span>
-                            <span class="text-[10px] bg-black/5 px-2 py-1 rounded font-black opacity-70">${cat.list ? cat.list.length : 0} söz</span>
+                            <span class="text-[9px] md:text-[10px] bg-black/5 px-2 py-1 rounded font-black opacity-70">${cat.list ? cat.list.length : 0} söz</span>
                         </label>
                     </div>`;
                 });
                 quotesHtml += `</div>`;
             } else {
-                // RASTGELE SÖZ GÖSTERİMİ
                 let activeQuotesList = [];
                 if (!state.activeQuoteCategories) {
                     state.activeQuoteCategories = globalQuoteCategories.map(c => c.id);
@@ -1285,11 +1288,11 @@
                 
                 if (activeQuotesList.length > 0) {
                     let randomQuote = activeQuotesList[Math.floor(Math.random() * activeQuotesList.length)];
-                    quotesHtml += `<div class="quote-card flex-1 flex items-center justify-center py-4 px-2">
-                        <p class="text-sm md:text-2xl font-black italic text-center relative px-6 leading-relaxed flame-text">
-                            <span class="text-5xl absolute -top-4 left-0 opacity-40 text-amber-600">"</span>
+                    quotesHtml += `<div class="quote-card flex-1 flex items-center justify-center py-2 px-1">
+                        <p class="text-lg md:text-3xl lg:text-4xl font-black italic text-center relative px-6 leading-tight flame-text">
+                            <span class="text-4xl md:text-6xl absolute -top-4 md:-top-6 left-0 opacity-40 text-amber-600">"</span>
                             ${randomQuote}
-                            <span class="text-5xl absolute -bottom-6 right-0 opacity-40 text-amber-600">"</span>
+                            <span class="text-4xl md:text-6xl absolute -bottom-6 md:-bottom-8 right-0 opacity-40 text-amber-600">"</span>
                         </p>
                     </div>`;
                 } else {
@@ -1298,9 +1301,9 @@
             }
             quotesHtml += `</div>`;
 
-            // Duyurular (Global Havuzdan)
-            let annHtml = `<div class="bg-white/50 dark:bg-black/20 p-5 md:p-8 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-start border border-black/5">`;
-            annHtml += `<h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest mb-4 border-b border-black/10 pb-3 text-indigo-600 dark:text-indigo-400">📢 DUYURULAR</h3>`;
+            // Duyurular 
+            let annHtml = `<div class="bg-white/50 dark:bg-black/20 p-4 md:p-5 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-start border border-black/5">`;
+            annHtml += `<h3 class="text-sm md:text-lg font-black opacity-80 uppercase tracking-widest mb-3 border-b border-black/10 pb-2 text-indigo-600 dark:text-indigo-400">📢 DUYURULAR</h3>`;
             annHtml += `<div class="space-y-3 overflow-y-auto custom-scroll pr-2 flex-1 max-h-[250px]">`;
             if(publicAnnouncements.length === 0) {
                 annHtml += `<p class="text-xs opacity-50 font-bold text-center">Henüz duyuru yok.</p>`;
@@ -1308,58 +1311,58 @@
                 publicAnnouncements.forEach(a => {
                     let dateStr = new Date(a.timestamp).toLocaleDateString('tr-TR', {day:'numeric', month:'short'});
                     annHtml += `<div class="bg-white/80 dark:bg-black/40 p-3 rounded-xl border border-indigo-100 shadow-sm transition hover:shadow-md">
-                        <div class="text-[10px] font-black text-indigo-500 mb-1">${dateStr}</div>
-                        <div class="text-sm font-bold opacity-90 leading-tight">${a.text}</div>
+                        <div class="text-[9px] md:text-[10px] font-black text-indigo-500 mb-1">${dateStr}</div>
+                        <div class="text-xs md:text-sm font-bold opacity-90 leading-tight">${a.text}</div>
                     </div>`;
                 });
             }
             annHtml += `</div></div>`;
 
             // Takvim
-            let calHtml = `<div class="bg-white/50 dark:bg-black/20 p-5 md:p-8 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-start border border-black/5">`;
-            calHtml += `<div class="flex justify-between items-center mb-4 md:mb-6 border-b border-black/10 pb-3 md:pb-4 w-full relative">`;
+            let calHtml = `<div class="bg-white/50 dark:bg-black/20 p-4 md:p-5 rounded-2xl md:rounded-3xl backdrop-blur-sm shadow-inner w-full relative h-full flex flex-col justify-start border border-black/5">`;
+            calHtml += `<div class="flex justify-between items-center mb-3 border-b border-black/10 pb-2 w-full relative">`;
             if (isCalEdit) {
-                calHtml += `<input type="text" class="custom-input font-black uppercase text-base md:text-xl w-1/2" value="${state.calendar.title || 'TAKVİM'}" onchange="state.calendar.title=this.value; window.saveDataToCloud()">`;
+                calHtml += `<input type="text" class="custom-input font-black uppercase text-sm md:text-lg w-1/2" value="${state.calendar.title || 'TAKVİM'}" onchange="state.calendar.title=this.value; window.saveDataToCloud()">`;
             } else {
-                calHtml += `<h3 class="text-base md:text-xl font-black opacity-80 uppercase tracking-widest flex items-center gap-2">⏳ ${state.calendar.title || 'TAKVİM'}</h3>`;
+                calHtml += `<h3 class="text-sm md:text-lg font-black opacity-80 uppercase tracking-widest flex items-center gap-2">⏳ ${state.calendar.title || 'TAKVİM'}</h3>`;
             }
-            calHtml += `<button onclick="toggleInlineEdit('header_calendar')" class="absolute right-0 top-0 text-lg md:text-xl bg-indigo-50 text-indigo-700 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl hover:bg-indigo-100 transition shadow-sm pointer-events-auto z-50">
+            calHtml += `<button onclick="toggleInlineEdit('header_calendar')" class="absolute right-0 top-0 text-base md:text-lg bg-indigo-50 text-indigo-700 w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-xl hover:bg-indigo-100 transition shadow-sm pointer-events-auto z-50">
                 ${isCalEdit ? '✅' : '✏️'}
             </button></div>`;
             
-            calHtml += `<div class="space-y-3 md:space-y-4 w-full text-sm md:text-lg mt-2 pointer-events-auto relative z-40 max-h-[250px] overflow-y-auto custom-scroll pr-2">`;
+            calHtml += `<div class="space-y-2 md:space-y-3 w-full text-sm md:text-base mt-2 pointer-events-auto relative z-40 max-h-[250px] overflow-y-auto custom-scroll pr-2">`;
             if (isCalEdit) {
                 calData.forEach((d, i) => {
                     calHtml += `<div class="flex flex-wrap sm:flex-nowrap items-center gap-2 mb-2 bg-white/80 p-2 rounded-xl border border-black/5">
-                        <input type="text" class="custom-input w-16 text-center !p-2" value="${d.emoji}" onchange="window.inlineUpdateCalendar(${i}, 'emoji', this.value)">
-                        <input type="text" class="custom-input flex-1 !p-2 min-w-[100px]" value="${d.label}" onchange="window.inlineUpdateCalendar(${i}, 'label', this.value)">
-                        <input type="date" class="custom-input w-full sm:w-36 !p-2 text-xs" value="${d.targetDate}" onchange="window.inlineUpdateCalendar(${i}, 'targetDate', this.value)">
-                        <button onclick="window.deleteCalendarItem(${i})" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg font-bold w-full sm:w-auto mt-2 sm:mt-0">Sil</button>
+                        <input type="text" class="custom-input w-12 md:w-16 text-center !p-1 md:!p-2 text-xs md:text-sm" value="${d.emoji}" onchange="window.inlineUpdateCalendar(${i}, 'emoji', this.value)">
+                        <input type="text" class="custom-input flex-1 !p-1 md:!p-2 min-w-[100px] text-xs md:text-sm" value="${d.label}" onchange="window.inlineUpdateCalendar(${i}, 'label', this.value)">
+                        <input type="date" class="custom-input w-full sm:w-32 !p-1 md:!p-2 text-[10px] md:text-xs" value="${d.targetDate}" onchange="window.inlineUpdateCalendar(${i}, 'targetDate', this.value)">
+                        <button onclick="window.deleteCalendarItem(${i})" class="bg-red-100 text-red-600 px-2 md:px-3 py-1 md:py-2 rounded-lg font-bold w-full sm:w-auto mt-2 sm:mt-0 text-xs">Sil</button>
                     </div>`;
                 });
-                calHtml += `<button onclick="window.addCalendarItem()" class="w-full bg-indigo-50/50 text-indigo-600 py-3 rounded-xl font-bold border-2 border-dashed border-indigo-200 mt-2 hover:bg-indigo-100 transition">+ Yeni Tarih Ekle</button>`;
+                calHtml += `<button onclick="window.addCalendarItem()" class="w-full bg-indigo-50/50 text-indigo-600 py-2 md:py-3 rounded-xl font-bold border-2 border-dashed border-indigo-200 mt-2 hover:bg-indigo-100 transition text-xs md:text-sm">+ Yeni Tarih Ekle</button>`;
             } else {
-                if(calData.length === 0) { calHtml += '<p class="text-xs md:text-sm opacity-50 font-bold">Kayıt yok.</p>'; }
+                if(calData.length === 0) { calHtml += '<p class="text-xs opacity-50 font-bold">Kayıt yok.</p>'; }
                 else {
                     calData.forEach(d => {
                         const tDate = new Date(d.targetDate); tDate.setHours(0,0,0,0);
                         const days = Math.ceil((tDate - today) / (1000 * 60 * 60 * 24));
                         const dayText = days > 0 ? days + ' gün' : (days === 0 ? 'BUGÜN' : 'Bitti');
-                        calHtml += `<div class="flex items-center justify-between bg-white/40 dark:bg-black/10 p-2 rounded-xl"><span class="flex items-center gap-2 md:gap-3">${d.emoji} <span class="font-bold opacity-80 text-xs md:text-base">${d.label}</span></span><span class="font-black text-[10px] md:text-sm text-indigo-600 bg-indigo-50 px-2.5 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-indigo-100 shadow-sm">${dayText}</span></div>`;
+                        calHtml += `<div class="flex items-center justify-between bg-white/40 dark:bg-black/10 p-2 rounded-xl"><span class="flex items-center gap-2 md:gap-3">${d.emoji} <span class="font-bold opacity-80 text-xs md:text-sm">${d.label}</span></span><span class="font-black text-[9px] md:text-xs text-indigo-600 bg-indigo-50 px-2 py-1 md:px-3 rounded-lg md:rounded-xl border border-indigo-100 shadow-sm">${dayText}</span></div>`;
                     });
                 }
             }
             calHtml += '</div></div>';
 
             html += `<div class="dashboard-slide ${currentSlideIndex === 0 ? 'active' : ''}" id="slide-home">
-                        <div class="module-full-content glass-card p-5 sm:p-10 md:p-16 shadow-2xl justify-center relative overflow-hidden group bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
+                        <div class="module-full-content glass-card p-4 sm:p-6 md:p-8 shadow-2xl justify-center relative overflow-hidden group bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
                             <div id="header-theme-icon" class="absolute right-[-20px] bottom-[-30px] text-[150px] md:text-[250px] opacity-5 transform rotate-15 pointer-events-none">${themeIcon}</div>
-                            <h1 class="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter uppercase leading-tight drop-shadow-lg glow-animate mb-2 md:mb-4" style="color: ${state.projectColor}">
+                            <h1 class="text-3xl sm:text-5xl md:text-7xl font-black tracking-tighter uppercase leading-tight drop-shadow-lg glow-animate mb-1 md:mb-2" style="color: ${state.projectColor}">
                                 <span id="dashboard-title-first">${firstPart}</span> <span id="dashboard-title-rest" class="italic opacity-80">${restPart}</span>
                             </h1>
-                            <p class="opacity-70 text-base md:text-2xl font-semibold relative z-10 mb-6 md:mb-12">Stratejik İlerleme ve Veri Analizi</p>
+                            <p class="opacity-70 text-sm md:text-xl font-semibold relative z-10 mb-4 md:mb-6">Stratejik İlerleme ve Veri Analizi</p>
                             
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 w-full max-w-6xl mx-auto relative z-10 pointer-events-auto transition-all items-stretch mt-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4 w-full max-w-6xl mx-auto relative z-10 pointer-events-auto transition-all items-stretch mt-2">
                                 ${calHtml}
                                 ${quotesHtml}
                                 ${annHtml}
@@ -1381,21 +1384,21 @@
 
                 let titleHtml = '';
                 if(isEdit && mod.type !== 'stats') { 
-                    titleHtml = `<div class="flex items-center gap-2 w-2/3"><span class="text-2xl md:text-4xl">${mod.icon}</span> <input type="text" class="custom-input text-lg md:text-2xl font-black uppercase !py-2" value="${mod.title}" onchange="state.activeModules.find(m=>m.id==='${mod.id}').title=this.value; window.saveDataToCloud()"></div>`;
+                    titleHtml = `<div class="flex items-center gap-2 w-2/3"><span class="text-xl md:text-3xl">${mod.icon}</span> <input type="text" class="custom-input text-base md:text-xl font-black uppercase !py-1.5" value="${mod.title}" onchange="state.activeModules.find(m=>m.id==='${mod.id}').title=this.value; window.saveDataToCloud()"></div>`;
                 } else {
-                    titleHtml = `<h2 class="text-xl md:text-4xl font-black uppercase tracking-tight opacity-80 flex items-center gap-2 md:gap-3">${mod.icon} ${mod.title}</h2>`;
+                    titleHtml = `<h2 class="text-lg md:text-3xl font-black uppercase tracking-tight opacity-80 flex items-center gap-2 md:gap-3">${mod.icon} ${mod.title}</h2>`;
                 }
 
                 let settingsBtnHtml = '';
                 if (mod.type !== 'pomodoro') {
-                    settingsBtnHtml = `<button onclick="toggleInlineEdit('${mod.id}')" class="text-xl md:text-2xl ${isEdit ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'} w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-xl hover:opacity-80 transition shadow-sm shrink-0 pointer-events-auto relative z-50">
+                    settingsBtnHtml = `<button onclick="toggleInlineEdit('${mod.id}')" class="text-lg md:text-xl ${isEdit ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'} w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-xl hover:opacity-80 transition shadow-sm shrink-0 pointer-events-auto relative z-50">
                                             ${isEdit ? '✅' : '⚙️'}
                                        </button>`;
                 }
 
                 html += `<div class="dashboard-slide ${currentSlideIndex === index + 1 ? 'active' : ''}" id="slide-${mod.id}">
-                            <div class="module-full-content glass-card p-4 sm:p-6 md:p-10 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
-                                <div class="flex justify-between items-center mb-3 md:mb-6 pb-2 md:pb-4 border-b border-black/10 shrink-0">
+                            <div class="module-full-content glass-card p-4 sm:p-5 md:p-6 shadow-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
+                                <div class="flex justify-between items-center mb-3 pb-2 border-b border-black/10 shrink-0">
                                     ${titleHtml}
                                     ${settingsBtnHtml}
                                 </div>
@@ -1408,32 +1411,32 @@
 
             // --- SLIDE N+1: PLATFORM MENÜSÜ ---
             html += `<div class="dashboard-slide ${currentSlideIndex === state.activeModules.length + 1 ? 'active' : ''}" id="slide-menu">
-                <div class="module-full-content glass-card p-6 sm:p-10 md:p-16 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
-                    <h2 class="text-2xl md:text-5xl font-black text-indigo-600 dark:text-indigo-400 mb-6 md:mb-12 border-b border-black/10 pb-4 w-full text-center">Platform Menüsü</h2>
+                <div class="module-full-content glass-card p-4 sm:p-6 md:p-8 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
+                    <h2 class="text-xl md:text-4xl font-black text-indigo-600 dark:text-indigo-400 mb-4 md:mb-8 border-b border-black/10 pb-3 w-full text-center">Platform Menüsü</h2>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 w-full max-w-3xl relative z-10 pointer-events-auto">
-                        <button onclick="openGlobalSettings()" class="bg-indigo-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-indigo-100 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
-                            <span class="text-3xl md:text-5xl group-hover:scale-110 transition">⚙️</span>
-                            <span class="font-black text-base md:text-xl text-indigo-900 dark:text-indigo-100">Ayarlar & Düzenle</span>
-                            <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-indigo-700 dark:text-indigo-300">Tema, Modül Sırası ve Yeni Araç</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6 w-full max-w-3xl relative z-10 pointer-events-auto">
+                        <button onclick="openGlobalSettings()" class="bg-indigo-50 dark:bg-slate-800 p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-md border border-indigo-100 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-3 text-center group">
+                            <span class="text-2xl md:text-4xl group-hover:scale-110 transition">⚙️</span>
+                            <span class="font-black text-sm md:text-lg text-indigo-900 dark:text-indigo-100">Ayarlar & Düzenle</span>
+                            <span class="hidden md:block text-[10px] md:text-xs font-semibold opacity-70 text-indigo-700 dark:text-indigo-300">Tema, Modül Sırası ve Yeni Araç</span>
                         </button>
                         
-                        <button onclick="window.showDialog('İletişim', 'Sorularınız, önerileriniz veya iş birlikleri için bize ulaşın:<br><br><b>Destek E-Posta:</b> destek@kisiselasistanim.com<br><b>Telefon:</b> +90 850 123 45 67')" class="bg-emerald-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-emerald-100 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
-                            <span class="text-3xl md:text-5xl group-hover:scale-110 transition">📞</span>
-                            <span class="font-black text-base md:text-xl text-emerald-900 dark:text-emerald-100">İletişim</span>
-                            <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-emerald-700 dark:text-emerald-300">Destek ve Sorularınız İçin</span>
+                        <button onclick="window.showDialog('İletişim', 'Sorularınız, önerileriniz veya iş birlikleri için bize ulaşın:<br><br><b>Destek E-Posta:</b> destek@kisiselasistanim.com<br><b>Telefon:</b> +90 850 123 45 67')" class="bg-emerald-50 dark:bg-slate-800 p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-md border border-emerald-100 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-3 text-center group">
+                            <span class="text-2xl md:text-4xl group-hover:scale-110 transition">📞</span>
+                            <span class="font-black text-sm md:text-lg text-emerald-900 dark:text-emerald-100">İletişim</span>
+                            <span class="hidden md:block text-[10px] md:text-xs font-semibold opacity-70 text-emerald-700 dark:text-emerald-300">Destek ve Sorularınız İçin</span>
                         </button>
                         
-                        <button onclick="window.showDialog('Şikayet & Geri Bildirim', 'Karşılaştığınız sorunları veya platformla ilgili şikayetlerinizi doğrudan ekibimize iletebilirsiniz.<br><br><b>Şikayet Hattı:</b> sikayet@kisiselasistanim.com<br>Veya panel üzerinden formu kullanabilirsiniz.')" class="bg-amber-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-amber-100 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
-                            <span class="text-3xl md:text-5xl group-hover:scale-110 transition">⚠️</span>
-                            <span class="font-black text-base md:text-xl text-amber-900 dark:text-amber-100">Şikayet / Bildirim</span>
-                            <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-amber-700 dark:text-amber-300">Sorun Bildirin veya Öneri Sunun</span>
+                        <button onclick="window.showDialog('Şikayet & Geri Bildirim', 'Karşılaştığınız sorunları veya platformla ilgili şikayetlerinizi doğrudan ekibimize iletebilirsiniz.<br><br><b>Şikayet Hattı:</b> sikayet@kisiselasistanim.com<br>Veya panel üzerinden formu kullanabilirsiniz.')" class="bg-amber-50 dark:bg-slate-800 p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-md border border-amber-100 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-3 text-center group">
+                            <span class="text-2xl md:text-4xl group-hover:scale-110 transition">⚠️</span>
+                            <span class="font-black text-sm md:text-lg text-amber-900 dark:text-amber-100">Şikayet / Bildirim</span>
+                            <span class="hidden md:block text-[10px] md:text-xs font-semibold opacity-70 text-amber-700 dark:text-amber-300">Sorun Bildirin veya Öneri Sunun</span>
                         </button>
 
-                        <button onclick="handleLogout()" class="bg-red-50 dark:bg-slate-800 p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-md border border-red-100 dark:border-slate-700 hover:border-red-400 dark:hover:border-red-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-4 text-center group">
-                            <span class="text-3xl md:text-5xl group-hover:scale-110 transition">🚪</span>
-                            <span class="font-black text-base md:text-xl text-red-700 dark:text-red-400">Çıkış Yap</span>
-                            <span class="hidden md:block text-xs md:text-sm font-semibold opacity-70 text-red-600 dark:text-red-300">Oturumu Güvenle Kapatın</span>
+                        <button onclick="handleLogout()" class="bg-red-50 dark:bg-slate-800 p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-md border border-red-100 dark:border-slate-700 hover:border-red-400 dark:hover:border-red-500 transition transform hover:-translate-y-1 flex flex-col items-center gap-2 md:gap-3 text-center group">
+                            <span class="text-2xl md:text-4xl group-hover:scale-110 transition">🚪</span>
+                            <span class="font-black text-sm md:text-lg text-red-700 dark:text-red-400">Çıkış Yap</span>
+                            <span class="hidden md:block text-[10px] md:text-xs font-semibold opacity-70 text-red-600 dark:text-red-300">Oturumu Güvenle Kapatın</span>
                         </button>
                     </div>
                 </div>
@@ -1442,39 +1445,39 @@
             // --- SLIDE N+2 (ADMİN PANELİ - SADECE YÖNETİCİYE GÖZÜKÜR) ---
             if(isAdmin) {
                 let adminHtml = `<div class="dashboard-slide ${currentSlideIndex === totalSlides - 1 ? 'active' : ''}" id="slide-admin">
-                    <div class="module-full-content glass-card p-6 sm:p-10 md:p-16 shadow-2xl flex flex-col bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
-                        <h2 class="text-3xl md:text-4xl font-black text-red-600 mb-6 border-b border-red-200 pb-4 flex items-center gap-3">👑 Yönetici Paneli</h2>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full relative z-10 pointer-events-auto">
+                    <div class="module-full-content glass-card p-4 sm:p-6 md:p-8 shadow-2xl flex flex-col bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
+                        <h2 class="text-2xl md:text-3xl font-black text-red-600 mb-4 border-b border-red-200 pb-3 flex items-center gap-2">👑 Yönetici Paneli</h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 w-full relative z-10 pointer-events-auto">
                             
                             <!-- Global Söz Yönetimi -->
-                            <div class="bg-amber-50 dark:bg-slate-800 p-5 rounded-2xl shadow-inner border border-amber-200 h-fit max-h-[600px] flex flex-col">
-                                <div class="flex flex-wrap justify-between items-center mb-4 border-b border-amber-200 pb-2">
-                                    <h3 class="font-black text-amber-800 dark:text-amber-400 text-sm md:text-base mb-2 md:mb-0">Motivasyon Kategorileri</h3>
+                            <div class="bg-amber-50 dark:bg-slate-800 p-4 rounded-2xl shadow-inner border border-amber-200 h-fit max-h-[600px] flex flex-col">
+                                <div class="flex flex-wrap justify-between items-center mb-3 border-b border-amber-200 pb-2">
+                                    <h3 class="font-black text-amber-800 dark:text-amber-400 text-xs md:text-sm mb-2 md:mb-0">Motivasyon Kategorileri</h3>
                                     <div class="flex gap-2">
-                                        ${globalQuoteCategories.length === 0 ? '<button onclick="window.adminLoadDefaultCategories()" class="bg-amber-200 text-amber-800 px-3 py-1.5 rounded shadow hover:bg-amber-300 text-[10px] font-bold">Örnekleri Yükle</button>' : ''}
-                                        <button onclick="window.adminAddQuoteCategory()" class="bg-amber-500 text-white px-3 py-1.5 rounded shadow hover:bg-amber-600 text-xs font-bold">+ Kategori</button>
+                                        ${globalQuoteCategories.length === 0 ? '<button onclick="window.adminLoadDefaultCategories()" class="bg-amber-200 text-amber-800 px-2 py-1 rounded shadow hover:bg-amber-300 text-[9px] font-bold">Örnekleri Yükle</button>' : ''}
+                                        <button onclick="window.adminAddQuoteCategory()" class="bg-amber-500 text-white px-3 py-1.5 rounded shadow hover:bg-amber-600 text-[10px] md:text-xs font-bold">+ Kategori</button>
                                     </div>
                                 </div>
-                                <div class="space-y-4 overflow-y-auto custom-scroll pr-2 flex-1">
+                                <div class="space-y-3 overflow-y-auto custom-scroll pr-2 flex-1">
                                     ${globalQuoteCategories.length === 0 ? '<p class="text-xs opacity-50">Henüz kategori yok.</p>' : ''}
                                     ${globalQuoteCategories.map(cat => `
                                         <div class="bg-white/80 dark:bg-black/30 p-3 rounded-xl border border-black/10">
                                             <div class="flex flex-wrap gap-2 justify-between items-center mb-2 border-b border-black/5 pb-2">
-                                                <h4 class="font-bold text-sm flex items-center gap-2 flex-1 min-w-[120px]">
+                                                <h4 class="font-bold text-xs md:text-sm flex items-center gap-2 flex-1 min-w-[120px]">
                                                     <span class="${cat.active ? 'text-emerald-500' : 'text-slate-400'}">${cat.active ? '●' : '○'}</span> <span class="truncate">${cat.name}</span>
                                                 </h4>
                                                 <div class="flex items-center gap-1 shrink-0">
-                                                    <button onclick="window.adminToggleQuoteCategory('${cat.id}', ${cat.active})" class="text-[9px] font-bold px-2 py-1.5 rounded ${cat.active ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}">${cat.active ? 'GİZLE' : 'AKTİF ET'}</button>
-                                                    <button onclick="window.adminAddQuoteToCategory('${cat.id}', '${JSON.stringify(cat.list || []).replace(/'/g, "\\'").replace(/"/g, '&quot;')}')" class="text-[9px] font-bold px-2 py-1.5 rounded bg-indigo-100 text-indigo-700 hover:bg-indigo-200">+ SÖZ EKLE</button>
-                                                    <button onclick="window.adminDeleteQuoteCategory('${cat.id}')" class="text-[9px] font-bold px-2 py-1.5 rounded bg-red-100 text-red-700 hover:bg-red-200">SİL</button>
+                                                    <button onclick="window.adminToggleQuoteCategory('${cat.id}', ${cat.active})" class="text-[8px] md:text-[9px] font-bold px-2 py-1 rounded ${cat.active ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}">${cat.active ? 'GİZLE' : 'AKTİF ET'}</button>
+                                                    <button onclick="window.adminAddQuoteToCategory('${cat.id}', '${JSON.stringify(cat.list || []).replace(/'/g, "\\'").replace(/"/g, '&quot;')}')" class="text-[8px] md:text-[9px] font-bold px-2 py-1 rounded bg-indigo-100 text-indigo-700 hover:bg-indigo-200">+ SÖZ EKLE</button>
+                                                    <button onclick="window.adminDeleteQuoteCategory('${cat.id}')" class="text-[8px] md:text-[9px] font-bold px-2 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200">SİL</button>
                                                 </div>
                                             </div>
                                             <div class="space-y-1.5 pl-2">
-                                                ${(!cat.list || cat.list.length === 0) ? '<p class="text-[10px] opacity-50 italic">Söz yok.</p>' : ''}
+                                                ${(!cat.list || cat.list.length === 0) ? '<p class="text-[9px] opacity-50 italic">Söz yok.</p>' : ''}
                                                 ${(cat.list || []).map((q, i) => `
                                                     <div class="flex justify-between items-start gap-2 group">
-                                                        <p class="text-[11px] font-medium opacity-80 flex-1 leading-tight border-l-2 border-amber-300 pl-2 py-0.5">- "${q}"</p>
-                                                        <button onclick="window.adminRemoveQuoteFromCategory('${cat.id}', '${JSON.stringify(cat.list).replace(/'/g, "\\'").replace(/"/g, '&quot;')}', ${i})" class="text-red-500 font-bold text-[9px] opacity-0 group-hover:opacity-100 transition bg-red-50 hover:bg-red-100 px-1.5 py-0.5 rounded shrink-0">X</button>
+                                                        <p class="text-[10px] md:text-[11px] font-medium opacity-80 flex-1 leading-tight border-l-2 border-amber-300 pl-2 py-0.5">- "${q}"</p>
+                                                        <button onclick="window.adminRemoveQuoteFromCategory('${cat.id}', '${JSON.stringify(cat.list).replace(/'/g, "\\'").replace(/"/g, '&quot;')}', ${i})" class="text-red-500 font-bold text-[8px] opacity-0 group-hover:opacity-100 transition bg-red-50 hover:bg-red-100 px-1.5 py-0.5 rounded shrink-0">X</button>
                                                     </div>
                                                 `).join('')}
                                             </div>
@@ -1483,34 +1486,34 @@
                                 </div>
                             </div>
 
-                            <div class="flex flex-col gap-6 h-fit">
+                            <div class="flex flex-col gap-4 md:gap-6 h-fit">
                                 <!-- Global Duyurular -->
-                                <div class="bg-indigo-50 dark:bg-slate-800 p-5 rounded-2xl shadow-inner border border-indigo-200">
-                                    <div class="flex justify-between items-center mb-4 border-b border-indigo-200 pb-2">
-                                        <h3 class="font-black text-indigo-800 dark:text-indigo-400 text-sm md:text-base">Genel Duyurular</h3>
-                                        <button onclick="window.adminAddAnnouncement()" class="bg-indigo-500 text-white px-4 py-1.5 rounded shadow hover:bg-indigo-600 text-xs font-bold">+ Ekle</button>
+                                <div class="bg-indigo-50 dark:bg-slate-800 p-4 rounded-2xl shadow-inner border border-indigo-200">
+                                    <div class="flex justify-between items-center mb-3 border-b border-indigo-200 pb-2">
+                                        <h3 class="font-black text-indigo-800 dark:text-indigo-400 text-xs md:text-sm">Genel Duyurular</h3>
+                                        <button onclick="window.adminAddAnnouncement()" class="bg-indigo-500 text-white px-3 py-1.5 rounded shadow hover:bg-indigo-600 text-[10px] md:text-xs font-bold">+ Ekle</button>
                                     </div>
                                     <div class="space-y-2 max-h-48 overflow-y-auto custom-scroll pr-2">
                                         ${publicAnnouncements.length === 0 ? '<p class="text-xs opacity-50">Duyuru yok.</p>' : ''}
                                         ${publicAnnouncements.map(a => `
-                                            <div class="flex justify-between items-center bg-white/80 dark:bg-black/30 p-2.5 rounded-lg border border-black/5">
-                                                <p class="text-xs font-bold opacity-80 flex-1 mr-2 line-clamp-2" title="${a.text}">${a.text}</p>
-                                                <button onclick="window.adminDeleteAnnouncement('${a.id}')" class="text-red-500 font-bold text-[10px] bg-red-100 hover:bg-red-200 px-3 py-1.5 rounded shrink-0">SİL</button>
+                                            <div class="flex justify-between items-center bg-white/80 dark:bg-black/30 p-2 rounded-lg border border-black/5">
+                                                <p class="text-[10px] md:text-xs font-bold opacity-80 flex-1 mr-2 line-clamp-2" title="${a.text}">${a.text}</p>
+                                                <button onclick="window.adminDeleteAnnouncement('${a.id}')" class="text-red-500 font-bold text-[8px] bg-red-100 hover:bg-red-200 px-2 py-1 rounded shrink-0">SİL</button>
                                             </div>
                                         `).join('')}
                                     </div>
                                 </div>
 
                                 <!-- Kullanıcı İzleme (Users Tracker) -->
-                                <div class="bg-emerald-50 dark:bg-slate-800 p-5 rounded-2xl shadow-inner border border-emerald-200">
-                                    <h3 class="font-black text-emerald-800 dark:text-emerald-400 mb-4 border-b border-emerald-200 pb-2 text-sm md:text-base">Sistemdeki Kullanıcılar (${allUsers.length})</h3>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto custom-scroll pr-2">
+                                <div class="bg-emerald-50 dark:bg-slate-800 p-4 rounded-2xl shadow-inner border border-emerald-200">
+                                    <h3 class="font-black text-emerald-800 dark:text-emerald-400 mb-3 border-b border-emerald-200 pb-2 text-xs md:text-sm">Sistemdeki Kullanıcılar (${allUsers.length})</h3>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto custom-scroll pr-2">
                                         ${allUsers.length === 0 ? '<p class="text-xs opacity-50">Kullanıcı bulunamadı.</p>' : ''}
                                         ${allUsers.map(u => `
-                                            <div onclick="window.viewUserProfile('${u.id}', '${u.email}')" class="bg-white/80 dark:bg-black/30 p-4 rounded-xl border border-black/10 flex flex-col hover:border-emerald-500 cursor-pointer transition group shadow-sm">
-                                                <span class="font-black text-sm truncate text-emerald-900 dark:text-emerald-300 group-hover:text-emerald-600 transition" title="${u.email}">${u.email}</span>
-                                                <span class="text-xs opacity-80 font-bold mt-1.5">Proje: ${u.projectName || 'Belirtilmedi'}</span>
-                                                <span class="text-[10px] opacity-60 mt-1">Son Görülme: ${new Date(u.lastActive).toLocaleString('tr-TR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}</span>
+                                            <div onclick="window.viewUserProfile('${u.id}', '${u.email}')" class="bg-white/80 dark:bg-black/30 p-3 rounded-xl border border-black/10 flex flex-col hover:border-emerald-500 cursor-pointer transition group shadow-sm">
+                                                <span class="font-black text-[10px] md:text-xs truncate text-emerald-900 dark:text-emerald-300 group-hover:text-emerald-600 transition" title="${u.email}">${u.email}</span>
+                                                <span class="text-[9px] md:text-[10px] opacity-80 font-bold mt-1">Proje: ${u.projectName || 'Belirtilmedi'}</span>
+                                                <span class="text-[8px] opacity-60 mt-1">Son Görülme: ${new Date(u.lastActive).toLocaleString('tr-TR', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}</span>
                                             </div>
                                         `).join('')}
                                     </div>
@@ -1563,8 +1566,8 @@
             let html = '';
             ALL_THEMES.forEach(t => {
                 let borderClass = state.theme === t.id ? 'border-indigo-600 bg-indigo-100 text-indigo-800 shadow-md dark:bg-indigo-900/80 dark:text-indigo-100 scale-105 transform' : 'border-black/10 opacity-70 hover:opacity-100 bg-white dark:bg-slate-700 hover:scale-105 transform';
-                html += `<div onclick="selectTheme('${t.id}', false)" class="p-2 md:p-3 border-2 rounded-xl cursor-pointer font-bold text-center transition-all ${borderClass} flex flex-col items-center gap-1 md:gap-2">
-                            <span class="text-xl md:text-2xl">${t.icon}</span><span class="truncate w-full">${t.name}</span>
+                html += `<div onclick="selectTheme('${t.id}', false)" class="p-2 border-2 rounded-xl cursor-pointer font-bold text-center transition-all ${borderClass} flex flex-col items-center gap-1">
+                            <span class="text-lg md:text-xl">${t.icon}</span><span class="truncate w-full text-[9px] md:text-[10px]">${t.name}</span>
                         </div>`;
             });
             document.getElementById('settings-theme-grid').innerHTML = html;
@@ -1597,30 +1600,30 @@
             const container = document.getElementById('settings-module-management');
             let html = '';
             
-            html += '<h4 class="text-xs md:text-sm font-black text-indigo-600 mb-3 uppercase tracking-widest border-b border-black/10 pb-2">📱 Aktif Araçlar (Sayfa Sırası)</h4>';
-            html += '<div class="space-y-3 mb-8">';
-            if(state.activeModules.length === 0) html += '<p class="text-xs opacity-50 font-bold p-4 bg-black/5 rounded-xl text-center">Aktif araç yok.</p>';
+            html += '<h4 class="text-[10px] md:text-xs font-black text-indigo-600 mb-2 uppercase tracking-widest border-b border-black/10 pb-2">📱 Aktif Araçlar (Sayfa Sırası)</h4>';
+            html += '<div class="space-y-2 mb-6">';
+            if(state.activeModules.length === 0) html += '<p class="text-[10px] opacity-50 font-bold p-3 bg-black/5 rounded-xl text-center">Aktif araç yok.</p>';
             state.activeModules.forEach((m, idx) => {
-                html += `<div class="flex items-center justify-between p-3 border-2 border-indigo-100 dark:border-indigo-900/50 rounded-xl bg-white dark:bg-slate-800 shadow-sm">
-                    <div class="font-bold text-sm flex items-center gap-3 flex-1 truncate"><span class="text-xl md:text-2xl w-8 text-center">${m.icon}</span> <span class="truncate">${m.title}</span> <span class="hidden sm:inline-block text-[10px] ml-2 text-indigo-500 font-black bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">Sayfa ${idx+2}</span></div>
+                html += `<div class="flex items-center justify-between p-2 border-2 border-indigo-100 dark:border-indigo-900/50 rounded-xl bg-white dark:bg-slate-800 shadow-sm">
+                    <div class="font-bold text-xs flex items-center gap-2 flex-1 truncate"><span class="text-base w-6 text-center">${m.icon}</span> <span class="truncate">${m.title}</span> <span class="hidden sm:inline-block text-[8px] ml-1 text-indigo-500 font-black bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">Sayfa ${idx+2}</span></div>
                     <div class="flex items-center gap-1 shrink-0 bg-slate-50 dark:bg-slate-700 p-1 rounded-lg">
-                        <button onclick="window.moveModuleList(${idx}, -1)" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-white dark:bg-slate-600 rounded shadow-sm font-bold hover:bg-indigo-50" ${idx===0?'disabled opacity-30':''}>←</button>
-                        <button onclick="window.moveModuleList(${idx}, 1)" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-white dark:bg-slate-600 rounded shadow-sm font-bold hover:bg-indigo-50" ${idx===state.activeModules.length-1?'disabled opacity-30':''}>→</button>
-                        <div class="w-px h-6 bg-black/10 mx-1"></div>
-                        <button onclick="window.removeActiveModule('${m.id}')" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-red-50 text-red-500 rounded shadow-sm font-bold hover:bg-red-500 hover:text-white">🗑️</button>
+                        <button onclick="window.moveModuleList(${idx}, -1)" class="w-6 h-6 flex items-center justify-center bg-white dark:bg-slate-600 rounded shadow-sm font-bold text-xs hover:bg-indigo-50" ${idx===0?'disabled opacity-30':''}>←</button>
+                        <button onclick="window.moveModuleList(${idx}, 1)" class="w-6 h-6 flex items-center justify-center bg-white dark:bg-slate-600 rounded shadow-sm font-bold text-xs hover:bg-indigo-50" ${idx===state.activeModules.length-1?'disabled opacity-30':''}>→</button>
+                        <div class="w-px h-4 bg-black/10 mx-0.5"></div>
+                        <button onclick="window.removeActiveModule('${m.id}')" class="w-6 h-6 flex items-center justify-center bg-red-50 text-red-500 rounded shadow-sm font-bold text-xs hover:bg-red-500 hover:text-white">🗑️</button>
                     </div>
                 </div>`;
             });
             html += '</div>';
 
-            html += '<h4 class="text-xs md:text-sm font-black text-slate-500 mb-3 uppercase tracking-widest border-b border-black/10 pb-2">➕ Pasif Araçlar (Ekle)</h4>';
-            html += '<div class="space-y-3">';
+            html += '<h4 class="text-[10px] md:text-xs font-black text-slate-500 mb-2 uppercase tracking-widest border-b border-black/10 pb-2">➕ Pasif Araçlar (Ekle)</h4>';
+            html += '<div class="space-y-2">';
             const inactive = state.modules.filter(m => !state.activeModules.some(active => active.id === m.id));
-            if(inactive.length === 0) html += '<p class="text-xs opacity-50 font-bold p-4 bg-black/5 rounded-xl text-center">Tüm araçlar ekli.</p>';
+            if(inactive.length === 0) html += '<p class="text-[10px] opacity-50 font-bold p-3 bg-black/5 rounded-xl text-center">Tüm araçlar ekli.</p>';
             inactive.forEach(m => {
-                html += `<div class="flex flex-wrap sm:flex-nowrap items-center justify-between p-3 md:p-4 border-2 border-black/10 border-dashed rounded-xl bg-white/50 dark:bg-slate-800/50 transition hover:border-indigo-300 gap-2">
-                    <div class="font-bold text-sm md:text-base flex items-center gap-3"><span class="text-xl md:text-2xl w-8 text-center">${m.icon}</span> ${m.title}</div>
-                    <button onclick="window.addModuleFromSettings('${m.id}')" class="bg-indigo-600 text-white w-full sm:w-auto px-5 py-2 rounded-lg text-xs md:text-sm font-bold hover:bg-indigo-700 shadow-sm">+ Ekle</button>
+                html += `<div class="flex flex-wrap sm:flex-nowrap items-center justify-between p-2 border-2 border-black/10 border-dashed rounded-xl bg-white/50 dark:bg-slate-800/50 transition hover:border-indigo-300 gap-2">
+                    <div class="font-bold text-xs flex items-center gap-2"><span class="text-base w-6 text-center">${m.icon}</span> ${m.title}</div>
+                    <button onclick="window.addModuleFromSettings('${m.id}')" class="bg-indigo-600 text-white px-3 py-1 rounded text-[10px] font-bold hover:bg-indigo-700 shadow-sm w-full sm:w-auto">+ Ekle</button>
                 </div>`;
             });
             html += '</div>';
@@ -1886,28 +1889,28 @@
             
             let editPanelHtml = '';
             if(isEdit) {
-                editPanelHtml = `<div class="bg-white/50 dark:bg-slate-800/50 p-6 rounded-3xl w-full mx-auto shadow-inner border border-indigo-200 mt-2 mb-6 transition-all duration-300">
-                    <div class="flex justify-between items-center mb-4 border-b border-indigo-100 pb-2">
-                        <div class="flex items-center gap-2 w-full"><span class="text-xl md:text-3xl">${mod.icon}</span> <input type="text" class="custom-input text-lg md:text-xl font-black uppercase !py-1 w-full" value="${mod.title}" onchange="state.activeModules.find(m=>m.id==='${mod.id}').title=this.value; window.saveDataToCloud()"></div>
+                editPanelHtml = `<div class="bg-white/50 dark:bg-slate-800/50 p-4 md:p-5 rounded-2xl md:rounded-3xl w-full mx-auto shadow-inner border border-indigo-200 mt-2 mb-4 transition-all duration-300">
+                    <div class="flex justify-between items-center mb-3 border-b border-indigo-100 pb-2">
+                        <div class="flex items-center gap-2 w-full"><span class="text-xl md:text-2xl">${mod.icon}</span> <input type="text" class="custom-input text-base md:text-lg font-black uppercase !py-1 w-full" value="${mod.title}" onchange="state.activeModules.find(m=>m.id==='${mod.id}').title=this.value; window.saveDataToCloud()"></div>
                     </div>
-                    <div class="space-y-3 max-h-[50vh] overflow-y-auto custom-scroll pr-2">`;
+                    <div class="space-y-2 max-h-[50vh] overflow-y-auto custom-scroll pr-2">`;
                 
                 data.forEach((d, i) => {
                     let emojis = ''; EMOJI_LIST.forEach(e => { emojis += `<option value="${e}" ${d.emoji === e ? 'selected' : ''}>${e}</option>`; });
-                    editPanelHtml += `<div class="flex flex-wrap md:flex-nowrap items-center gap-2 p-3 bg-white dark:bg-slate-700 rounded-xl shadow-sm border border-black/5">
-                        <select class="custom-input !py-2 !px-1 w-12 md:w-16 text-center text-xl" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'emoji', this.value)">${emojis}</select>
-                        <input type="text" class="custom-input !py-2 flex-1" value="${d.title}" placeholder="Kategori Adı" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'title', this.value)">
+                    editPanelHtml += `<div class="flex flex-wrap md:flex-nowrap items-center gap-2 p-2 bg-white dark:bg-slate-700 rounded-xl shadow-sm border border-black/5">
+                        <select class="custom-input !py-1.5 !px-1 w-10 md:w-12 text-center text-sm" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'emoji', this.value)">${emojis}</select>
+                        <input type="text" class="custom-input !py-1.5 flex-1 text-xs md:text-sm" value="${d.title}" placeholder="Kategori Adı" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'title', this.value)">
                         <div class="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
-                            <input type="number" class="custom-input !py-2 w-20 text-center" value="${d.completed}" title="Tamamlanan" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'completed', parseInt(this.value))">
+                            <input type="number" class="custom-input !py-1.5 w-16 text-center text-xs" value="${d.completed}" title="Tamamlanan" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'completed', parseInt(this.value))">
                             <span class="font-black opacity-50">/</span>
-                            <input type="number" class="custom-input !py-2 w-20 text-center" value="${d.total}" title="Hedef" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'total', parseInt(this.value))">
-                            <button onclick="window.deleteModuleItem('${mod.id}', ${i}, 'stat')" class="bg-red-100 text-red-600 px-4 py-2 rounded-xl hover:bg-red-200">🗑️</button>
+                            <input type="number" class="custom-input !py-1.5 w-16 text-center text-xs" value="${d.total}" title="Hedef" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'total', parseInt(this.value))">
+                            <button onclick="window.deleteModuleItem('${mod.id}', ${i}, 'stat')" class="bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs hover:bg-red-200">🗑️</button>
                         </div>
                     </div>`;
                 });
                 
                 editPanelHtml += `</div>
-                    <button onclick="window.addNewData('${mod.id}', 'stat')" class="w-full mt-4 bg-indigo-50/50 text-indigo-600 font-bold py-3 rounded-xl border-2 border-dashed border-indigo-200 hover:bg-indigo-100 transition">+ Yeni Kategori Ekle</button>
+                    <button onclick="window.addNewData('${mod.id}', 'stat')" class="w-full mt-3 bg-indigo-50/50 text-indigo-600 font-bold py-2 rounded-xl border-2 border-dashed border-indigo-200 hover:bg-indigo-100 transition text-xs">+ Yeni Kategori Ekle</button>
                 </div>`;
             }
 
@@ -1917,127 +1920,127 @@
             
             let html = editPanelHtml; 
             
-            html += '<div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10 w-full shrink-0">';
-            html += `<div class="glass-card p-4 md:p-6 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-[10px] md:text-sm font-black uppercase opacity-60">Başarı</p><p class="text-3xl md:text-5xl font-black flame-gold mt-2">%${overall}</p></div>`;
-            html += `<div class="glass-card p-4 md:p-6 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-[10px] md:text-sm font-black uppercase opacity-60">Biten</p><p class="text-3xl md:text-5xl font-black mt-2">${tDone}</p></div>`;
-            html += `<div class="glass-card p-4 md:p-6 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-[10px] md:text-sm font-black uppercase opacity-60">Kalan</p><p class="text-3xl md:text-5xl font-black text-indigo-600 mt-2">${tTarget-tDone}</p></div>`;
-            html += `<div class="glass-card p-4 md:p-6 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-[10px] md:text-sm font-black uppercase opacity-60">Kategori</p><p class="text-3xl md:text-5xl font-black mt-2">${data.length}</p></div>`;
+            html += '<div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-6 w-full shrink-0">';
+            html += `<div class="glass-card p-3 md:p-4 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-[9px] md:text-[10px] font-black uppercase opacity-60">Başarı</p><p class="text-xl md:text-3xl font-black flame-gold mt-1">%${overall}</p></div>`;
+            html += `<div class="glass-card p-3 md:p-4 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-[9px] md:text-[10px] font-black uppercase opacity-60">Biten</p><p class="text-xl md:text-3xl font-black mt-1">${tDone}</p></div>`;
+            html += `<div class="glass-card p-3 md:p-4 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-[9px] md:text-[10px] font-black uppercase opacity-60">Kalan</p><p class="text-xl md:text-3xl font-black text-indigo-600 mt-1">${tTarget-tDone}</p></div>`;
+            html += `<div class="glass-card p-3 md:p-4 text-center border border-black/5 bg-white/50 dark:bg-black/20"><p class="text-[9px] md:text-[10px] font-black uppercase opacity-60">Kategori</p><p class="text-xl md:text-3xl font-black mt-1">${data.length}</p></div>`;
             html += '</div>';
             
-            html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-start w-full min-h-[300px]">';
-            html += `<div class="w-full h-[250px] md:h-[350px] relative flex items-center justify-center p-2 md:p-4 bg-white/50 dark:bg-black/20 rounded-3xl border border-black/5"><canvas id="radarChart-${mod.id}"></canvas></div>`;
-            html += '<div class="space-y-4 md:space-y-6 w-full max-h-[350px] overflow-y-auto custom-scroll pr-2">';
+            html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-start w-full min-h-[250px]">';
+            html += `<div class="w-full h-[200px] md:h-[250px] relative flex items-center justify-center p-2 bg-white/50 dark:bg-black/20 rounded-2xl md:rounded-3xl border border-black/5"><canvas id="radarChart-${mod.id}"></canvas></div>`;
+            html += '<div class="space-y-3 md:space-y-4 w-full max-h-[300px] overflow-y-auto custom-scroll pr-2">';
             
             data.forEach(s => {
                 const perc = s.total > 0 ? Math.round((s.completed/s.total)*100) : 0;
-                html += `<div><div class="flex justify-between text-sm md:text-base font-bold mb-2 opacity-80"><span>${s.emoji} ${s.title} <span class="opacity-50 text-xs ml-2">(${s.completed}/${s.total})</span></span> <span>%${perc}</span></div>`;
-                html += `<div class="h-3 md:h-4 bg-black/10 rounded-full overflow-hidden shadow-inner"><div class="h-full transition-all duration-1000" style="width:${perc}%; background-color: hsl(${perc * 1.2}, 80%, 45%);"></div></div></div>`;
+                html += `<div><div class="flex justify-between text-xs md:text-sm font-bold mb-1 opacity-80"><span>${s.emoji} ${s.title} <span class="opacity-50 text-[10px] ml-1">(${s.completed}/${s.total})</span></span> <span>%${perc}</span></div>`;
+                html += `<div class="h-2 md:h-3 bg-black/10 rounded-full overflow-hidden shadow-inner"><div class="h-full transition-all duration-1000" style="width:${perc}%; background-color: hsl(${perc * 1.2}, 80%, 45%);"></div></div></div>`;
             });
             html += '</div></div>';
             return html;
         }
 
         window.renderTasks = function(mod, isEdit) {
-            let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full pb-8">';
+            let html = '<div class="flex flex-col gap-2 md:gap-3 mt-3 w-full pb-4">';
             mod.data.forEach((d, i) => {
                 const progress = parseInt(d.progress || 0);
                 let badgeClass = d.status === 'Yapıldı' ? 'badge-done' : (d.status === 'Diğer' ? 'badge-other' : 'badge-pending');
                 let isItemEdit = state.itemEdit && state.itemEdit[mod.id + '_' + i];
 
                 if (isItemEdit) {
-                    html += `<div class="bg-indigo-50/50 dark:bg-slate-800/80 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 border border-indigo-300 shadow-inner">`;
-                    html += `<div class="flex-1 space-y-2 w-full">
-                                <input type="text" class="inline-edit-input text-sm md:text-base" value="${d.task}" placeholder="Görev Başlığı" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'task', this.value)">
-                                <input type="text" class="inline-edit-input text-xs font-normal italic opacity-80" value="${d.note || ''}" placeholder="Kısa bir not ekle..." onchange="window.inlineUpdateData('${mod.id}', ${i}, 'note', this.value)">
+                    html += `<div class="bg-indigo-50/50 dark:bg-slate-800/80 rounded-xl p-3 md:p-4 flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border border-indigo-300 shadow-inner">`;
+                    html += `<div class="flex-1 space-y-1 w-full">
+                                <input type="text" class="inline-edit-input text-xs md:text-sm !py-1" value="${d.task}" placeholder="Görev Başlığı" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'task', this.value)">
+                                <input type="text" class="inline-edit-input text-[10px] font-normal italic opacity-80 !py-1" value="${d.note || ''}" placeholder="Kısa bir not ekle..." onchange="window.inlineUpdateData('${mod.id}', ${i}, 'note', this.value)">
                              </div>`;
-                    html += `<div class="w-full md:w-1/3 flex items-center gap-3">
+                    html += `<div class="w-full md:w-1/3 flex items-center gap-2">
                                 <input type="range" class="w-full" style="accent-color: hsl(${progress * 1.2}, 80%, 45%);" min="0" max="100" step="5" value="${progress}" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'progress', parseInt(this.value))" oninput="this.nextElementSibling.innerText = '%' + this.value; this.style.accentColor = 'hsl(' + (this.value * 1.2) + ', 80%, 45%)'">
-                                <span class="text-xs font-black opacity-60 w-10 text-right">%${progress}</span>
+                                <span class="text-[10px] font-black opacity-60 w-8 text-right">%${progress}</span>
                              </div>`;
                     html += `<div class="flex items-center justify-between md:justify-end gap-2 mt-2 md:mt-0">
-                                <select class="custom-input !py-2 !px-2 text-xs w-28" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'status', this.value)">
+                                <select class="custom-input !py-1 !px-1 text-[10px] w-20" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'status', this.value)">
                                     <option ${d.status==='Yapılmadı'?'selected':''}>Yapılmadı</option>
                                     <option ${d.status==='Yapıldı'?'selected':''}>Yapıldı</option>
                                     <option ${d.status==='Diğer'?'selected':''}>Diğer</option>
                                 </select>
-                                <button onclick="window.deleteModuleItem('${mod.id}', ${i}, 'task')" class="text-red-500 bg-red-100 px-3 py-2 rounded-xl font-bold hover:bg-red-200">SİL</button>
-                                <button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-white bg-emerald-500 px-3 py-2 rounded-xl font-bold hover:bg-emerald-600 shadow-md">KAYDET</button>
+                                <button onclick="window.deleteModuleItem('${mod.id}', ${i}, 'task')" class="text-red-500 bg-red-100 px-2 py-1 rounded-lg font-bold text-[10px] hover:bg-red-200">SİL</button>
+                                <button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-white bg-emerald-500 px-2 py-1 rounded-lg font-bold text-[10px] hover:bg-emerald-600 shadow-sm">KAYDET</button>
                              </div>`;
                     html += `</div>`;
                 } else {
-                    html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 relative group transition border border-transparent hover:border-black/5">`;
+                    html += `<div class="bg-black/5 dark:bg-white/5 rounded-xl p-3 md:p-4 flex flex-col md:flex-row md:items-center gap-2 md:gap-4 relative group transition border border-transparent hover:border-black/5">`;
                     html += `<div class="flex-1">
-                                <div class="font-bold text-sm md:text-base text-slate-800 dark:text-slate-200">${d.task}</div>
-                                <div class="italic opacity-60 text-[11px] md:text-xs mt-1">${d.note || '-'}</div>
+                                <div class="font-bold text-xs md:text-sm text-slate-800 dark:text-slate-200">${d.task}</div>
+                                <div class="italic opacity-60 text-[9px] md:text-[10px] mt-0.5">${d.note || '-'}</div>
                              </div>`;
-                    html += `<div class="w-full md:w-1/3 flex items-center gap-3">
-                                <div class="w-full bg-black/10 rounded-full h-2 md:h-3 overflow-hidden shadow-inner"><div class="h-full transition-all duration-1000" style="width:${progress}%; background-color: hsl(${progress * 1.2}, 80%, 45%);"></div></div>
-                                <span class="text-xs font-black w-10 text-right" style="color: hsl(${progress * 1.2}, 80%, 40%);">%${progress}</span>
+                    html += `<div class="w-full md:w-1/3 flex items-center gap-2">
+                                <div class="w-full bg-black/10 rounded-full h-1.5 md:h-2 overflow-hidden shadow-inner"><div class="h-full transition-all duration-1000" style="width:${progress}%; background-color: hsl(${progress * 1.2}, 80%, 45%);"></div></div>
+                                <span class="text-[10px] font-black w-8 text-right" style="color: hsl(${progress * 1.2}, 80%, 40%);">%${progress}</span>
                              </div>`;
-                    html += `<div class="flex items-center justify-end gap-3 mt-2 md:mt-0">
-                                <span class="status-badge ${badgeClass} text-[10px] md:text-xs">${d.status}</span>
-                                <button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-indigo-600 bg-indigo-100 px-4 py-2 rounded-xl text-[10px] md:text-xs font-black shadow hover:bg-indigo-200 transition opacity-100 md:opacity-0 group-hover:opacity-100">DÜZENLE</button>
+                    html += `<div class="flex items-center justify-end gap-2 mt-1 md:mt-0">
+                                <span class="status-badge ${badgeClass} text-[8px] md:text-[9px] !px-2 !py-1">${d.status}</span>
+                                <button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-indigo-600 bg-indigo-100 px-2 py-1.5 rounded-lg text-[8px] md:text-[9px] font-black shadow hover:bg-indigo-200 transition opacity-100 md:opacity-0 group-hover:opacity-100">DÜZENLE</button>
                              </div>`;
                     html += `</div>`;
                 }
             });
             
-            html += `<button onclick="window.addNewData('${mod.id}', 'task')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Görev Ekle</button>`;
+            html += `<button onclick="window.addNewData('${mod.id}', 'task')" class="text-[10px] md:text-xs font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-4 py-3 rounded-xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-1">+ Yeni Görev Ekle</button>`;
             html += '</div>';
             return html;
         }
 
         window.renderContacts = function(mod, isEdit) {
-            let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full pb-8">';
+            let html = '<div class="flex flex-col gap-2 md:gap-3 mt-3 w-full pb-4">';
             mod.data.forEach((d, i) => {
                 let isItemEdit = state.itemEdit && state.itemEdit[mod.id + '_' + i];
                 
                 if (isItemEdit) {
-                    html += `<div class="bg-indigo-50/50 dark:bg-slate-800/80 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 border border-indigo-300 shadow-inner">`;
-                    html += `<div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full">`;
-                    html += `<div><input type="text" class="inline-edit-input" value="${d.name}" placeholder="Ad Soyad" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'name', this.value)"></div>`;
-                    html += `<div><input type="text" class="inline-edit-input" value="${d.role}" placeholder="Rol" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'role', this.value)"></div>`;
-                    html += `<div><input type="text" class="inline-edit-input" value="${d.contact}" placeholder="Telefon/E-Posta" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'contact', this.value)"></div>`;
-                    html += `<div><input type="text" class="inline-edit-input" value="${d.ref}" placeholder="Referans" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'ref', this.value)"></div>`;
-                    html += `<div class="sm:col-span-2"><input type="text" class="inline-edit-input font-normal italic" value="${d.note||''}" placeholder="Özel Notlar..." onchange="window.inlineUpdateData('${mod.id}', ${i}, 'note', this.value)"></div>`;
+                    html += `<div class="bg-indigo-50/50 dark:bg-slate-800/80 rounded-xl p-3 md:p-4 flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border border-indigo-300 shadow-inner">`;
+                    html += `<div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full">`;
+                    html += `<div><input type="text" class="inline-edit-input !py-1 text-xs" value="${d.name}" placeholder="Ad Soyad" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'name', this.value)"></div>`;
+                    html += `<div><input type="text" class="inline-edit-input !py-1 text-xs" value="${d.role}" placeholder="Rol" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'role', this.value)"></div>`;
+                    html += `<div><input type="text" class="inline-edit-input !py-1 text-xs" value="${d.contact}" placeholder="Telefon/E-Posta" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'contact', this.value)"></div>`;
+                    html += `<div><input type="text" class="inline-edit-input !py-1 text-xs" value="${d.ref}" placeholder="Referans" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'ref', this.value)"></div>`;
+                    html += `<div class="sm:col-span-2"><input type="text" class="inline-edit-input font-normal italic !py-1 text-xs" value="${d.note||''}" placeholder="Özel Notlar..." onchange="window.inlineUpdateData('${mod.id}', ${i}, 'note', this.value)"></div>`;
                     html += `</div>`;
                     html += `<div class="w-full md:w-auto flex justify-end gap-2 mt-2 md:mt-0">
-                                <button onclick="window.deleteModuleItem('${mod.id}', ${i}, 'contact')" class="text-red-500 bg-red-100 px-4 py-2.5 rounded-xl font-bold hover:bg-red-200">SİL</button>
-                                <button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-white bg-emerald-500 px-4 py-2.5 rounded-xl font-bold hover:bg-emerald-600 shadow-md">KAYDET</button>
+                                <button onclick="window.deleteModuleItem('${mod.id}', ${i}, 'contact')" class="text-red-500 bg-red-100 px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-red-200">SİL</button>
+                                <button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-white bg-emerald-500 px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-emerald-600 shadow-sm">KAYDET</button>
                              </div>`;
                     html += `</div>`;
                 } else {
-                    html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 relative group transition border border-transparent hover:border-black/5">`;
-                    html += `<div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full">`;
-                    html += `<div><div class="font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 text-base md:text-lg flex items-center flex-wrap gap-2">${d.name} ${d.role ? `<span class="bg-gradient-to-r from-amber-200 to-orange-300 text-amber-900 px-2 py-0.5 rounded-md text-[9px] font-black uppercase shadow-sm">${d.role}</span>` : ''}</div></div>`;
-                    html += `<div class="text-xs md:text-sm font-medium opacity-80 flex items-center gap-1">${d.contact ? '📞 '+d.contact : ''}</div>`;
-                    html += `<div class="text-xs md:text-sm opacity-80 flex items-center gap-1">${d.ref ? '👤 '+d.ref : ''}</div>`;
+                    html += `<div class="bg-black/5 dark:bg-white/5 rounded-xl p-3 md:p-4 flex flex-col md:flex-row md:items-center gap-2 md:gap-4 relative group transition border border-transparent hover:border-black/5">`;
+                    html += `<div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 w-full">`;
+                    html += `<div><div class="font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 text-sm md:text-base flex items-center flex-wrap gap-1">${d.name} ${d.role ? `<span class="bg-gradient-to-r from-amber-200 to-orange-300 text-amber-900 px-1.5 py-0.5 rounded text-[8px] font-black uppercase shadow-sm">${d.role}</span>` : ''}</div></div>`;
+                    html += `<div class="text-[10px] md:text-xs font-medium opacity-80 flex items-center gap-1">${d.contact ? '📞 '+d.contact : ''}</div>`;
+                    html += `<div class="text-[10px] md:text-xs opacity-80 flex items-center gap-1">${d.ref ? '👤 '+d.ref : ''}</div>`;
                     html += `</div>`;
-                    html += `<div class="w-full md:w-1/4 text-xs md:text-sm italic opacity-60 line-clamp-2 md:truncate">${d.note || '-'}</div>`;
-                    html += `<div class="w-full md:w-auto flex justify-end mt-2 md:mt-0 opacity-100 md:opacity-0 group-hover:opacity-100 transition">
-                                <button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-indigo-600 bg-indigo-100 px-4 py-2 rounded-xl text-[10px] md:text-xs font-black shadow hover:bg-indigo-200">DÜZENLE</button>
+                    html += `<div class="w-full md:w-1/4 text-[10px] md:text-xs italic opacity-60 line-clamp-2 md:truncate">${d.note || '-'}</div>`;
+                    html += `<div class="w-full md:w-auto flex justify-end mt-1 md:mt-0 opacity-100 md:opacity-0 group-hover:opacity-100 transition">
+                                <button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-indigo-600 bg-indigo-100 px-3 py-1.5 rounded-lg text-[8px] md:text-[9px] font-black shadow hover:bg-indigo-200">DÜZENLE</button>
                              </div>`;
                     html += `</div>`;
                 }
             });
             
-            html += `<button onclick="window.addNewData('${mod.id}', 'contact')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Kişi Ekle</button>`;
+            html += `<button onclick="window.addNewData('${mod.id}', 'contact')" class="text-[10px] md:text-xs font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-4 py-3 rounded-xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-1">+ Yeni Kişi Ekle</button>`;
             html += '</div>';
             return html;
         }
 
         window.renderInterviews = function(mod, isEdit) {
-            let html = '<div class="flex flex-col gap-3 md:gap-4 mt-4 md:mt-6 w-full pb-4">';
+            let html = '<div class="flex flex-col gap-2 md:gap-3 mt-3 w-full pb-4">';
             
             let boolKeys = Object.keys(mod.columns).filter(k => k.startsWith('bool'));
 
             if (mod.data && mod.data.length > 0 && boolKeys.length > 0) {
-                let statsHtml = '<div class="flex flex-wrap items-center justify-start md:justify-end gap-2 md:gap-4 mb-2 bg-indigo-50/50 dark:bg-indigo-900/20 px-4 py-2 rounded-xl border border-indigo-100/50 shadow-sm w-fit ml-auto">';
+                let statsHtml = '<div class="flex flex-wrap items-center justify-start md:justify-end gap-2 mb-2 bg-indigo-50/50 dark:bg-indigo-900/20 px-3 py-1.5 rounded-xl border border-indigo-100/50 shadow-sm w-fit ml-auto">';
                 boolKeys.forEach(key => {
                     let total = mod.data.length;
                     let checked = mod.data.filter(d => d[key]).length;
                     let perc = total > 0 ? Math.round((checked / total) * 100) : 0;
-                    statsHtml += `<div class="flex items-center gap-1.5 text-[10px] md:text-xs font-black text-indigo-700 dark:text-indigo-300 opacity-90 uppercase">
+                    statsHtml += `<div class="flex items-center gap-1 text-[9px] md:text-[10px] font-black text-indigo-700 dark:text-indigo-300 opacity-90 uppercase">
                                     <span>${mod.columns[key]}:</span>
                                     <span class="bg-indigo-600 text-white px-1.5 py-0.5 rounded shadow-sm">%${perc}</span>
                                   </div>`;
@@ -2047,62 +2050,62 @@
             }
 
             if(isEdit) {
-                html += `<div class="bg-indigo-50 dark:bg-slate-800 p-4 rounded-2xl mb-4 border border-indigo-200 flex flex-wrap gap-4 items-center">
-                            <span class="text-xs font-black text-indigo-600 w-full md:w-auto">Sütun İsimlerini Düzenle:</span>`;
+                html += `<div class="bg-indigo-50 dark:bg-slate-800 p-3 rounded-xl mb-3 border border-indigo-200 flex flex-wrap gap-2 items-center">
+                            <span class="text-[10px] md:text-xs font-black text-indigo-600 w-full md:w-auto">Sütun İsimlerini Düzenle:</span>`;
                 
                 Object.keys(mod.columns).forEach(key => {
                     if(key.startsWith('bool')) {
                         html += `<div class="flex items-center gap-1">
-                                    <input type="text" class="custom-input !py-1 text-xs w-24" value="${mod.columns[key]}" onchange="mod.columns['${key}']=this.value; window.saveDataToCloud()">
-                                    ${key !== 'bool1' && key !== 'bool2' && key !== 'bool3' ? `<button onclick="window.removeColumnFromInterview('${mod.id}', '${key}')" class="text-red-500 px-2 py-1 bg-red-100 rounded-lg hover:bg-red-200 font-bold">X</button>` : ''}
+                                    <input type="text" class="custom-input !py-1 text-[10px] w-20" value="${mod.columns[key]}" onchange="mod.columns['${key}']=this.value; window.saveDataToCloud()">
+                                    ${key !== 'bool1' && key !== 'bool2' && key !== 'bool3' ? `<button onclick="window.removeColumnFromInterview('${mod.id}', '${key}')" class="text-red-500 px-1.5 py-0.5 bg-red-100 rounded hover:bg-red-200 font-bold text-[9px]">X</button>` : ''}
                                  </div>`;
                     }
                 });
                 
-                html += `<button onclick="window.addColumnToInterview('${mod.id}')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700">+ Sütun Ekle</button>`;
-                html += `<button onclick="window.toggleInlineEdit('${mod.id}')" class="bg-emerald-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-600 shadow-sm ml-auto">Kapat</button>`;
+                html += `<button onclick="window.addColumnToInterview('${mod.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-[9px] font-bold hover:bg-indigo-700">+ Sütun Ekle</button>`;
+                html += `<button onclick="window.toggleInlineEdit('${mod.id}')" class="bg-emerald-500 text-white px-3 py-1 rounded text-[9px] font-bold hover:bg-emerald-600 shadow-sm ml-auto">Kapat</button>`;
                 html += `</div>`;
             }
 
             mod.data.forEach((d, i) => {
                 let isItemEdit = state.itemEdit && state.itemEdit[mod.id + '_' + i];
 
-                html += `<div class="bg-black/5 dark:bg-white/5 rounded-2xl p-3 md:p-5 flex flex-col xl:flex-row xl:items-center gap-3 md:gap-5 relative group transition ${isItemEdit ? 'border-indigo-300 bg-indigo-50/30' : 'border border-transparent hover:border-black/10'}">`;
+                html += `<div class="bg-black/5 dark:bg-white/5 rounded-xl p-2.5 md:p-3 flex flex-col xl:flex-row xl:items-center gap-2 md:gap-3 relative group transition ${isItemEdit ? 'border-indigo-300 bg-indigo-50/30' : 'border border-transparent hover:border-black/10'}">`;
                 
                 if(isItemEdit) {
-                    html += `<div class="flex w-full xl:w-1/3 gap-2">`;
-                    html += `<input type="text" class="inline-edit-input w-20 text-center" value="${d.code}" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'code', this.value)">`;
-                    html += `<input type="text" class="inline-edit-input flex-1" value="${d.name}" placeholder="İsim Girin" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'name', this.value)">`;
+                    html += `<div class="flex w-full xl:w-1/3 gap-1">`;
+                    html += `<input type="text" class="inline-edit-input w-16 text-center text-xs !py-1" value="${d.code}" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'code', this.value)">`;
+                    html += `<input type="text" class="inline-edit-input flex-1 text-xs !py-1" value="${d.name}" placeholder="İsim Girin" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'name', this.value)">`;
                     html += `</div>`;
                 } else {
-                    html += `<div class="flex w-full xl:w-1/3 gap-2">`;
-                    html += `<div class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md p-2 md:p-3 rounded-lg md:rounded-xl font-black text-xs md:text-sm w-16 md:w-20 text-center">${d.code}</div>`;
-                    html += `<div class="bg-white/60 dark:bg-black/30 p-2 md:p-3 rounded-lg md:rounded-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300 text-sm md:text-base flex-1 truncate">${d.name}</div>`;
+                    html += `<div class="flex w-full xl:w-1/3 gap-2 items-center">`;
+                    html += `<div class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-sm px-2 py-1.5 rounded-lg font-black text-[10px] w-14 text-center">${d.code}</div>`;
+                    html += `<div class="bg-white/60 dark:bg-black/30 px-2 py-1.5 rounded-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300 text-[11px] md:text-xs flex-1 truncate">${d.name}</div>`;
                     html += `</div>`;
                 }
                 
-                html += `<div class="flex flex-wrap sm:flex-nowrap items-center justify-between w-full xl:w-auto gap-2 md:gap-4 flex-1 bg-white/40 dark:bg-black/20 p-2 md:p-3 rounded-xl border border-white/20">`;
+                html += `<div class="flex flex-wrap sm:flex-nowrap items-center justify-between w-full xl:w-auto gap-2 flex-1 bg-white/40 dark:bg-black/20 px-2 py-1.5 rounded-lg border border-white/20">`;
                 
                 boolKeys.forEach(key => {
-                    html += `<label class="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold cursor-pointer hover:opacity-80 transition">
-                                <input type="checkbox" class="w-4 h-4 md:w-5 md:h-5 accent-indigo-600" ${d[key] ? 'checked' : ''} onchange="window.inlineUpdateData('${mod.id}', ${i}, '${key}', this.checked); window.renderDashboard();"> ${mod.columns[key]}
+                    html += `<label class="flex items-center gap-1 md:gap-1.5 text-[9px] md:text-[10px] font-bold cursor-pointer hover:opacity-80 transition">
+                                <input type="checkbox" class="w-3.5 h-3.5 accent-indigo-600" ${d[key] ? 'checked' : ''} onchange="window.inlineUpdateData('${mod.id}', ${i}, '${key}', this.checked); window.renderDashboard();"> ${mod.columns[key]}
                              </label>`;
                 });
                 
                 html += `</div>`;
                 
-                html += `<div class="flex items-center justify-end gap-2 mt-2 xl:mt-0 ${isItemEdit ? 'opacity-100' : 'opacity-100 md:opacity-0 group-hover:opacity-100'} transition w-full xl:w-auto">`;
+                html += `<div class="flex items-center justify-end gap-1.5 mt-1 xl:mt-0 ${isItemEdit ? 'opacity-100' : 'opacity-100 md:opacity-0 group-hover:opacity-100'} transition w-full xl:w-auto">`;
                 if(isItemEdit) {
-                    html += `<button onclick="window.deleteModuleItem('${mod.id}', ${i}, 'interview')" class="text-red-500 font-bold text-[10px] md:text-xs bg-red-100/80 px-4 py-2.5 rounded-xl hover:bg-red-200 transition shadow-sm w-full xl:w-auto">SİL</button>`;
-                    html += `<button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-white bg-emerald-500 px-4 py-2.5 rounded-xl text-[10px] md:text-xs font-bold hover:bg-emerald-600 shadow-md w-full xl:w-auto">TAMAM</button>`;
+                    html += `<button onclick="window.deleteModuleItem('${mod.id}', ${i}, 'interview')" class="text-red-500 font-bold text-[9px] bg-red-100/80 px-2 py-1.5 rounded-lg hover:bg-red-200 transition shadow-sm w-full xl:w-auto">SİL</button>`;
+                    html += `<button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-white bg-emerald-500 px-2 py-1.5 rounded-lg text-[9px] font-bold hover:bg-emerald-600 shadow-md w-full xl:w-auto">TAMAM</button>`;
                 } else {
-                    html += `<button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-indigo-600 bg-indigo-100 px-4 py-2 rounded-xl text-[10px] md:text-xs font-black shadow hover:bg-indigo-200">DÜZENLE</button>`;
+                    html += `<button onclick="window.toggleItemEdit('${mod.id}', ${i})" class="text-indigo-600 bg-indigo-100 px-2 py-1.5 rounded-lg text-[9px] font-black shadow hover:bg-indigo-200">DÜZENLE</button>`;
                 }
                 html += `</div>`;
 
                 html += `</div>`;
             });
-            html += `<button onclick="window.addNewData('${mod.id}', 'interview')" class="text-xs md:text-sm font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-6 py-4 md:py-5 rounded-2xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-2">+ Yeni Görüşme Ekle</button>`;
+            html += `<button onclick="window.addNewData('${mod.id}', 'interview')" class="text-[10px] md:text-xs font-bold text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/40 px-4 py-2.5 rounded-xl hover:bg-indigo-100 transition shadow-sm text-center border-2 border-indigo-200/50 border-dashed w-full mt-1">+ Yeni Görüşme Ekle</button>`;
             html += '</div>';
             return html;
         }
@@ -2145,39 +2148,39 @@
         window.renderJournal = function(mod, isEdit) {
             let listHtml = '';
             if(!mod.data || mod.data.length === 0) {
-                listHtml = '<p class="opacity-50 text-center py-10 text-sm md:text-lg font-bold">Henüz kayıt yok.</p>';
+                listHtml = '<p class="opacity-50 text-center py-6 text-xs md:text-sm font-bold">Henüz kayıt yok.</p>';
             } else {
                 mod.data.forEach((d, i) => {
-                    listHtml += '<div class="glass-card p-4 md:p-8 rounded-2xl md:rounded-3xl border border-black/5 relative ml-4 md:ml-8 mb-4 md:mb-6 group hover:border-indigo-300 transition bg-white/50 dark:bg-black/20">';
-                    listHtml += '<div class="absolute -left-[1.15rem] md:-left-10 top-5 md:top-6 w-4 h-4 md:w-5 md:h-5 rounded-full bg-indigo-500 border-4 border-white dark:border-slate-800 shadow-md"></div>';
-                    listHtml += '<div class="flex justify-between items-start mb-2 md:mb-4">';
+                    listHtml += '<div class="glass-card p-3 md:p-5 rounded-2xl border border-black/5 relative ml-4 md:ml-6 mb-3 md:mb-4 group hover:border-indigo-300 transition bg-white/50 dark:bg-black/20">';
+                    listHtml += '<div class="absolute -left-[1.15rem] md:-left-[1.65rem] top-4 w-3.5 h-3.5 rounded-full bg-indigo-500 border-2 border-white dark:border-slate-800 shadow-sm"></div>';
+                    listHtml += '<div class="flex justify-between items-start mb-2">';
                     
                     if(isEdit) {
-                        listHtml += `<input type="text" class="inline-edit-input text-[10px] md:text-xs text-indigo-500 w-1/2" value="${d.date}" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'date', this.value)">`;
+                        listHtml += `<input type="text" class="inline-edit-input text-[9px] md:text-[10px] text-indigo-500 w-1/2 !py-1" value="${d.date}" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'date', this.value)">`;
                     } else {
-                        listHtml += `<div class="text-[10px] md:text-xs font-black text-indigo-500 uppercase tracking-widest">${d.date}</div>`;
+                        listHtml += `<div class="text-[9px] md:text-[10px] font-black text-indigo-500 uppercase tracking-widest">${d.date}</div>`;
                     }
                     
-                    listHtml += `<div class="transition flex gap-2 ${isEdit ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}">`;
-                    listHtml += `<button onclick="window.editJournalEntry('${mod.id}', ${i})" class="text-[9px] md:text-[10px] font-bold text-indigo-600 bg-indigo-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-indigo-200">DÜZENLE</button>`;
-                    listHtml += `<button onclick="window.deleteJournalEntry('${mod.id}', ${i})" class="text-[9px] md:text-[10px] font-bold text-red-600 bg-red-100 px-2 py-1 md:px-3 md:py-1.5 rounded-lg hover:bg-red-200">SİL</button>`;
+                    listHtml += `<div class="transition flex gap-1.5 ${isEdit ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}">`;
+                    listHtml += `<button onclick="window.editJournalEntry('${mod.id}', ${i})" class="text-[8px] md:text-[9px] font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded hover:bg-indigo-200">DÜZENLE</button>`;
+                    listHtml += `<button onclick="window.deleteJournalEntry('${mod.id}', ${i})" class="text-[8px] md:text-[9px] font-bold text-red-600 bg-red-100 px-2 py-1 rounded hover:bg-red-200">SİL</button>`;
                     listHtml += '</div></div>';
                     
                     if(isEdit) {
-                        listHtml += `<textarea class="inline-edit-input text-sm md:text-lg w-full h-24" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'text', this.value)">${d.text}</textarea>`;
+                        listHtml += `<textarea class="inline-edit-input text-xs md:text-sm w-full h-16 !p-2" onchange="window.inlineUpdateData('${mod.id}', ${i}, 'text', this.value)">${d.text}</textarea>`;
                     } else {
-                        listHtml += `<p class="text-sm md:text-lg font-medium opacity-90 leading-relaxed">${d.text}</p>`;
+                        listHtml += `<p class="text-xs md:text-sm font-medium opacity-90 leading-relaxed">${d.text}</p>`;
                     }
                     listHtml += '</div>';
                 });
             }
 
-            let html = '<div class="flex flex-col h-full mt-4 md:mt-6 w-full">';
-            html += '<div class="flex flex-col md:flex-row gap-3 md:gap-4 mb-6 md:mb-10 border-b border-black/10 pb-4 md:pb-8 shrink-0">';
-            html += `<input type="text" id="journal-input-${mod.id}" class="custom-input flex-1 !py-3 md:!py-4 text-sm md:!text-lg !px-4 md:!px-6 rounded-xl md:rounded-2xl shadow-inner" placeholder="${mod.columns?.placeholder || 'Bugün neler yaptın?'}" onkeydown="if(event.key==='Enter') window.addJournalEntry('${mod.id}')">`;
-            html += `<button onclick="window.addJournalEntry('${mod.id}')" class="btn-primary !w-full md:!w-auto !py-3 md:!py-4 md:!px-10 text-sm md:text-lg shadow-xl rounded-xl md:rounded-2xl hover:-translate-y-1 transform transition">${mod.columns?.btnText || 'Kaydet'}</button>`;
+            let html = '<div class="flex flex-col h-full mt-3 w-full">';
+            html += '<div class="flex flex-col md:flex-row gap-2 md:gap-3 mb-4 md:mb-6 border-b border-black/10 pb-3 md:pb-4 shrink-0">';
+            html += `<input type="text" id="journal-input-${mod.id}" class="custom-input flex-1 !py-2 !px-4 text-xs md:text-sm shadow-inner" placeholder="${mod.columns?.placeholder || 'Bugün neler yaptın?'}" onkeydown="if(event.key==='Enter') window.addJournalEntry('${mod.id}')">`;
+            html += `<button onclick="window.addJournalEntry('${mod.id}')" class="btn-primary !w-full md:!w-auto !py-2 !px-6 text-xs md:text-sm shadow-md hover:-translate-y-0.5 transform transition">${mod.columns?.btnText || 'Kaydet'}</button>`;
             html += '</div>';
-            html += '<div class="flex-1 w-full pl-3 md:pl-4 border-l-2 border-black/10">' + listHtml + '</div>';
+            html += '<div class="flex-1 w-full pl-2.5 md:pl-4 border-l-2 border-black/10">' + listHtml + '</div>';
             html += '</div>';
             return html;
         }
