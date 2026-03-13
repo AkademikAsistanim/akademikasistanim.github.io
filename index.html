@@ -217,19 +217,6 @@
         .glow-animate { animation: textGlow 2s infinite alternate; }
         @keyframes textGlow { from { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; opacity: 0.8;} to { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor; opacity: 1;} }
 
-        /* ALEV EFEKTLİ YAZI SİTİLİ */
-        .flame-text {
-            background: linear-gradient(0deg, #ff0000 0%, #ff5e00 40%, #ffb300 80%, #ffffff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: flicker 1.5s infinite alternate;
-            text-shadow: 0 0 10px rgba(255, 69, 0, 0.3), 0 0 20px rgba(255, 0, 0, 0.1);
-        }
-        @keyframes flicker {
-            0% { filter: drop-shadow(0 0 3px rgba(255, 69, 0, 0.4)); transform: scale(1); }
-            100% { filter: drop-shadow(0 0 8px rgba(255, 69, 0, 0.6)); transform: scale(1.01); }
-        }
-
         /* STATUS BADGES */
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
         .badge-done { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; } 
@@ -250,7 +237,7 @@
         #loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999999; display: none; align-items: center; justify-content: center; flex-direction: column; color: white; }
         .spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 4px solid #fff; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 1rem; }
 
-        /* --- OK (BUTON) YÖNLENDİRMELİ EKRANLAR (SIKILAŞTIRILMIŞ) --- */
+        /* --- OK (BUTON) YÖNLENDİRMELİ EKRANLAR (SIKILAŞTIRILMIŞ & ANIMASYONSUZ) --- */
         .dashboard-container { width: 100%; }
         
         .dashboard-slide {
@@ -259,15 +246,13 @@
             height: 100vh;
             padding: 1rem 1rem 4rem 1rem;
             box-sizing: border-box;
-            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            /* YANIP SÖNME PROBLEMİNİ ÇÖZMEK İÇİN ANIMASYON KALDIRILDI */
             overflow-y: auto; 
         }
         
         @media (min-width: 768px) { .dashboard-slide { padding: 1rem 2rem 4rem 2rem; } }
 
         .dashboard-slide.active { display: block; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .module-full-content { width: 100%; max-width: 1200px; margin: 1vh auto 4rem auto; display: flex; flex-direction: column; min-height: 80vh; }
 
@@ -356,7 +341,7 @@
                 
                 <div class="p-8 pt-4 text-center">
                     <!-- LOGO -->
-                    <img src="logo.png" alt="Kişisel Asistanım Logo" class="w-32 h-32 mx-auto rounded-[2rem] shadow-[0_0_30px_rgba(0,242,254,0.4)] mb-6 border-2 border-white/20 object-cover hover:scale-105 transition-transform duration-300 relative z-20">
+                    <img src="https://akademikasistanim.github.io/logo.png" alt="Kişisel Asistanım Logo" class="w-32 h-32 mx-auto rounded-[2rem] shadow-[0_0_30px_rgba(0,242,254,0.4)] mb-6 border-2 border-white/20 object-cover hover:scale-105 transition-transform duration-300 relative z-20">
                     
                     <h1 class="text-4xl font-black mb-2 text-white tracking-tighter drop-shadow-md">Kişisel<span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">Asistanım</span></h1>
                     <p class="text-sm opacity-70 mb-8 font-medium text-slate-300">Kişisel planlama ve verimlilik platformu.</p>
@@ -1267,8 +1252,16 @@
             setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
         }
 
-        // --- DASHBOARD OLUŞTURMA ---
+        // --- DASHBOARD OLUŞTURMA (DEBOUNCE EKLENDİ) ---
+        let renderDebounceTimer = null;
         window.renderDashboard = function() {
+            if (renderDebounceTimer) clearTimeout(renderDebounceTimer);
+            renderDebounceTimer = setTimeout(() => {
+                window._coreRenderDashboard();
+            }, 60);
+        };
+
+        window._coreRenderDashboard = function() {
             const container = document.getElementById('dashboard-container');
             const indicators = document.getElementById('slide-indicators');
             if(!container || !indicators) return;
@@ -1336,10 +1329,10 @@
                 if (activeQuotesList.length > 0) {
                     let randomQuote = activeQuotesList[Math.floor(Math.random() * activeQuotesList.length)];
                     quotesHtml += `<div class="quote-card flex-1 flex items-center justify-center py-2 px-1">
-                        <p class="text-lg md:text-3xl lg:text-4xl font-black italic text-center relative px-6 leading-tight flame-text">
-                            <span class="text-4xl md:text-6xl absolute -top-4 md:-top-6 left-0 opacity-40 text-amber-600">"</span>
+                        <p class="text-base md:text-xl lg:text-2xl font-medium italic text-center relative px-8 leading-relaxed text-slate-700 dark:text-slate-200" style="font-family: 'Georgia', serif;">
+                            <span class="text-3xl md:text-5xl absolute -top-3 md:-top-4 left-0 opacity-20 text-indigo-400">"</span>
                             ${randomQuote}
-                            <span class="text-4xl md:text-6xl absolute -bottom-6 md:-bottom-8 right-0 opacity-40 text-amber-600">"</span>
+                            <span class="text-3xl md:text-5xl absolute -bottom-4 md:-bottom-6 right-0 opacity-20 text-indigo-400">"</span>
                         </p>
                     </div>`;
                 } else {
@@ -2082,14 +2075,20 @@
             let boolKeys = Object.keys(mod.columns).filter(k => k.startsWith('bool'));
 
             if (mod.data && mod.data.length > 0 && boolKeys.length > 0) {
-                let statsHtml = '<div class="flex flex-wrap items-center justify-start md:justify-end gap-2 mb-2 bg-indigo-50/50 dark:bg-indigo-900/20 px-3 py-1.5 rounded-xl border border-indigo-100/50 shadow-sm w-fit ml-auto">';
+                let statsHtml = '<div class="flex flex-wrap items-center justify-start md:justify-end gap-2 mb-3 px-1 w-full ml-auto">';
                 boolKeys.forEach(key => {
                     let total = mod.data.length;
                     let checked = mod.data.filter(d => d[key]).length;
                     let perc = total > 0 ? Math.round((checked / total) * 100) : 0;
-                    statsHtml += `<div class="flex items-center gap-1 text-[9px] md:text-[10px] font-black text-indigo-700 dark:text-indigo-300 opacity-90 uppercase">
-                                    <span>${mod.columns[key]}:</span>
-                                    <span class="bg-indigo-600 text-white px-1.5 py-0.5 rounded shadow-sm">%${perc}</span>
+                    statsHtml += `<div class="flex items-center gap-2 bg-white/80 dark:bg-slate-800/80 p-1.5 pr-3 rounded-full shadow-sm border border-indigo-100 dark:border-indigo-500/30">
+                                    <div class="relative w-8 h-8 flex items-center justify-center">
+                                        <svg viewBox="0 0 36 36" class="w-full h-full transform -rotate-90">
+                                            <path class="text-slate-200 dark:text-slate-700" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                            <path class="text-indigo-500 transition-all duration-1000 drop-shadow-[0_0_2px_rgba(99,102,241,0.5)]" stroke-dasharray="${perc}, 100" stroke-width="3" stroke="currentColor" fill="none" stroke-linecap="round" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        </svg>
+                                        <span class="absolute text-[8px] font-black text-slate-700 dark:text-slate-200">${perc}%</span>
+                                    </div>
+                                    <span class="text-[9px] md:text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">${mod.columns[key]}</span>
                                   </div>`;
                 });
                 statsHtml += '</div>';
@@ -2103,14 +2102,17 @@
                 Object.keys(mod.columns).forEach(key => {
                     if(key.startsWith('bool')) {
                         html += `<div class="flex items-center gap-1">
-                                    <input type="text" class="custom-input !py-1 text-[10px] w-20" value="${mod.columns[key]}" onchange="mod.columns['${key}']=this.value; window.saveDataToCloud()">
-                                    ${key !== 'bool1' && key !== 'bool2' && key !== 'bool3' ? `<button onclick="window.removeColumnFromInterview('${mod.id}', '${key}')" class="text-red-500 px-1.5 py-0.5 bg-red-100 rounded hover:bg-red-200 font-bold text-[9px]">X</button>` : ''}
+                                    <input type="text" class="custom-input !py-1 text-[10px] w-20" value="${mod.columns[key]}" onchange="mod.columns['${key}']=this.value;">
+                                    <button onclick="window.removeColumnFromInterview('${mod.id}', '${key}')" class="text-red-500 px-1.5 py-0.5 bg-red-100 rounded hover:bg-red-200 font-bold text-[9px]" title="Sütunu Sil">X</button>
                                  </div>`;
                     }
                 });
                 
                 html += `<button onclick="window.addColumnToInterview('${mod.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-[9px] font-bold hover:bg-indigo-700">+ Sütun Ekle</button>`;
-                html += `<button onclick="window.toggleInlineEdit('${mod.id}')" class="bg-emerald-500 text-white px-3 py-1 rounded text-[9px] font-bold hover:bg-emerald-600 shadow-sm ml-auto">Kapat</button>`;
+                html += `<div class="ml-auto flex gap-2">
+                            <button onclick="window.saveDataToCloud(); window.renderDashboard();" class="bg-blue-500 text-white px-3 py-1 rounded text-[9px] font-bold hover:bg-blue-600 shadow-sm">Kaydet</button>
+                            <button onclick="window.toggleInlineEdit('${mod.id}')" class="bg-slate-400 text-white px-3 py-1 rounded text-[9px] font-bold hover:bg-slate-500 shadow-sm">Kapat</button>
+                         </div>`;
                 html += `</div>`;
             }
 
