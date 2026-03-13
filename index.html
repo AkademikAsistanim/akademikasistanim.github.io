@@ -845,7 +845,15 @@
             const mod = state.activeModules.find(m => m.id === modId);
             if(mod && mod.data[index]) {
                 mod.data[index][field] = value;
-                // Değişiklik sütun isimlerini değiştirirken state modülünde direkt yapıldığı için onchange buluta atılır
+                window.saveDataToCloud();
+            }
+        }
+
+        // YENİ EKLENEN FONKSİYON: Sütun İsimlerini Global Olarak Kaydetmek İçin
+        window.updateColumnName = function(modId, colKey, value) {
+            const mod = state.activeModules.find(m => m.id === modId);
+            if(mod && mod.columns) {
+                mod.columns[colKey] = value;
             }
         }
 
@@ -2099,7 +2107,7 @@
                 Object.keys(mod.columns).forEach(key => {
                     if(key.startsWith('bool')) {
                         html += `<div class="flex items-center gap-1">
-                                    <input type="text" class="custom-input !py-1 text-[10px] w-20" value="${mod.columns[key]}" onchange="mod.columns['${key}']=this.value;">
+                                    <input type="text" class="custom-input !py-1 text-[10px] w-20" value="${mod.columns[key]}" onchange="window.updateColumnName('${mod.id}', '${key}', this.value)">
                                     <button onclick="window.removeColumnFromInterview('${mod.id}', '${key}')" class="text-red-500 px-1.5 py-0.5 bg-red-100 rounded hover:bg-red-200 font-bold text-[9px]" title="Sütunu Sil">X</button>
                                  </div>`;
                     }
