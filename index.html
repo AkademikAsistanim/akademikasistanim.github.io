@@ -845,10 +845,7 @@
             const mod = state.activeModules.find(m => m.id === modId);
             if(mod && mod.data[index]) {
                 mod.data[index][field] = value;
-                window.saveDataToCloud();
-                if (mod.type === 'tasks' && field === 'progress') {
-                    window.renderDashboard();
-                }
+                // Değişiklik sütun isimlerini değiştirirken state modülünde direkt yapıldığı için onchange buluta atılır
             }
         }
 
